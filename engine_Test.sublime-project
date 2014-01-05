@@ -1,0 +1,22 @@
+{
+    "folders":
+    [
+        {
+            "path": "../../projects/engine_Test"
+        }
+    ],
+    
+    "build_systems":
+    [
+        {
+            "name": "CMakeC++",
+			"path": "${project}",
+            "cmd": ["../../dev_tools/cmake/bin/cmake", "--trace", "../../projects/engine_Test"]
+        },
+        {
+            "name": "PremakeC++",
+			"path": "${project}",
+            "cmd": ["../premake/premake", "--scripts", "../../projects/engine_Test", "vs2013" ]
+        }
+    ]
+}
