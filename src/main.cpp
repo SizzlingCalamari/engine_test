@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
 
-	GLuint ProgramID = LoadShaders("../src/shaders/simplasfevertex.vs", "../src/shaders/simplasfdefragment.fs");
+	GLuint ProgramID = LoadShaders("../src/shaders/simplevertex.vs", "../src/shaders/simplefragment.fs");
 
 	static const GLfloat vertex_data[] = 
 	{
