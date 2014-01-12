@@ -30,7 +30,7 @@ bool World::Initialize()
 	PhysicsComponentInfo info;
 	info.shape = new btBoxShape(btVector3(btScalar(110.), btScalar(1.), btScalar(110.)));
 
-	uint32_t ent = m_EntSys->CreateEntity({ m_Physics.second, m_Graphics.second });
+	uint32_t ent = m_EntSys->CreateEntity({ m_Physics.second/*, m_Graphics.second*/ });
 	auto pc = m_Physics.first->GetComponent(ent);
 	pc.SetInfo(info);
 

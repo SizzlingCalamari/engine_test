@@ -10,16 +10,10 @@ solution "engine_test"
         location "build"
         files { "**.h", "**.cpp" }
         includedirs {
-            "../bullet-2.82-r2704/src",
-            "external/SDL/include"
+            "../bullet-2.82-r2704/src"
         }
         libdirs {
-            "../bullet-2.82-r2704/lib",
-            "lib"
-        }
-        links {
-            "SDL2",
-            "SDL2main"
+            "../bullet-2.82-r2704/lib"
         }
 
     configuration "Debug"

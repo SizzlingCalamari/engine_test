@@ -3,11 +3,9 @@
 #include <iostream>
 
 #include "World.h"
-#include "SDL.h"
 
 int main(int argc, char *argv[])
 {
-	SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO | SDL_INIT_EVENTS);
     std::cout << "Hello World!" << std::endl;
 
     World w;
@@ -21,5 +19,4 @@ int main(int argc, char *argv[])
 		w.Update(SERVER_FRAME_DT);
 	}
     w.Shutdown();
-	SDL_Quit();
 }
