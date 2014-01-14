@@ -53,8 +53,8 @@ uint64_t CurTimeMicro()
 	return micro.time_since_epoch().count();
 }
 
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
+//#define WIN32_LEAN_AND_MEAN
+//#include <Windows.h>
 
 void World::Update(uint32_t dt)
 {
@@ -82,6 +82,6 @@ void World::Update(uint32_t dt)
 	}
 	else if ((dt-acc) > 1000)
 	{
-		Sleep((dt-acc)/2000);
+		//Sleep((dt-acc)/2000);
 	}
 }

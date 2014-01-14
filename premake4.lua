@@ -1,12 +1,17 @@
+
 -- A solution contains projects, and defines the available configurations
 solution "engine_test"
     location "build"
     configurations { "Debug", "Release" }
-    flags { "StaticRuntime" }
+    flags { "StaticRuntime", "NoExceptions" }
     defines {
         "_CRT_SECURE_NO_WARNINGS",
-        "_CRT_NONSTDC_NO_WARNINGS"
+        "_CRT_NONSTDC_NO_WARNINGS",
+        "_HAS_EXCEPTIONS=0"
     }
+
+    configuration { "vs*" }
+        buildoptions { "/MP"  }
     
     configuration "Debug"
         targetdir "build/Debug"
@@ -17,6 +22,22 @@ solution "engine_test"
         targetdir "build/Release"
         defines { "NDEBUG" }
         flags { "Symbols", "Optimize" }
+
+    -- Xrandr dependency
+    configuration "linux"
+        if (os.findlib("libXrandr") == nil) then
+            os.execute("sudo apt-get install libxrandr-dev")
+        end
+        -- hack to force compiler
+        premake.gcc.cc  = 'gcc-4.8'
+        premake.gcc.cxx = 'g++-4.8'
+        buildoptions { "-std=c++11" }
+
+    language "C++"
+    include "../bullet-2.82-r2704/src/BulletSoftBody"
+    include "../bullet-2.82-r2704/src/BulletDynamics"
+    include "../bullet-2.82-r2704/src/BulletCollision"
+    include "../bullet-2.82-r2704/src/LinearMath"
     
     -- A project defines one build target
     project "engine_test"
@@ -24,30 +45,17 @@ solution "engine_test"
         language "C++"
         defines "GLEW_STATIC"
         files { "**.h", "**.cpp", "**.vs", "**.fs" }
-        links { "glew", "glfw", "opengl32" }
         includedirs {
             "../bullet-2.82-r2704/src",
             "../glfw-3.0.4/include",
             "../glew-1.10.0/include"
         }
-        libdirs {
-            "../bullet-2.82-r2704/lib",
-            "lib"
-        }
-        configuration "Debug"
-            links {
-                "BulletCollision_vs2013_debug",
-                "BulletDynamics_vs2013_debug",
-                "LinearMath_vs2013_debug",
-            }
+        links { "GL", "glew", "glfw", "BulletSoftBody", "BulletDynamics", "BulletCollision", "LinearMath" }
+        configuration "linux"
+            links { "rt", "m", "pthread", "X11", "Xrandr", "Xi", "Xxf86vm" }
+        configuration "windows"
+            links "opengl32"
 
-        configuration "Release"
-            links {
-                "BulletCollision_vs2013",
-                "BulletDynamics_vs2013",
-                "LinearMath_vs2013"
-            }
-    
     project "glew"
         kind "StaticLib"
         language "C"
