@@ -1,5 +1,5 @@
 
-premake4 clean
-premake4 vs2013
+premake5 clean
+premake5 vs2013
 
 pause

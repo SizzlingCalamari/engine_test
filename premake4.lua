@@ -1,7 +1,13 @@
 
+-- Xrandr dependency
+if (os.get == "linux" and os.findlib("libXrandr") == nil) then
+    os.execute("sudo apt-get install libxrandr-dev")
+end
+
 -- A solution contains projects, and defines the available configurations
 solution "engine_test"
     location "build"
+    startproject "engine_test"
     configurations { "Debug", "Release" }
     flags { "StaticRuntime", "NoExceptions" }
     defines {
@@ -10,7 +16,7 @@ solution "engine_test"
         "_HAS_EXCEPTIONS=0"
     }
 
-    configuration { "vs*" }
+    configuration { "vs*", "Release" }
         buildoptions { "/MP"  }
     
     configuration "Debug"
@@ -21,16 +27,11 @@ solution "engine_test"
     configuration "Release"
         targetdir "build/Release"
         defines { "NDEBUG" }
-        flags { "Symbols", "Optimize" }
+        optimize "On"
+        flags { "Symbols" }
 
-    -- Xrandr dependency
     configuration "linux"
-        if (os.findlib("libXrandr") == nil) then
-            os.execute("sudo apt-get install libxrandr-dev")
-        end
-        -- hack to force compiler
-        premake.gcc.cc  = 'gcc-4.8'
-        premake.gcc.cxx = 'g++-4.8'
+        toolset "clang"
         buildoptions { "-std=c++11" }
 
     language "C++"
@@ -48,13 +49,14 @@ solution "engine_test"
         includedirs {
             "../bullet-2.82-r2704/src",
             "../glfw-3.0.4/include",
-            "../glew-1.10.0/include"
+            "../glew-1.10.0/include",
+            "../glm/glm"
         }
-        links { "GL", "glew", "glfw", "BulletSoftBody", "BulletDynamics", "BulletCollision", "LinearMath" }
         configuration "linux"
-            links { "rt", "m", "pthread", "X11", "Xrandr", "Xi", "Xxf86vm" }
+            links { "GL", "rt", "m", "pthread", "X11", "Xrandr", "Xi", "Xxf86vm" }
         configuration "windows"
             links "opengl32"
+        links { "glew", "glfw", "BulletSoftBody", "BulletDynamics", "BulletCollision", "LinearMath" }
 
     project "glew"
         kind "StaticLib"
