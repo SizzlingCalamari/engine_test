@@ -8,6 +8,7 @@ end
 solution "engine_test"
     location "build"
     startproject "engine_test"
+    language "C++"
     configurations { "Debug", "Release" }
     flags { "StaticRuntime", "NoExceptions" }
     defines {
@@ -32,9 +33,7 @@ solution "engine_test"
 
     configuration "linux"
         toolset "clang"
-        buildoptions { "-std=c++11" }
 
-    language "C++"
     include "../bullet-2.82-r2704/src/BulletSoftBody"
     include "../bullet-2.82-r2704/src/BulletDynamics"
     include "../bullet-2.82-r2704/src/BulletCollision"
@@ -43,6 +42,7 @@ solution "engine_test"
     -- A project defines one build target
     project "engine_test"
         kind "ConsoleApp"
+        targetdir "build"
         language "C++"
         defines "GLEW_STATIC"
         files { "**.h", "**.cpp", "**.vs", "**.fs" }
@@ -52,11 +52,12 @@ solution "engine_test"
             "../glew-1.10.0/include",
             "../glm/glm"
         }
+        links { "glew", "glfw", "BulletSoftBody", "BulletDynamics", "BulletCollision", "LinearMath" }
         configuration "linux"
             links { "GL", "rt", "m", "pthread", "X11", "Xrandr", "Xi", "Xxf86vm" }
+            buildoptions { "-std=c++11" }
         configuration "windows"
             links "opengl32"
-        links { "glew", "glfw", "BulletSoftBody", "BulletDynamics", "BulletCollision", "LinearMath" }
 
     project "glew"
         kind "StaticLib"
