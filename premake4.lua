@@ -11,14 +11,12 @@ solution "engine_test"
     language "C++"
     configurations { "Debug", "Release" }
     flags { "StaticRuntime", "NoExceptions", "Symbols" }
+    vectorextensions "SSE2"
     defines {
         "_CRT_SECURE_NO_WARNINGS",
         "_CRT_NONSTDC_NO_WARNINGS",
         "_HAS_EXCEPTIONS=0"
     }
-
-    configuration { "vs*", "Release" }
-        buildoptions { "/MP"  }
     
     configuration "Debug"
         targetdir "build/Debug"
@@ -28,14 +26,31 @@ solution "engine_test"
         targetdir "build/Release"
         defines { "NDEBUG" }
         optimize "On"
+        flags { "LinkTimeOptimization", "MultiProcessorCompile" }
 
     configuration "linux"
         toolset "clang"
 
     include "../bullet-2.82-r2704/src/BulletSoftBody"
+        configuration "Debug"
+            targetdir "build/Debug"
+        configuration "Release"
+            targetdir "build/Release"
     include "../bullet-2.82-r2704/src/BulletDynamics"
+        configuration "Debug"
+            targetdir "build/Debug"
+        configuration "Release"
+            targetdir "build/Release"
     include "../bullet-2.82-r2704/src/BulletCollision"
+        configuration "Debug"
+            targetdir "build/Debug"
+        configuration "Release"
+            targetdir "build/Release"
     include "../bullet-2.82-r2704/src/LinearMath"
+        configuration "Debug"
+            targetdir "build/Debug"
+        configuration "Release"
+            targetdir "build/Release"
     
     -- A project defines one build target
     project "engine_test"
@@ -115,7 +130,6 @@ solution "engine_test"
                 "../glfw-3.0.4/src/x11_*",
                 "../glfw-3.0.4/src/glx_*"
             }
-            buildoptions "-pthread"
             defines {
                 "_GLFW_X11",
                 "_GLFW_GLX",
