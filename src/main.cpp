@@ -107,12 +107,7 @@ int main(int argc, const char *argv[])
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
-	GLuint VertexArrayID;
-	glGenVertexArrays(1, &VertexArrayID);
-	glBindVertexArray(VertexArrayID);
-
 	GLuint ProgramID = LoadShaders("../src/shaders/simplevertex.vs", "../src/shaders/simplefragment.fs");
-
 	GLuint MatrixID = glGetUniformLocation(ProgramID, "MVP");
 	
 	glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
@@ -121,6 +116,22 @@ int main(int argc, const char *argv[])
 		* glm::rotate(30.0f, glm::vec3(0, 0, 1.0f))
 		* glm::scale(glm::vec3(1.0f));
 	glm::mat4 MVP = Projection * View * Model;
+
+	glm::mat4 MVPTRI = Projection * View * glm::mat4(1.0f);
+
+	static const GLfloat tri_data[] =
+	{
+		-1.0f, -1.0f, 0.0f,
+		1.0f, -1.0f, 0.0f,
+		0.0f,  1.0f, 0.0f
+	};
+
+	static const GLfloat tri_colour[] =
+	{
+		0.583f, 0.771f, 0.014f,
+		0.609f, 0.115f, 0.436f,
+		0.327f, 0.483f, 0.844f
+	};
 
 	static const GLfloat vertex_data[] = 
 	{
@@ -202,18 +213,36 @@ int main(int argc, const char *argv[])
 		0.982f, 0.099f, 0.879f
 	};
 
-	GLuint vertexbuffer;
-	glGenBuffers(1, &vertexbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data, GL_STATIC_DRAW);
+	GLuint VertexArrays[2];
+	glGenVertexArrays(sizeof(VertexArrays), VertexArrays);
 
-	GLuint colourbuffer;
-	glGenBuffers(1, &colourbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, colourbuffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(colour_data), colour_data, GL_STATIC_DRAW);
+	GLuint buffers[4];
+	glGenBuffers(sizeof(buffers), buffers);
 
-    World w;
-    w.Initialize();
+	glBindVertexArray(VertexArrays[0]);
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data, GL_STATIC_DRAW);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+		glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(colour_data), colour_data, GL_STATIC_DRAW);
+			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+	glBindVertexArray(0);
+
+	glBindVertexArray(VertexArrays[1]);
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, buffers[2]);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(tri_data), tri_data, GL_STATIC_DRAW);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+		glBindBuffer(GL_ARRAY_BUFFER, buffers[3]);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(tri_colour), tri_colour, GL_STATIC_DRAW);
+			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+	glBindVertexArray(0);
+
+	World w;
+	w.Initialize();
 
 	const uint32_t SERVER_FRAME_DT = 10000;
 
@@ -224,20 +253,15 @@ int main(int argc, const char *argv[])
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glUseProgram(ProgramID);
-			glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
-		
-			glEnableVertexAttribArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-
-			glEnableVertexAttribArray(1);
-				glBindBuffer(GL_ARRAY_BUFFER, colourbuffer);
-				glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-
-			glDrawArrays(GL_TRIANGLES, 0, sizeof(vertex_data) / 3 / sizeof(vertex_data[0]));
-
-			glDisableVertexAttribArray(1);
-			glDisableVertexAttribArray(0);
+			glBindVertexArray(VertexArrays[0]);
+				glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+				glDrawArrays(GL_TRIANGLES, 0, sizeof(vertex_data) / 3 / sizeof(vertex_data[0]));
+			glBindVertexArray(0);
+			glBindVertexArray(VertexArrays[1]);
+				glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVPTRI[0][0]);
+				glDrawArrays(GL_TRIANGLES, 0, sizeof(tri_data) / 3 / sizeof(tri_data[0]));
+			glBindVertexArray(0);
+		glUseProgram(0);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -247,8 +271,7 @@ int main(int argc, const char *argv[])
 	glfwDestroyWindow(window);
 	glfwTerminate();
 
-	glDeleteBuffers(1, &vertexbuffer);
-	glDeleteBuffers(1, &colourbuffer);
 	glDeleteProgram(ProgramID);
-	glDeleteVertexArrays(1, &VertexArrayID);
+	glDeleteBuffers(sizeof(buffers), buffers);
+	glDeleteVertexArrays(sizeof(VertexArrays), VertexArrays);
 }
