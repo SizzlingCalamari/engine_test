@@ -10,7 +10,7 @@ solution "engine_test"
     startproject "engine_test"
     language "C++"
     configurations { "Debug", "Release" }
-    flags { "StaticRuntime", "NoExceptions" }
+    flags { "StaticRuntime", "NoExceptions", "Symbols" }
     defines {
         "_CRT_SECURE_NO_WARNINGS",
         "_CRT_NONSTDC_NO_WARNINGS",
@@ -22,14 +22,12 @@ solution "engine_test"
     
     configuration "Debug"
         targetdir "build/Debug"
-        defines { "DEBUG" }
-        flags { "Symbols" }
+        defines { "DEBUG", "_DEBUG" }
     
     configuration "Release"
         targetdir "build/Release"
         defines { "NDEBUG" }
         optimize "On"
-        flags { "Symbols" }
 
     configuration "linux"
         toolset "clang"
@@ -50,7 +48,7 @@ solution "engine_test"
             "../bullet-2.82-r2704/src",
             "../glfw-3.0.4/include",
             "../glew-1.10.0/include",
-            "../glm/glm"
+            "../glm/"
         }
         links { "glew", "glfw", "BulletSoftBody", "BulletDynamics", "BulletCollision", "LinearMath" }
         configuration "linux"
