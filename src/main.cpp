@@ -13,6 +13,15 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
+void GLErrorCallback(
+	GLenum source, GLenum type,
+	GLuint id, GLenum severity,
+	GLsizei length, const char *msg,
+	void *userdata )
+{
+	std::cout << msg << std::endl;
+}
+
 off_t GetFileSize(int fd)
 {
 	struct stat buf;
@@ -87,6 +96,7 @@ int main(int argc, const char *argv[])
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
 
 	glfwWindowHint(GLFW_RED_BITS, 0);
 	glfwWindowHint(GLFW_GREEN_BITS, 0);
@@ -100,6 +110,13 @@ int main(int argc, const char *argv[])
 
 	glewExperimental = true;
 	glewInit();
+
+	if (GL_ARB_debug_output)
+	{
+		std::cout << "Debugging!" << std::endl;
+		glDebugMessageCallbackARB(&GLErrorCallback, nullptr);
+		glEnable(GL_DEBUG_OUTPUT);
+	}
 
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, 1);
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
@@ -226,7 +243,7 @@ int main(int argc, const char *argv[])
 			glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data, GL_STATIC_DRAW);
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 		glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(colour_data), colour_data, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(colour_data), colour_data, GL_STREAM_DRAW);
 			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	glBindVertexArray(0);
 
@@ -237,7 +254,7 @@ int main(int argc, const char *argv[])
 			glBufferData(GL_ARRAY_BUFFER, sizeof(tri_data), tri_data, GL_STATIC_DRAW);
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 		glBindBuffer(GL_ARRAY_BUFFER, buffers[3]);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(tri_colour), tri_colour, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(tri_colour), tri_colour, GL_STREAM_DRAW);
 			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 	glBindVertexArray(0);
 
@@ -255,10 +272,32 @@ int main(int argc, const char *argv[])
 		glUseProgram(ProgramID);
 			glBindVertexArray(VertexArrays[0]);
 				glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+				glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
+					glBufferData(GL_ARRAY_BUFFER, sizeof(colour_data), nullptr, GL_STREAM_DRAW);
+					{
+						GLfloat *c = (GLfloat*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
+						size_t count = sizeof(colour_data)/sizeof(colour_data[0]);
+						for (int i = 0; i < count; ++i)
+						{
+							c[i] = c[(i+1)%count];
+						}
+						glUnmapBuffer(GL_ARRAY_BUFFER);
+					}
 				glDrawArrays(GL_TRIANGLES, 0, sizeof(vertex_data) / 3 / sizeof(vertex_data[0]));
 			glBindVertexArray(0);
 			glBindVertexArray(VertexArrays[1]);
 				glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVPTRI[0][0]);
+				glBindBuffer(GL_ARRAY_BUFFER, buffers[3]);
+					glBufferData(GL_ARRAY_BUFFER, sizeof(tri_colour), nullptr, GL_STREAM_DRAW);
+					{
+						GLfloat *c = (GLfloat*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
+						size_t count = sizeof(tri_colour)/sizeof(tri_colour[0]);
+						for (int i = 0; i < count; ++i)
+						{
+							c[i] = c[(i+1)%count];
+						}
+						glUnmapBuffer(GL_ARRAY_BUFFER);
+					}
 				glDrawArrays(GL_TRIANGLES, 0, sizeof(tri_data) / 3 / sizeof(tri_data[0]));
 			glBindVertexArray(0);
 		glUseProgram(0);
