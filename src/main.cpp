@@ -214,10 +214,10 @@ int main(int argc, const char *argv[])
 	};
 
 	GLuint VertexArrays[2];
-	glGenVertexArrays(sizeof(VertexArrays), VertexArrays);
+	glGenVertexArrays(sizeof(VertexArrays) / sizeof(GLuint), VertexArrays);
 
 	GLuint buffers[4];
-	glGenBuffers(sizeof(buffers), buffers);
+	glGenBuffers(sizeof(buffers) / sizeof(GLuint), buffers);
 
 	glBindVertexArray(VertexArrays[0]);
 		glEnableVertexAttribArray(0);
@@ -268,10 +268,10 @@ int main(int argc, const char *argv[])
 	}
     w.Shutdown();
 
+	glDeleteProgram(ProgramID);
+	glDeleteBuffers(sizeof(buffers) / sizeof(GLuint), buffers);
+	glDeleteVertexArrays(sizeof(VertexArrays) / sizeof(GLuint), VertexArrays);
+
 	glfwDestroyWindow(window);
 	glfwTerminate();
-
-	glDeleteProgram(ProgramID);
-	glDeleteBuffers(sizeof(buffers), buffers);
-	glDeleteVertexArrays(sizeof(VertexArrays), VertexArrays);
 }
