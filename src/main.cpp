@@ -272,11 +272,11 @@ int main(int argc, const char *argv[])
 			glBindVertexArray(VertexArrays[0]);
 				glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 				glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
-					glBufferData(GL_ARRAY_BUFFER, sizeof(colour_data), nullptr, GL_STREAM_DRAW);
+					//glBufferData(GL_ARRAY_BUFFER, sizeof(colour_data), nullptr, GL_STREAM_DRAW);
 					{
 						GLfloat *c = (GLfloat*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 						size_t count = sizeof(colour_data)/sizeof(colour_data[0]);
-						for (int i = 0; i < count; ++i)
+						for (size_t i = 0; i < count; ++i)
 						{
 							c[i] = c[(i+1)%count];
 						}
@@ -287,11 +287,11 @@ int main(int argc, const char *argv[])
 			glBindVertexArray(VertexArrays[1]);
 				glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVPTRI[0][0]);
 				glBindBuffer(GL_ARRAY_BUFFER, buffers[3]);
-					glBufferData(GL_ARRAY_BUFFER, sizeof(tri_colour), nullptr, GL_STREAM_DRAW);
+					//glBufferData(GL_ARRAY_BUFFER, sizeof(tri_colour), nullptr, GL_STREAM_DRAW);
 					{
 						GLfloat *c = (GLfloat*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 						size_t count = sizeof(tri_colour)/sizeof(tri_colour[0]);
-						for (int i = 0; i < count; ++i)
+						for (size_t i = 0; i < count; ++i)
 						{
 							c[i] = c[(i+1)%count];
 						}
