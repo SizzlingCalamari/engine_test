@@ -9,7 +9,7 @@
 #include "SDL_opengl.h"
 #include "SDL.h"
 
-#include <sys/stat.h>
+#include "FileUtils.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -22,13 +22,6 @@ void APIENTRY GLErrorCallback(
 	void *userdata )
 {
 	std::cout << msg << std::endl;
-}
-
-off_t GetFileSize(int fd)
-{
-	struct stat buf;
-	int ret = fstat(fd, &buf);
-	return ret == 0 ? buf.st_size : -1;
 }
 
 GLuint LoadShaders(const char *vertex_file, const char *fragment_file)
@@ -46,8 +39,8 @@ GLuint LoadShaders(const char *vertex_file, const char *fragment_file)
 		return 0;
 	}
 
-	off_t vertex_size = GetFileSize(fileno(VertexShaderFile));
-	off_t fragment_size = GetFileSize(fileno(FragmentShaderFile));
+	off_t vertex_size = GetFileSize(VertexShaderFile);
+	off_t fragment_size = GetFileSize(FragmentShaderFile);
 
 	char *VertexShaderCode = (char*)malloc(vertex_size + 1);
 	char *FragmentShaderCode = (char*)malloc(fragment_size + 1);
