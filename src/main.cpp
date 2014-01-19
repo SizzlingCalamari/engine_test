@@ -5,7 +5,9 @@
 #include "World.h"
 
 #include "GL/glew.h"
-#include "GLFW/glfw3.h"
+
+#include "SDL_opengl.h"
+#include "SDL.h"
 
 #include <sys/stat.h>
 
@@ -13,7 +15,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
-void GLErrorCallback(
+void APIENTRY GLErrorCallback(
 	GLenum source, GLenum type,
 	GLuint id, GLenum severity,
 	GLsizei length, const char *msg,
@@ -88,25 +90,22 @@ GLuint LoadShaders(const char *vertex_file, const char *fragment_file)
 
 int main(int argc, const char *argv[])
 {
-    std::cout << "Hello World!" << std::endl;
+	std::cout << "Hello World!" << std::endl;
 
-	glfwInit();
+	SDL_SetMainReady();
+	SDL_Init(SDL_INIT_VIDEO);
 
-	glfwWindowHint(GLFW_SAMPLES, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-	glfwWindowHint(GLFW_RED_BITS, 0);
-	glfwWindowHint(GLFW_GREEN_BITS, 0);
-	glfwWindowHint(GLFW_BLUE_BITS, 0);
-	glfwWindowHint(GLFW_ALPHA_BITS, 0);
-	glfwWindowHint(GLFW_DEPTH_BITS, 32);
-	glfwWindowHint(GLFW_STENCIL_BITS, 0);
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
-	GLFWwindow* window = glfwCreateWindow(640, 480, "JORDAN", NULL, NULL);
-	glfwMakeContextCurrent(window);
+	SDL_Window* window = SDL_CreateWindow("JORDAN", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_OPENGL);
+	SDL_GLContext context = SDL_GL_CreateContext(window);
 
 	glewExperimental = true;
 	glewInit();
@@ -118,7 +117,6 @@ int main(int argc, const char *argv[])
 		glEnable(GL_DEBUG_OUTPUT);
 	}
 
-	glfwSetInputMode(window, GLFW_STICKY_KEYS, 1);
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
 	glEnable(GL_DEPTH_TEST);
@@ -263,8 +261,16 @@ int main(int argc, const char *argv[])
 
 	const uint32_t SERVER_FRAME_DT = 10000;
 
-	while (!glfwWindowShouldClose(window))
+	bool bQuit = false;
+	while (!bQuit)
 	{
+		SDL_PumpEvents();
+		SDL_Event event;
+		while (SDL_PollEvent(&event) == 1)
+		{
+			bQuit = (event.type == SDL_QUIT);
+		}
+
 		w.Update(SERVER_FRAME_DT);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -302,8 +308,7 @@ int main(int argc, const char *argv[])
 			glBindVertexArray(0);
 		glUseProgram(0);
 
-		glfwSwapBuffers(window);
-		glfwPollEvents();
+		SDL_GL_SwapWindow(window);
 	}
     w.Shutdown();
 
@@ -311,6 +316,7 @@ int main(int argc, const char *argv[])
 	glDeleteBuffers(sizeof(buffers) / sizeof(GLuint), buffers);
 	glDeleteVertexArrays(sizeof(VertexArrays) / sizeof(GLuint), VertexArrays);
 
-	glfwDestroyWindow(window);
-	glfwTerminate();
+	SDL_GL_DeleteContext(context);
+	SDL_DestroyWindow(window);
+	SDL_Quit();
 }
