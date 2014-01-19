@@ -41,6 +41,8 @@ solution "engine_test"
         flags { "LinkTimeOptimization", "MultiProcessorCompile" }
     
     -- os specific configurations
+    configuration "windows"
+        defines "WIN32"
     configuration "linux"
         toolset "clang"
     
