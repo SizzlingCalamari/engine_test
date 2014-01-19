@@ -9,14 +9,15 @@
 #include "SDL.h"
 #include "SDL_opengl.h"
 
-
 #include "FileUtils.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
-void GLAPIENTRY GLErrorCallback(
+#include "SOIL.h"
+
+void APIENTRY GLErrorCallback(
 	GLenum source, GLenum type,
 	GLuint id, GLenum severity,
 	GLsizei length, const char *msg,
@@ -117,6 +118,7 @@ int main(int argc, const char *argv[])
 	glDepthFunc(GL_LESS);
 
 	GLuint ProgramID = LoadShaders("../src/shaders/simplevertex.vs", "../src/shaders/simplefragment.fs");
+	GLuint ProgramIDTex = LoadShaders("../src/shaders/texturevertex.vs", "../src/shaders/texturefragment.fs");
 	GLuint MatrixID = glGetUniformLocation(ProgramID, "MVP");
 	
 	glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
@@ -140,6 +142,13 @@ int main(int argc, const char *argv[])
 		0.583f, 0.771f, 0.014f,
 		0.609f, 0.115f, 0.436f,
 		0.327f, 0.483f, 0.844f
+	};
+
+	static const GLfloat tri_uv[] =
+	{
+		0.0f, 0.0f,
+		1.0f, 0.0f,
+		0.0f, 1.0f
 	};
 
 	static const GLfloat vertex_data[] = 
@@ -222,6 +231,12 @@ int main(int argc, const char *argv[])
 		0.982f, 0.099f, 0.879f
 	};
 
+	GLuint texture = SOIL_load_OGL_texture(
+		"../textures/jesusbond_feelingfresh.jpg", SOIL_LOAD_AUTO,
+		SOIL_CREATE_NEW_ID, SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT);
+
+	GLuint TextureID = glGetUniformLocation(ProgramIDTex, "myTextureSampler");
+
 	GLuint VertexArrays[2];
 	glGenVertexArrays(sizeof(VertexArrays) / sizeof(GLuint), VertexArrays);
 
@@ -246,8 +261,8 @@ int main(int argc, const char *argv[])
 			glBufferData(GL_ARRAY_BUFFER, sizeof(tri_data), tri_data, GL_STATIC_DRAW);
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 		glBindBuffer(GL_ARRAY_BUFFER, buffers[3]);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(tri_colour), tri_colour, GL_STREAM_DRAW);
-			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(tri_uv), tri_uv, GL_STATIC_DRAW);
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 	glBindVertexArray(0);
 
 	World w;
@@ -285,19 +300,13 @@ int main(int argc, const char *argv[])
 					}
 				glDrawArrays(GL_TRIANGLES, 0, sizeof(vertex_data) / 3 / sizeof(vertex_data[0]));
 			glBindVertexArray(0);
+		glUseProgram(0);
+		glUseProgram(ProgramIDTex);
 			glBindVertexArray(VertexArrays[1]);
 				glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVPTRI[0][0]);
-				glBindBuffer(GL_ARRAY_BUFFER, buffers[3]);
-					//glBufferData(GL_ARRAY_BUFFER, sizeof(tri_colour), nullptr, GL_STREAM_DRAW);
-					{
-						GLfloat *c = (GLfloat*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
-						size_t count = sizeof(tri_colour)/sizeof(tri_colour[0]);
-						for (size_t i = 0; i < count; ++i)
-						{
-							c[i] = c[(i+1)%count];
-						}
-						glUnmapBuffer(GL_ARRAY_BUFFER);
-					}
+				glActiveTexture(GL_TEXTURE0);
+					glBindTexture(GL_TEXTURE_2D, texture);
+					glUniform1i(TextureID, 0);
 				glDrawArrays(GL_TRIANGLES, 0, sizeof(tri_data) / 3 / sizeof(tri_data[0]));
 			glBindVertexArray(0);
 		glUseProgram(0);
@@ -306,9 +315,11 @@ int main(int argc, const char *argv[])
 	}
     w.Shutdown();
 
+	glDeleteProgram(ProgramIDTex);
 	glDeleteProgram(ProgramID);
 	glDeleteBuffers(sizeof(buffers) / sizeof(GLuint), buffers);
 	glDeleteVertexArrays(sizeof(VertexArrays) / sizeof(GLuint), VertexArrays);
+	glDeleteTextures(1, &texture);
 
 	SDL_GL_DeleteContext(context);
 	SDL_DestroyWindow(window);
