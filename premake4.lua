@@ -4,6 +4,12 @@ if (os.get == "linux" and os.findlib("libXrandr") == nil) then
     os.execute("sudo apt-get install libxrandr-dev")
 end
 
+sdl_dir = "../sdl-dev/"
+bullet_dir = "../bullet-2.82-r2704/"
+glew_dir = "../glew-1.10.0/"
+glm_dir = "../glm/"
+soil_dir = "../Simple OpenGL Image Library/"
+
 -- A solution contains projects, and defines the available configurations
 solution "engine_test"
     location "build"
@@ -54,16 +60,15 @@ solution "engine_test"
         defines { "GLEW_STATIC", "SDL_MAIN_HANDLED" }
         files { "**.h", "**.cpp", "**.vs", "**.fs" }
         includedirs {
-            "../sdl-dev/include",
-            "../bullet-2.82-r2704/src",
-            "../glfw-3.0.4/include",
-            "../glew-1.10.0/include",
-            "../glm/",
-            "../Simple OpenGL Image Library/src"
+            sdl_dir .. "include",
+            bullet_dir .. "src",
+            glew_dir .. "include",
+            glm_dir,
+            soil_dir .. "src"
         }
         
         -- SDL2 linking
-        libdirs "../sdl-dev/VisualC"
+        libdirs (sdl_dir .. "VisualC")
         configuration { "windows", "x32", "Debug" }
             links { "/SDL/Win32/Debug/SDL2", "/SDLmain/Win32/Debug/SDL2main" }
             copylocal "/SDL/Win32/Debug/SDL2"
@@ -76,38 +81,44 @@ solution "engine_test"
         configuration { "windows", "x64", "Release" }
             links { "/SDL/x64/Release/SDL2", "/SDLmain/x64/Release/SDL2main" }
             copylocal "/SDL/x64/Release/SDL2"
-        -- TODO: linux, osx sdl linking
+        configuration { "linux" }
+            links { "SDL2" }
+        -- TODO: osx sdl linking
         configuration {}
         
         -- Bullet Physics linking
-        libdirs "../bullet-2.82-r2704/lib"
-        configuration { "windows", "x32", "Debug" }
+        libdirs (bullet_dir .. "lib")
+        configuration { "x32", "Debug" }
+            suffix = _ACTION .. "_debug"
             links {
-                "BulletSoftBody_vs2013_debug",
-                "BulletDynamics_vs2013_debug",
-                "BulletCollision_vs2013_debug",
-                "LinearMath_vs2013_debug"
+                "BulletSoftBody_" .. suffix,
+                "BulletDynamics_" .. suffix,
+                "BulletCollision_" .. suffix,
+                "LinearMath_" .. suffix
             }
-        configuration { "windows", "x32", "Release" }
+        configuration { "x32", "Release" }
+            suffix = _ACTION
             links {
-                "BulletSoftBody_vs2013",
-                "BulletDynamics_vs2013",
-                "BulletCollision_vs2013",
-                "LinearMath_vs2013"
+                "BulletSoftBody_" .. suffix,
+                "BulletDynamics_" .. suffix,
+                "BulletCollision_" .. suffix,
+                "LinearMath_" .. suffix
             }
-        configuration { "windows", "x64", "Debug" }
+        configuration { "x64", "Debug" }
+            suffix = _ACTION .. "_x64_debug"
             links {
-                "BulletSoftBody_vs2013_x64_debug",
-                "BulletDynamics_vs2013_x64_debug",
-                "BulletCollision_vs2013_x64_debug",
-                "LinearMath_vs2013_x64_debug"
+                "BulletSoftBody_" .. suffix,
+                "BulletDynamics_" .. suffix,
+                "BulletCollision_" .. suffix,
+                "LinearMath_" .. suffix
             }
-        configuration { "windows", "x64", "Release" }
+        configuration { "x64", "Release" }
+            suffix = _ACTION .. "_x64_release"
             links {
-                "BulletSoftBody_vs2013_x64_release",
-                "BulletDynamics_vs2013_x64_release",
-                "BulletCollision_vs2013_x64_release",
-                "LinearMath_vs2013_x64_release"
+                "BulletSoftBody_" .. suffix,
+                "BulletDynamics_" .. suffix,
+                "BulletCollision_" .. suffix,
+                "LinearMath_" .. suffix
             }
         configuration {}
         
@@ -122,19 +133,20 @@ solution "engine_test"
         kind "StaticLib"
         language "C"
         defines "GLEW_STATIC"
-        includedirs "../glew-1.10.0/include"
+        includedirs (glew_dir .. "include")
         files {
-            "../glew-1.10.0/src/glew.c",
-            "../glew-1.10.0/src/glewinfo.c"
+            glew_dir .. "src/glew.c",
+            glew_dir .. "src/glewinfo.c"
         }
     
     project "soil"
         kind "StaticLib"
         language "C"
-        includedirs "../Simple OpenGL Image Library/src"
+        includedirs (soil_dir .. "src")
         files {
-            "../Simple OpenGL Image Library/src/image_helper.c",
-            "../Simple OpenGL Image Library/src/stb_image_aug.c",
-            "../Simple OpenGL Image Library/src/image_DXT.c",
-            "../Simple OpenGL Image Library/src/SOIL.c"
+            soil_dir .. "src/image_helper.c",
+            soil_dir .. "src/stb_image_aug.c",
+            soil_dir .. "src/image_DXT.c",
+            soil_dir .. "src/SOIL.c"
         }
+

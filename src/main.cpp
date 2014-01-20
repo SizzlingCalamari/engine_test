@@ -6,8 +6,9 @@
 
 #include "GL/glew.h"
 
-#include "SDL_opengl.h"
 #include "SDL.h"
+#include "SDL_opengl.h"
+
 
 #include "FileUtils.h"
 
@@ -15,7 +16,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
-void APIENTRY GLErrorCallback(
+void GLAPIENTRY GLErrorCallback(
 	GLenum source, GLenum type,
 	GLuint id, GLenum severity,
 	GLsizei length, const char *msg,
