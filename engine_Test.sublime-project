@@ -1,22 +1,22 @@
 {
-    "folders":
-    [
-        {
-            "path": "../../projects/engine_Test"
-        }
-    ],
-    
-    "build_systems":
-    [
-        {
-            "name": "CMakeC++",
-			"path": "${project}",
-            "cmd": ["../../dev_tools/cmake/bin/cmake", "--trace", "../../projects/engine_Test"]
-        },
-        {
-            "name": "PremakeC++",
-			"path": "${project}",
-            "cmd": ["../premake/premake", "--scripts", "../../projects/engine_Test", "vs2013" ]
-        }
-    ]
+	"build_systems":
+	[
+	],
+	"folders":
+	[
+		{
+			"path": "/home/MATTER/jcristiano/projects/engine"
+		}
+	],
+	"settings":
+	{
+		"sublimeclang_options":
+		[
+			"-I${folder:${project_path:engine_Test.sublime-project}}/../sdl-dev/include/",
+			"-I${folder:${project_path:engine_Test.sublime-project}}/../bullet-2.82-r2704/src/",
+			"-I${folder:${project_path:engine_Test.sublime-project}}/../glew-1.10.0/include/",
+			"-I${folder:${project_path:engine_Test.sublime-project}}/../glm/",
+			"-I${folder:${project_path:engine_Test.sublime-project}}/../soil-july07-2008/src/"
+		]
+	}
 }

@@ -8,7 +8,7 @@ sdl_dir = "../sdl-dev/"
 bullet_dir = "../bullet-2.82-r2704/"
 glew_dir = "../glew-1.10.0/"
 glm_dir = "../glm/"
-soil_dir = "../Simple OpenGL Image Library/"
+soil_dir = "../soil-july07-2008/"
 
 -- A solution contains projects, and defines the available configurations
 solution "engine_test"
