@@ -4,10 +4,7 @@
 
 #include "World.h"
 
-#include "GLContext.h"
 #include "SDLWrap.h"
-
-#include "FileUtils.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -24,88 +21,31 @@ void APIENTRY GLErrorCallback(
     std::cout << msg << std::endl;
 }
 
-GLuint LoadShaders(const char *vertex_file, const char *fragment_file)
-{
-    GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
-    GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
-
-    FILE *VertexShaderFile = fopen(vertex_file, "rb");
-    FILE *FragmentShaderFile = fopen(fragment_file, "rb");
-
-    if (!VertexShaderFile || !FragmentShaderFile)
-    {
-        if (VertexShaderFile) fclose(VertexShaderFile);
-        if (FragmentShaderFile) fclose(FragmentShaderFile);
-        return 0;
-    }
-
-    off_t vertex_size = GetFileSize(VertexShaderFile);
-    off_t fragment_size = GetFileSize(FragmentShaderFile);
-
-    char *VertexShaderCode = (char*)malloc(vertex_size + 1);
-    char *FragmentShaderCode = (char*)malloc(fragment_size + 1);
-
-    VertexShaderCode[vertex_size] = '\0';
-    FragmentShaderCode[fragment_size] = '\0';
-    
-    fread(VertexShaderCode, 1, vertex_size, VertexShaderFile);
-    fread(FragmentShaderCode, 1, fragment_size, FragmentShaderFile);
-
-    fclose(VertexShaderFile);
-    fclose(FragmentShaderFile);
-
-    glShaderSource(VertexShaderID, 1, (const char**)&VertexShaderCode, nullptr);
-    glCompileShader(VertexShaderID);
-
-    glShaderSource(FragmentShaderID, 1, (const char**)&FragmentShaderCode, nullptr);
-    glCompileShader(FragmentShaderID);
-
-    GLint res = GL_FALSE;
-
-    glGetShaderiv(VertexShaderID, GL_COMPILE_STATUS, &res);
-    glGetShaderiv(FragmentShaderID, GL_COMPILE_STATUS, &res);
-
-    GLuint ProgramID = glCreateProgram();
-    glAttachShader(ProgramID, VertexShaderID);
-    glAttachShader(ProgramID, FragmentShaderID);
-    glLinkProgram(ProgramID);
-
-    glGetProgramiv(ProgramID, GL_LINK_STATUS, &res);
-
-    glDeleteShader(VertexShaderID);
-    glDeleteShader(FragmentShaderID);
-
-    free(FragmentShaderCode);
-    free(VertexShaderCode);
-
-    return ProgramID;
-}
-
 int main(int argc, const char *argv[])
 {
     std::cout << "Hello World!" << std::endl;
 
     SDLWrap sdl;
-    sdl.Init(SDL_INIT_VIDEO);
+    sdl.Init(INIT_VIDEO);
 
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
-    SDL_Window* window = sdl.CreateWindow("JORDAN", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_OPENGL);
-    GLContext context = sdl.CreateGLContext(window);
+    SDLWindow window = sdl.CreateWindow("JORDAN", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_OPENGL);
+    GLContext context = sdl.CreateGLContext(&window);
     context.SetDebugMessageCallback(&GLErrorCallback);
     context.EnableDepthTest(GL_LESS);
 
     glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
-    GLuint ProgramID = LoadShaders("../src/shaders/simplevertex.vs", "../src/shaders/simplefragment.fs");
-    GLuint ProgramIDTex = LoadShaders("../src/shaders/texturevertex.vs", "../src/shaders/texturefragment.fs");
+    GLuint ProgramID = context.LoadShaders("../src/shaders/simplevertex.vs", "../src/shaders/simplefragment.fs");
+    GLuint ProgramIDTex = context.LoadShaders("../src/shaders/texturevertex.vs", "../src/shaders/texturefragment.fs");
     GLuint MatrixID = glGetUniformLocation(ProgramID, "MVP");
     
     glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
@@ -255,18 +195,10 @@ int main(int argc, const char *argv[])
     World w;
     w.Initialize();
 
-    const uint32_t SERVER_FRAME_DT = 10000;
+    const uint SERVER_FRAME_DT = 10000;
 
-    bool bQuit = false;
-    while (!bQuit)
+    while (sdl.ProcessEvents())
     {
-        SDL_PumpEvents();
-        SDL_Event event;
-        while (SDL_PollEvent(&event) == 1)
-        {
-            bQuit = (event.type == SDL_QUIT);
-        }
-
         w.Update(SERVER_FRAME_DT);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -298,12 +230,10 @@ int main(int argc, const char *argv[])
             glBindVertexArray(0);
         glUseProgram(0);
 
-        SDL_GL_SwapWindow(window);
+        window.SwapBuffers();
     }
     w.Shutdown();
 
-    glDeleteProgram(ProgramIDTex);
-    glDeleteProgram(ProgramID);
     glDeleteBuffers(sizeof(buffers) / sizeof(GLuint), buffers);
     glDeleteVertexArrays(sizeof(VertexArrays) / sizeof(GLuint), VertexArrays);
     glDeleteTextures(1, &texture);
