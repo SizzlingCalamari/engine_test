@@ -21,7 +21,7 @@ public:
         int x, int y, int w,
         int h, Uint32 flags);
 
-    SDL_GLContext CreateGLContext(SDL_Window *window);
+    GLContext CreateGLContext(SDL_Window *window);
 
 private:
     std::list<SDL_GLContext> m_glcontexts;

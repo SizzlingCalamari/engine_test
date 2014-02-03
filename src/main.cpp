@@ -18,8 +18,8 @@
 void APIENTRY GLErrorCallback(
     GLenum source, GLenum type,
     GLuint id, GLenum severity,
-    GLsizei length, const char *msg,
-    void *userdata )
+    GLsizei length, const GLchar *msg,
+    GLvoid *userdata )
 {
     std::cout << msg << std::endl;
 }

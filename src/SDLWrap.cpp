@@ -4,7 +4,7 @@
 bool SDLWrap::Init(uint32_t flags)
 {
     SDL_SetMainReady();
-    return SDL_Init(flags);
+    return (SDL_Init(flags) == 0);
 }
 
 void SDLWrap::Shutdown()
@@ -30,14 +30,25 @@ SDL_Window *SDLWrap::CreateWindow(
     return win;
 }
 
-SDL_GLContext SDLWrap::CreateGLContext(SDL_Window *window)
+class RunOnce
+{
+public:
+    template<typename T>
+    explicit inline RunOnce(T fn) { fn(); }
+};
+
+GLContext SDLWrap::CreateGLContext(SDL_Window *window)
 {
     SDL_GLContext c = SDL_GL_CreateContext(window);
-    if (m_glcontexts.empty())
+
+    // glew needs to be initialized after 
+    // the gl_createcontext call
+    static RunOnce glew([]
     {
         glewExperimental = true;
         glewInit();
-    }
+    });
+
     m_glcontexts.emplace_back(c);
-    return c;
+    return GLContext(c);
 }
