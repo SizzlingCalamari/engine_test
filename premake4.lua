@@ -57,9 +57,14 @@ solution "engine_test"
         kind "ConsoleApp"
         targetdir "build"
         language "C++"
+
+        pchheader "platform.h"
+        pchsource "platform.pch"
+
         defines { "GLEW_STATIC", "SDL_MAIN_HANDLED" }
         files { "**.h", "**.cpp", "**.vs", "**.fs" }
         includedirs {
+            "src",
             sdl_dir .. "include",
             bullet_dir .. "src",
             glew_dir .. "include",

@@ -1,5 +1,4 @@
 
-#include <cstdint>
 #include <iostream>
 
 #include "World.h"
@@ -12,7 +11,7 @@
 
 #include "SOIL.h"
 
-void APIENTRY GLErrorCallback(
+void STDCALL GLErrorCallback(
     GLenum source, GLenum type,
     GLuint id, GLenum severity,
     GLsizei length, const GLchar *msg,

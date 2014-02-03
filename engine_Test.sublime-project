@@ -12,6 +12,7 @@
 	{
 		"sublimeclang_options":
 		[
+			"-include${folder:${project_path:engine_Test.sublime-project}}/src/platform.h",
 			"-I${folder:${project_path:engine_Test.sublime-project}}/../sdl-dev/include/",
 			"-I${folder:${project_path:engine_Test.sublime-project}}/../bullet-2.82-r2704/src/",
 			"-I${folder:${project_path:engine_Test.sublime-project}}/../glew-1.10.0/include/",

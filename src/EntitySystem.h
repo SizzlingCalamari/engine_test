@@ -1,7 +1,6 @@
 
 #pragma once
 
-#include <stdint.h>
 #include <queue>
 #include <vector>
 
@@ -16,19 +15,19 @@ public:
     bool Initialize();
     void Shutdown();
 
-    uint32_t CreateEntity(const std::vector<uint8_t> &components);
-    void DestroyEntity(uint32_t ent);
+    uint32 CreateEntity(const std::vector<uint8> &components);
+    void DestroyEntity(uint32 ent);
 
-	uint32_t RegisterComponentSystem(IEntityComponentSystem *pSystem, uint32_t depends_on = 0);
+	uint32 RegisterComponentSystem(IEntityComponentSystem *pSystem, uint32 depends_on = 0);
 
-	void Update(uint32_t dt);
-
-private:
-    const static uint32_t MAX_ENTS = 2048;
+	void Update(uint32 dt);
 
 private:
-    std::deque<uint32_t> m_FreeEnts;
-    std::vector<uint32_t> m_DestroyedEnts;
+    const static uint32 MAX_ENTS = 2048;
+
+private:
+    std::deque<uint32> m_FreeEnts;
+    std::vector<uint32> m_DestroyedEnts;
 
     std::vector<IEntityComponentSystem*> m_Systems;
 };

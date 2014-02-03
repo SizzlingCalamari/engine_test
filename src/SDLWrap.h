@@ -1,7 +1,6 @@
 
 #pragma once
 
-#include <cstdint>
 #include <list>
 #include <memory>
 
@@ -32,11 +31,11 @@ public:
     SDLWrap();
     ~SDLWrap() = default;
 
-    auto Init(uint32_t flags) -> bool;
+    auto Init(uint flags) -> bool;
     void Shutdown();
 
     auto CreateWindow(const char *title, int x, int y,
-                      int w, int h, uint32_t flags) -> SDLWindow;
+                      int w, int h, uint flags) -> SDLWindow;
 
     auto CreateGLContext(SDLWindow *window) -> GLContext;
 
@@ -46,7 +45,7 @@ private:
     auto GrabEvents() -> int;
 
 private:
-    static const uint32_t MAX_EVENTS_PER_ITERATION = 20;
+    static const uint MAX_EVENTS_PER_ITERATION = 20;
 
 private:
     std::list<SDL_GLContext> m_glcontexts;

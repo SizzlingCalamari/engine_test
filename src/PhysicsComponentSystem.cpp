@@ -13,7 +13,7 @@ PhysicsComponentSystem::~PhysicsComponentSystem()
 	delete m_PhysicsWorld;
 }
 
-PhysicsComponent PhysicsComponentSystem::GetComponent(uint32_t ent)
+PhysicsComponent PhysicsComponentSystem::GetComponent(uint32 ent)
 {
 	return PhysicsComponent(this, ent);
 }
@@ -32,17 +32,17 @@ void PhysicsComponentSystem::Shutdown()
 	}
 }
 
-void PhysicsComponentSystem::AttachComponent(uint32_t ent)
+void PhysicsComponentSystem::AttachComponent(uint32 ent)
 {
 	m_Components[ent] = nullptr;
 }
 
-void PhysicsComponentSystem::Update(uint32_t dt)
+void PhysicsComponentSystem::Update(uint32 dt)
 {
 	m_PhysicsWorld->GetDynamicsWorld()->stepSimulation(dt / 1000000.0f);
 }
 
-void PhysicsComponentSystem::SetComponentInfo(uint32_t ent, const PhysicsComponentInfo &info)
+void PhysicsComponentSystem::SetComponentInfo(uint32 ent, const PhysicsComponentInfo &info)
 {
 	DeleteComponent(m_Components.at(ent));
 

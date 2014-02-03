@@ -16,7 +16,7 @@ public:
     PhysicsComponentSystem();
     ~PhysicsComponentSystem();
 
-	PhysicsComponent GetComponent(uint32_t ent);
+	PhysicsComponent GetComponent(uint32 ent);
 
 public:
 	// IEntityComponentSystem
@@ -26,18 +26,18 @@ public:
     virtual void Shutdown();
 
 protected:
-	virtual void AttachComponent(uint32_t ent);
+	virtual void AttachComponent(uint32 ent);
 
-	virtual void Update(uint32_t dt);
+	virtual void Update(uint32 dt);
 	//
 	// =======
 
-	void SetComponentInfo(uint32_t ent, const PhysicsComponentInfo &info);
+	void SetComponentInfo(uint32 ent, const PhysicsComponentInfo &info);
 
 private:
 	void DeleteComponent(PhysicsComponentInternal *comp);
 
 private:
 	PhysicsWorld *m_PhysicsWorld;
-	std::unordered_map<uint32_t, PhysicsComponentInternal*> m_Components;
+	std::unordered_map<uint32, PhysicsComponentInternal*> m_Components;
 };

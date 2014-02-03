@@ -12,7 +12,7 @@ EntitySystem::~EntitySystem()
 
 bool EntitySystem::Initialize()
 {
-    std::deque<uint32_t> ents;
+    std::deque<uint32> ents;
     for (uint_fast32_t i = 0; i < MAX_ENTS; ++i)
     {
         ents.emplace_back(i);
@@ -35,9 +35,9 @@ void EntitySystem::Shutdown()
     }
 }
 
-uint32_t EntitySystem::CreateEntity(const std::vector<uint8_t> &components)
+uint32 EntitySystem::CreateEntity(const std::vector<uint8> &components)
 {
-    uint32_t ent = m_FreeEnts.front();
+    uint32 ent = m_FreeEnts.front();
     m_FreeEnts.pop_back();
 
 	for (uint_fast32_t i : components)
@@ -47,18 +47,18 @@ uint32_t EntitySystem::CreateEntity(const std::vector<uint8_t> &components)
     return ent;
 }
 
-void EntitySystem::DestroyEntity(uint32_t ent)
+void EntitySystem::DestroyEntity(uint32 ent)
 {
     m_DestroyedEnts.emplace_back(ent);
 }
 
-uint32_t EntitySystem::RegisterComponentSystem(IEntityComponentSystem *pSystem, uint32_t depends_on /*= 0*/)
+uint32 EntitySystem::RegisterComponentSystem(IEntityComponentSystem *pSystem, uint32 depends_on /*= 0*/)
 {
 	m_Systems.emplace_back(pSystem);
 	return m_Systems.size() - 1;
 }
 
-void EntitySystem::Update(uint32_t dt)
+void EntitySystem::Update(uint32 dt)
 {
 	if (!m_DestroyedEnts.empty())
 	{

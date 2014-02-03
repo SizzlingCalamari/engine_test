@@ -30,7 +30,7 @@ bool World::Initialize()
 	PhysicsComponentInfo info;
 	info.shape = new btBoxShape(btVector3(btScalar(110.), btScalar(1.), btScalar(110.)));
 
-	uint32_t ent = m_EntSys->CreateEntity({ m_Physics.second/*, m_Graphics.second*/ });
+	uint32 ent = m_EntSys->CreateEntity({ m_Physics.second/*, m_Graphics.second*/ });
 	auto pc = m_Physics.first->GetComponent(ent);
 	pc.SetInfo(info);
 
@@ -46,7 +46,7 @@ void World::Shutdown()
 
 #include <chrono>
 
-uint64_t CurTimeMicro()
+uint64 CurTimeMicro()
 {
 	using namespace std::chrono;
 	auto micro = time_point_cast<microseconds>(high_resolution_clock::now());
@@ -56,14 +56,14 @@ uint64_t CurTimeMicro()
 //#define WIN32_LEAN_AND_MEAN
 //#include <Windows.h>
 
-void World::Update(uint32_t dt)
+void World::Update(uint32 dt)
 {
-	static uint64_t acc = 0;
-	static uint64_t cur = CurTimeMicro();
-	static uint64_t last = cur - dt;
+	static uint64 acc = 0;
+	static uint64 cur = CurTimeMicro();
+	static uint64 last = cur - dt;
 
-	uint64_t time_now = CurTimeMicro();
-	uint64_t frame_time = time_now - last;
+	uint64 time_now = CurTimeMicro();
+	uint64 frame_time = time_now - last;
 	if (frame_time > 100000)
 	{
 		frame_time = 100000;

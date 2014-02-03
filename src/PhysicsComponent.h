@@ -1,7 +1,6 @@
 
 #pragma once
 
-#include <cstdint>
 #include "btBulletDynamicsCommon.h"
 
 typedef btCollisionObject PhysicsComponentInternal;
@@ -22,9 +21,9 @@ public:
 	void SetInfo(const PhysicsComponentInfo &info);
 
 protected:
-	PhysicsComponent(PhysicsComponentSystem *sys, uint32_t ent);
+	PhysicsComponent(PhysicsComponentSystem *sys, uint32 ent);
 
 private:
 	PhysicsComponentSystem *m_PhysicsSystem;
-	uint32_t m_ent;
+	uint32 m_ent;
 };

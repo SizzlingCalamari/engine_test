@@ -16,7 +16,7 @@ SDLWrap::SDLWrap():
 {    
 }
 
-bool SDLWrap::Init(uint32_t flags)
+bool SDLWrap::Init(uint flags)
 {
     SDL_SetMainReady();
     return (SDL_Init(flags) == 0);
@@ -38,7 +38,7 @@ void SDLWrap::Shutdown()
 SDLWindow SDLWrap::CreateWindow(
     const char *title,
     int x, int y, int w,
-    int h, uint32_t flags)
+    int h, uint flags)
 {
     SDL_Window *win = SDL_CreateWindow(title, x, y, w, h, flags);
     m_windows.emplace_back(win);
@@ -79,7 +79,7 @@ bool SDLWrap::ProcessEvents()
     {
         for (int i = 0; i < num_events; ++i)
         {
-            uint32_t type = m_events[i].type;
+            uint32 type = m_events[i].type;
             quit = quit || (type == SDL_QUIT);
         }
     }
