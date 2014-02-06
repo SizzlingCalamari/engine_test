@@ -1,6 +1,6 @@
 
 #ifdef PLATFORM_PCH
-#  error this is a pch, don't include it...
+#  error this is force included already. don't include it...
 #else
 #  define PLATFORM_PCH
 #endif
@@ -22,7 +22,10 @@
 #endif // STDCALL
 
 // types
+typedef unsigned char uchar;
+typedef unsigned short ushort;
 typedef unsigned int uint;
+typedef unsigned long ulong;
 
 typedef int8_t int8;
 typedef int16_t int16;
