@@ -2,7 +2,7 @@
 #pragma once
 
 #include <list>
-#include <memory>
+#include <array>
 
 #include "GLContext.h"
 #include "SDLWindow.h"
@@ -28,7 +28,7 @@ enum InitFlags
 class SDLWrap
 {
 public:
-    SDLWrap();
+    SDLWrap() = default;
     ~SDLWrap() = default;
 
     auto Init(uint flags) -> bool;
@@ -50,5 +50,5 @@ private:
 private:
     std::list<SDL_GLContext> m_glcontexts;
     std::list<SDL_Window*> m_windows;
-    std::unique_ptr<SDL_Event[]> m_events;
+    std::array<SDL_Event, MAX_EVENTS_PER_ITERATION> m_events;
 };

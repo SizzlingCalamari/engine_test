@@ -11,11 +11,6 @@ static_assert(INIT_GAMECONTROLER == SDL_INIT_GAMECONTROLLER, "INIT_GAMECONTROLER
 static_assert(INIT_EVENTS == SDL_INIT_EVENTS, "INIT_EVENTS incorrect");
 static_assert(INIT_EVERYTHING == SDL_INIT_EVERYTHING, "INIT_EVERYTHING incorrect");
 
-SDLWrap::SDLWrap():
-    m_events(new SDL_Event[MAX_EVENTS_PER_ITERATION])
-{    
-}
-
 bool SDLWrap::Init(uint flags)
 {
     SDL_SetMainReady();
@@ -88,6 +83,6 @@ bool SDLWrap::ProcessEvents()
 
 int SDLWrap::GrabEvents()
 {
-    return SDL_PeepEvents(m_events.get(), MAX_EVENTS_PER_ITERATION,
+    return SDL_PeepEvents(m_events.data(), MAX_EVENTS_PER_ITERATION,
         SDL_GETEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
 }
