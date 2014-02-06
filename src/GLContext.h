@@ -4,7 +4,8 @@
 #include <list>
 
 #include "GL/glew.h"
-#include "SDL_video.h"
+//#include "SDL_video.h"
+typedef void *SDL_GLContext;
 
 class GLContext
 {

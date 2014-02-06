@@ -46,8 +46,8 @@ GLuint GLContext::LoadShaders(
     off_t vertex_size = GetFileSize(VertexShaderFile);
     off_t fragment_size = GetFileSize(FragmentShaderFile);
 
-    char *VertexShaderCode = (char*)malloc(vertex_size + 1);
-    char *FragmentShaderCode = (char*)malloc(fragment_size + 1);
+    char *VertexShaderCode = new char[vertex_size + 1];
+    char *FragmentShaderCode = new char[fragment_size + 1];
 
     VertexShaderCode[vertex_size] = '\0';
     FragmentShaderCode[fragment_size] = '\0';
@@ -79,8 +79,8 @@ GLuint GLContext::LoadShaders(
     glDeleteShader(VertexShaderID);
     glDeleteShader(FragmentShaderID);
 
-    free(FragmentShaderCode);
-    free(VertexShaderCode);
+    delete [] FragmentShaderCode;
+    delete [] VertexShaderCode;
 
     m_programs.emplace_back(ProgramID);
     return ProgramID;
