@@ -1,11 +1,13 @@
 
 #pragma once
 
-#include <list>
+#include <unordered_set>
 
 #include "GL/glew.h"
 //#include "SDL_video.h"
 typedef void *SDL_GLContext;
+class ShaderManager;
+class ShaderProgram;
 
 class GLContext
 {
@@ -13,15 +15,16 @@ public:
     GLContext(SDL_GLContext context);
     ~GLContext();
 
-    auto SetDebugMessageCallback(GLDEBUGPROCARB fn,
-                                 void* userdata = nullptr) -> bool;
+    auto CreateShaderManager() -> ShaderManager*;
 
-    auto LoadShaders(const char *vertex_file,
-                     const char *fragment_file) -> uint;
+    static bool SetDebugMessageCallback(GLDEBUGPROCARB fn,
+                                        void* userdata = nullptr);
 
-    void EnableDepthTest(GLenum func);
+    static void EnableDepthTest(GLenum func);
+
+    static void SetActiveProgram(ShaderProgram *p);
 
 private:
     SDL_GLContext m_context;
-    std::list<uint> m_programs;
+    std::unordered_set<ShaderManager*> m_shader_managers;
 };

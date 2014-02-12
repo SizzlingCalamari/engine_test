@@ -1,9 +1,11 @@
 
 #include <iostream>
+#include <cassert>
 
 #include "World.h"
 
 #include "SDLWrap.h"
+#include "ShaderManager.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -38,15 +40,30 @@ int main(int argc, const char *argv[])
 
     SDLWindow window = sdl.CreateWindow("JORDAN", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_OPENGL);
     GLContext context = sdl.CreateGLContext(&window);
-    context.SetDebugMessageCallback(&GLErrorCallback);
-    context.EnableDepthTest(GL_LESS);
+    GLContext::SetDebugMessageCallback(&GLErrorCallback);
+    GLContext::EnableDepthTest(GL_LESS);
 
     glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
-    GLuint ProgramID = context.LoadShaders("../src/shaders/simplevertex.vs", "../src/shaders/simplefragment.fs");
-    GLuint ProgramIDTex = context.LoadShaders("../src/shaders/texturevertex.vs", "../src/shaders/texturefragment.fs");
-    GLuint MatrixID = glGetUniformLocation(ProgramID, "MVP");
-    
+    std::vector<Shader> vertexShaders;
+    std::vector<Shader> fragmentShaders;
+
+    ShaderManager *sm = context.CreateShaderManager();
+    sm->CompileShaders(
+        {"../src/shaders/simplevertex.vs", "../src/shaders/texturevertex.vs"},
+        {"../src/shaders/simplefragment.fs", "../src/shaders/texturefragment.fs"},
+        vertexShaders, fragmentShaders);
+
+    ShaderProgram simple = sm->CreateProgram();
+    simple.AttachShader(vertexShaders[0]);
+    simple.AttachShader(fragmentShaders[0]);
+    assert(simple.Link());
+
+    ShaderProgram texture = sm->CreateProgram();
+    texture.AttachShader(vertexShaders[1]);
+    texture.AttachShader(fragmentShaders[1]);
+    assert(texture.Link());
+
     glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
     glm::mat4 View = glm::lookAt(glm::vec3(4, 3, 3), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
     glm::mat4 Model = glm::translate(glm::vec3(-3.0f, 0.0f, 0.0f))
@@ -157,11 +174,12 @@ int main(int argc, const char *argv[])
         0.982f, 0.099f, 0.879f
     };
 
-    GLuint texture = SOIL_load_OGL_texture(
+    GLuint tex = SOIL_load_OGL_texture(
         "../textures/jesusbond_feelingfresh.jpg", SOIL_LOAD_AUTO,
         SOIL_CREATE_NEW_ID, SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT);
 
-    GLuint TextureID = glGetUniformLocation(ProgramIDTex, "myTextureSampler");
+    GLuint MatrixID = simple.GetUniformLocation("MVP");
+    GLuint TextureID = texture.GetUniformLocation("myTextureSampler");
 
     GLuint VertexArrays[2];
     glGenVertexArrays(sizeof(VertexArrays) / sizeof(GLuint), VertexArrays);
@@ -202,7 +220,7 @@ int main(int argc, const char *argv[])
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glUseProgram(ProgramID);
+        GLContext::SetActiveProgram(&simple);
             glBindVertexArray(VertexArrays[0]);
                 glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
                 glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
@@ -219,11 +237,11 @@ int main(int argc, const char *argv[])
                 glDrawArrays(GL_TRIANGLES, 0, sizeof(vertex_data) / 3 / sizeof(vertex_data[0]));
             glBindVertexArray(0);
         glUseProgram(0);
-        glUseProgram(ProgramIDTex);
+        GLContext::SetActiveProgram(&texture);
             glBindVertexArray(VertexArrays[1]);
                 glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVPTRI[0][0]);
                 glActiveTexture(GL_TEXTURE0);
-                    glBindTexture(GL_TEXTURE_2D, texture);
+                    glBindTexture(GL_TEXTURE_2D, tex);
                     glUniform1i(TextureID, 0);
                 glDrawArrays(GL_TRIANGLES, 0, sizeof(tri_data) / 3 / sizeof(tri_data[0]));
             glBindVertexArray(0);
@@ -235,7 +253,7 @@ int main(int argc, const char *argv[])
 
     glDeleteBuffers(sizeof(buffers) / sizeof(GLuint), buffers);
     glDeleteVertexArrays(sizeof(VertexArrays) / sizeof(GLuint), VertexArrays);
-    glDeleteTextures(1, &texture);
+    glDeleteTextures(1, &tex);
 
     sdl.Shutdown();
 }
