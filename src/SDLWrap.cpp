@@ -1,6 +1,7 @@
 
 #include "SDLWrap.h"
 #include "SDL.h"
+#include "utils.h"
 
 static_assert(INIT_TIMER == SDL_INIT_TIMER, "INIT_TIMER incorrect");
 static_assert(INIT_AUDIO == SDL_INIT_AUDIO, "INIT_AUDIO incorrect");
@@ -23,7 +24,7 @@ void SDLWrap::Shutdown()
     {
         SDL_GL_DeleteContext(context);
     }
-    for (auto *window : m_windows)
+    for (auto window : m_windows)
     {
         SDL_DestroyWindow(window);
     }
@@ -39,13 +40,6 @@ SDLWindow SDLWrap::CreateWindow(
     m_windows.emplace_back(win);
     return SDLWindow(win);
 }
-
-class RunOnce
-{
-public:
-    template<typename T>
-    explicit inline RunOnce(T fn) { fn(); }
-};
 
 GLContext SDLWrap::CreateGLContext(SDLWindow *window)
 {
