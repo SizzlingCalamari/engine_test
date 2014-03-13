@@ -43,7 +43,7 @@ vector<Shader> ShaderManager::CompileShaders(
     vector<Shader> compiled = CreateShaders(type, num_shaders); 
     for (size_t i = 0; i < num_shaders; ++i)
     {
-        FILE *ShaderFile = fopen(shader_files[i].c_str(), "r");
+        FILE *ShaderFile = fopen(shader_files[i].c_str(), "rb");
         if (!ShaderFile)
         {
             continue;
