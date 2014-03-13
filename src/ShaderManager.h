@@ -43,7 +43,7 @@ class ShaderProgram
     friend class GLContext;
 
 public:
-    ShaderProgram(ShaderProgram&& other) = default;
+    ShaderProgram(ShaderProgram& other) = default;
     ~ShaderProgram() = default;
 
     void AttachShader(Shader s);
