@@ -30,7 +30,7 @@ public:
     SDLWrap() = default;
     ~SDLWrap() = default;
 
-    auto Init(uint flags) -> bool;
+    bool Init(uint flags);
     void Shutdown();
 
     auto CreateWindow(const char *title, int x, int y,
@@ -38,7 +38,7 @@ public:
 
     auto CreateGLContext(SDLWindow *window) -> void*;
 
-    auto ProcessEvents() -> bool;
+    bool ProcessEvents();
 
 private:
     auto GrabEvents() -> int;
