@@ -137,7 +137,7 @@ int main(int argc, const char *argv[])
     auto renderer = Renderer::CreateAndInit3DRenderer(sdl.CreateGLContext(&window));
 
     Camera cam;
-    cam.CalcProjection();
+    cam.CalcView();
 
     auto box_transform = glm::translate(glm::vec3(-3.0f, 0.0f, 0.0f))
         * glm::rotate(30.0f, glm::vec3(0, 0, 1.0f))

@@ -8,16 +8,16 @@
 class Camera
 {
 public:
-    void CalcProjection()
+    void CalcView()
     {
-        m_projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
+        m_view = glm::lookAt(glm::vec3(4, 3, 3), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
     }
 
-    const glm::mat4& GetProjection() const
+    const glm::mat4& GetView() const
     {
-        return m_projection;
+        return m_view;
     }
 
 private:
-    glm::mat4 m_projection;
+    glm::mat4 m_view;
 };
