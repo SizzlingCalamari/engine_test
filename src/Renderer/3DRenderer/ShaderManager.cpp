@@ -3,6 +3,7 @@
 #include "FileUtils.h"
 #include "GL/glew.h"
 #include "utils.h"
+#include "glutils.h"
 #include <cassert>
 
 using namespace std;
@@ -29,40 +30,28 @@ void ShaderManager::CompileShaders(
     fragment_out = CompileShaders(fshader_files, GL_FRAGMENT_SHADER);
 }
 
-ShaderProgram ShaderManager::CreateProgram()
+uint ShaderManager::CreateProgram()
 {
     uint program = glCreateProgram();
     m_programs.insert(program);
-    return ShaderProgram(program);
+    return program;
 }
 
 vector<Shader> ShaderManager::CompileShaders(
     const vector<string> &shader_files, uint type)
 {
-    size_t num_shaders = shader_files.size();
-    vector<Shader> compiled = CreateShaders(type, num_shaders); 
-    for (size_t i = 0; i < num_shaders; ++i)
+    int num_shaders = shader_files.size();
+    auto shader_list = CreateShaders(type, num_shaders);
+
+    for (auto i = 0; i < num_shaders; ++i)
     {
-        FILE *ShaderFile = fopen(shader_files[i].c_str(), "rb");
-        if (!ShaderFile)
+        if (ReadBinaryFileToString(shader_files[i], m_codescratch))
         {
-            continue;
+            auto success = CompileShader(shader_list[i], m_codescratch);
+            assert(success);
         }
-
-        off_t size = GetFileSize(ShaderFile);
-        m_codescratch.resize(size+1);
-        m_codescratch[size] = '\0';
-        fread(&m_codescratch[0], 1, size, ShaderFile);
-        fclose(ShaderFile);
-
-        glShaderSource(compiled[i], 1, StrRValPtr(m_codescratch.data()), nullptr);
-        glCompileShader(compiled[i]);
-
-        int res = GL_FALSE;
-        glGetShaderiv(compiled[i], GL_COMPILE_STATUS, &res);
-        assert(res == GL_TRUE);
     }
-    return compiled;
+    return shader_list;
 }
 
 vector<Shader> ShaderManager::CreateShaders(uint type, uint num)

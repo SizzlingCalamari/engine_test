@@ -6,6 +6,7 @@
 #endif
 
 #include <cstdint>
+#include <cassert>
 
 // STDCALL define
 #ifndef STDCALL
@@ -20,6 +21,11 @@
 #    define STDCALL
 #  endif // STDCALL
 #endif // STDCALL
+
+// msvc doesn't support noexcept yet
+#ifdef _MSC_VER
+  #define noexcept
+#endif
 
 // types
 typedef unsigned char uchar;

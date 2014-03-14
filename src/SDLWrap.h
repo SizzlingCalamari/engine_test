@@ -4,7 +4,6 @@
 #include <list>
 #include <array>
 
-#include "GLContext.h"
 #include "SDLWindow.h"
 #include "SDL_events.h"
 
@@ -37,7 +36,7 @@ public:
     auto CreateWindow(const char *title, int x, int y,
                       int w, int h, uint flags) -> SDLWindow;
 
-    auto CreateGLContext(SDLWindow *window) -> GLContext;
+    auto CreateGLContext(SDLWindow *window) -> void*;
 
     auto ProcessEvents() -> bool;
 

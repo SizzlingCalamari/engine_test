@@ -10,6 +10,8 @@ glew_dir = "../glew-1.10.0/"
 glm_dir = "../glm/"
 soil_dir = "../soil-july07-2008/"
 
+src_dir = "src/"
+
 -- A solution contains projects, and defines the available configurations
 solution "engine_test"
     location "build"
@@ -67,7 +69,8 @@ solution "engine_test"
             bullet_dir .. "src",
             glew_dir .. "include",
             glm_dir,
-            soil_dir .. "src"
+            soil_dir .. "src",
+            src_dir .. "public/"
         }
         
         -- SDL2 linking

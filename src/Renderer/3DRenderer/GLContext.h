@@ -4,15 +4,13 @@
 #include <unordered_set>
 
 #include "GL/glew.h"
-//#include "SDL_video.h"
-typedef void *SDL_GLContext;
+
 class ShaderManager;
-class ShaderProgram;
 
 class GLContext
 {
 public:
-    GLContext(SDL_GLContext context);
+    GLContext(void *context);
     ~GLContext();
 
     auto CreateShaderManager() -> ShaderManager*;
@@ -22,9 +20,7 @@ public:
 
     static void EnableDepthTest(GLenum func);
 
-    static void SetActiveProgram(ShaderProgram *p);
-
 private:
-    SDL_GLContext m_context;
+    void *m_context;
     std::unordered_set<ShaderManager*> m_shader_managers;
 };

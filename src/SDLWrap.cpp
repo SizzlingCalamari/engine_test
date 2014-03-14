@@ -1,7 +1,6 @@
 
 #include "SDLWrap.h"
 #include "SDL.h"
-#include "utils.h"
 
 static_assert(INIT_TIMER == SDL_INIT_TIMER, "INIT_TIMER incorrect");
 static_assert(INIT_AUDIO == SDL_INIT_AUDIO, "INIT_AUDIO incorrect");
@@ -41,21 +40,13 @@ SDLWindow SDLWrap::CreateWindow(
     return SDLWindow(win);
 }
 
-GLContext SDLWrap::CreateGLContext(SDLWindow *window)
+void *SDLWrap::CreateGLContext(SDLWindow *window)
 {
     SDL_Window *w = window->GetHandle();
     SDL_GLContext c = SDL_GL_CreateContext(w);
 
-    // glew needs to be initialized after 
-    // the gl_createcontext call
-    static RunOnce glew([]
-    {
-        glewExperimental = true;
-        glewInit();
-    });
-
     m_glcontexts.emplace_back(c);
-    return GLContext(c);
+    return c;
 }
 
 bool SDLWrap::ProcessEvents()

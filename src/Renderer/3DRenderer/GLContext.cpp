@@ -3,7 +3,7 @@
 #include "FileUtils.h"
 #include "ShaderManager.h"
 
-GLContext::GLContext(SDL_GLContext context):
+GLContext::GLContext(void *context):
     m_context(context)
 {
 }
@@ -39,9 +39,4 @@ void GLContext::EnableDepthTest(GLenum func)
 {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(func);
-}
-
-void GLContext::SetActiveProgram(ShaderProgram *p)
-{
-    glUseProgram(p->m_id);
 }
