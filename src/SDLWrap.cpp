@@ -1,6 +1,7 @@
 
 #include "SDLWrap.h"
 #include "SDL.h"
+#include "utils.h"
 
 static_assert(INIT_TIMER == SDL_INIT_TIMER, "INIT_TIMER incorrect");
 static_assert(INIT_AUDIO == SDL_INIT_AUDIO, "INIT_AUDIO incorrect");
@@ -57,9 +58,10 @@ bool SDLWrap::ProcessEvents()
     SDL_PumpEvents();
     while ((num_events = GrabEvents()) > 0)
     {
-        for (int i = 0; i < num_events; ++i)
+        auto h = ForEachHelper(m_events.cbegin(), m_events.cbegin() + num_events);
+        for (auto &event : h)
         {
-            uint32 type = m_events[i].type;
+            uint32 type = event.type;
             quit = quit || (type == SDL_QUIT);
         }
     }
