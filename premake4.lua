@@ -4,13 +4,19 @@ if (os.get == "linux" and os.findlib("libXrandr") == nil) then
     os.execute("sudo apt-get install libxrandr-dev")
 end
 
-sdl_dir = "../sdl-dev/"
-bullet_dir = "../bullet-2.82-r2704/"
-glew_dir = "../glew-1.10.0/"
-glm_dir = "../glm/"
-soil_dir = "../soil-july07-2008/"
+-- visual studio intellisense doesn't work with relative include paths
+vs_include_prefix = ""
+if string.find(_ACTION, "vs20") then
+    vs_include_prefix = "$(SolutionDir)../"
+end
 
-src_dir = "src/"
+sdl_dir = vs_include_prefix .. "../sdl-dev/"
+bullet_dir = vs_include_prefix .. "../bullet-2.82-r2704/"
+glew_dir = vs_include_prefix .. "../glew-1.10.0/"
+glm_dir = vs_include_prefix .. "../glm/"
+soil_dir = vs_include_prefix .. "../soil-july07-2008/"
+
+src_dir = vs_include_prefix .. "src/"
 
 -- A solution contains projects, and defines the available configurations
 solution "engine_test"
