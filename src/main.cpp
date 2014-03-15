@@ -9,6 +9,8 @@
 #include "Renderer/Renderer.h"
 #include "Renderer/3DRenderer/3DRenderer.h"
 #include "Renderer/3DRenderer/Camera.h"
+#include "Renderer/3DRenderer/Renderable.h"
+#include "Renderer/3DRenderer/Scene.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
