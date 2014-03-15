@@ -33,6 +33,9 @@ public:
             glewExperimental = true;
             glewInit();
         });
+
+        glGenVertexArrays(1, &m_vao);
+        glBindVertexArray(m_vao);
     }
 
     void Init()
@@ -110,6 +113,7 @@ public:
 
 private:
     GLContext m_glcontext;
+    GLuint m_vao;
 
     ShaderManager *m_shader_manager;
     uint m_colour_shader;
