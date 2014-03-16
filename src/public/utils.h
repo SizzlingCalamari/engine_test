@@ -27,14 +27,14 @@ template<class T>
 class RValPtrClass
 {
 public:
-    explicit RValPtrClass(T&& p) noexcept: m_ptr(std::forward<T>(p)) {}
-    operator T*() noexcept { return &m_ptr; }
+    explicit inline RValPtrClass(T&& p) noexcept: m_ptr(std::forward<T>(p)) {}
+    inline operator T*() noexcept { return &m_ptr; }
 private:
     T m_ptr;
 };
 
 template<class T>
-auto RValPtr(T&& p) -> RValPtrClass<T>
+inline auto RValPtr(T&& p) -> RValPtrClass<T>
 {
     return RValPtrClass<T>(std::forward<T>(p));
 }
@@ -49,21 +49,59 @@ template<class T>
 class ForEachHelperClass
 {
 public:
-    explicit ForEachHelperClass(T&& begin, T&& end) noexcept:
+    explicit inline ForEachHelperClass(T&& begin, T&& end) noexcept:
         m_begin(std::forward<T>(begin)),
         m_end(std::forward<T>(end))
     {
     }
 
-    T begin() const noexcept { return m_begin; }
-    T end() const noexcept { return m_end; }
+    inline T begin() const noexcept { return m_begin; }
+    inline T end() const noexcept { return m_end; }
 private:
     T m_begin;
     T m_end;
 };
 
 template<class T>
-auto ForEachHelper(T&& begin, T&& end) -> ForEachHelperClass<T>
+inline auto ForEachHelper(T&& begin, T&& end) -> ForEachHelperClass<T>
 {
     return ForEachHelperClass<T>(std::forward<T>(begin), std::forward<T>(end));
+}
+
+namespace utils
+{
+    template<typename T>
+    inline T min(T a, T b)
+    {
+        return (a < b ? a : b);
+    }
+
+    template<typename T>
+    inline T max(T a, T b)
+    {
+        return (a > b ? a : b);
+    }
+
+    template<typename T>
+    inline void lessswap(T& a, T& b)
+    {
+        const T x = min(a, b);
+        const T y = max(a, b);
+        a = x;
+        b = y;
+    }
+
+    //
+    // sorting networks from
+    // http://pages.ripco.net/~jgamble/nw.html
+    //
+    template<typename T>
+    void sort4(T* elems)
+    {
+        lessswap(elems[0], elems[1]);
+        lessswap(elems[2], elems[3]);
+        lessswap(elems[0], elems[2]);
+        lessswap(elems[1], elems[3]);
+        lessswap(elems[1], elems[2]);
+    }
 }
