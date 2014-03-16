@@ -49,6 +49,7 @@ void *SDLWrap::CreateGLContext(SDLWindow *window)
     m_glcontexts.emplace_back(c);
     return c;
 }
+#include <iostream>
 
 bool SDLWrap::ProcessEvents()
 {
@@ -62,7 +63,21 @@ bool SDLWrap::ProcessEvents()
         for (auto &event : h)
         {
             uint32 type = event.type;
-            quit = quit || (type == SDL_QUIT);
+            switch (type)
+            {
+            case SDL_KEYDOWN:
+            case SDL_KEYUP:
+                for (auto &it : m_keyboard_listeners)
+                {
+                    it(event.key);
+                }
+                break;
+            case SDL_QUIT:
+                quit = true;
+                break;
+            default:
+                break;
+            }
         }
     }
     return !quit;

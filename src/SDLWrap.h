@@ -3,6 +3,8 @@
 
 #include <list>
 #include <array>
+#include <functional>
+#include <vector>
 
 #include "SDLWindow.h"
 #include "SDL_events.h"
@@ -24,6 +26,8 @@ enum InitFlags
         INIT_HAPTIC | INIT_GAMECONTROLER | INIT_EVENTS
 };
 
+typedef std::function<void(const SDL_KeyboardEvent&)> KeyboardCallback;
+
 class SDLWrap
 {
 public:
@@ -40,6 +44,11 @@ public:
 
     bool ProcessEvents();
 
+    void RegisterKeyboardEventListener(KeyboardCallback fn)
+    {
+        m_keyboard_listeners.emplace_back(std::move(fn));
+    }
+
 private:
     auto GrabEvents() -> int;
 
@@ -50,4 +59,6 @@ private:
     std::list<SDL_GLContext> m_glcontexts;
     std::list<SDL_Window*> m_windows;
     std::array<SDL_Event, MAX_EVENTS_PER_ITERATION> m_events;
+
+    std::vector<KeyboardCallback> m_keyboard_listeners;
 };

@@ -16,6 +16,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
+#include "Input/InputContext.h"
+#include "Input/InputMapper.h"
+
 #include "SOIL.h"
 
 static const float vertex_data[] = 
@@ -119,6 +122,37 @@ static const float tri_uv[] =
     0.0f, 1.0f
 };
 
+void callback(const KeyboardEventInfo& info)
+{
+    ButtonCombination b = info.buttons;
+    if (b.m_buttons[0])
+    {
+        std::cout << b.m_buttons[0] << " ";
+    }
+    if (info.buttons.m_buttons[1])
+    {
+        std::cout << b.m_buttons[1] << " ";
+    }
+    if (info.buttons.m_buttons[2])
+    {
+        std::cout << b.m_buttons[2] << " ";
+    }
+    if (info.buttons.m_buttons[3])
+    {
+        std::cout << b.m_buttons[3] << " ";
+    }
+
+    if (info.pressed)
+    {
+        std::cout << "down";
+    }
+    else
+    {
+        std::cout << "up";
+    }
+    std::cout << std::endl;
+}
+
 int main(int argc, const char *argv[])
 {
     std::cout << "Hello World!" << std::endl;
@@ -156,6 +190,19 @@ int main(int argc, const char *argv[])
     Scene scene;
     scene.AddObject(&box);
     scene.AddObject(&tri);
+
+    KeyboardContext k;
+    k.AddMapping({ SDL_SCANCODE_A }, &::callback);
+    k.AddMapping({ SDL_SCANCODE_S }, &::callback);
+    k.AddMapping({ SDL_SCANCODE_D }, &::callback);
+    k.AddMapping({ SDL_SCANCODE_W }, &::callback);
+    k.AddMapping({ SDL_SCANCODE_LCTRL, SDL_SCANCODE_X }, &::callback);
+
+    InputMapper m;
+    m.LoadContext(std::move(k));
+
+    using namespace std::placeholders;
+    sdl.RegisterKeyboardEventListener(std::bind(&InputMapper::ReceiveInput, &m, _1));
 
     //GLuint tex = SOIL_load_OGL_texture(
     //    "../textures/jesusbond_feelingfresh.jpg", SOIL_LOAD_AUTO,
