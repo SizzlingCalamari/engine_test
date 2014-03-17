@@ -56,12 +56,11 @@ public:
             {
                 // If the input key is part of a button combo, 
                 // and the rest of the buttons in that combo are set...
-                bool do_callback = ButtonCombination::has_button(keys, info.scancode);
-                do_callback &= m_key_states[keys.m_buttons[0]];
-                do_callback &= m_key_states[keys.m_buttons[1]];
-                do_callback &= m_key_states[keys.m_buttons[2]];
-                do_callback &= m_key_states[keys.m_buttons[3]];
-                if (do_callback)
+                if (ButtonCombination::has_button(keys, info.scancode) &&
+                    m_key_states[keys.m_buttons[0]] &&
+                    m_key_states[keys.m_buttons[1]] &&
+                    m_key_states[keys.m_buttons[2]] &&
+                    m_key_states[keys.m_buttons[3]])
                 {
                     // Set the key combination and run the callback.
                     info.buttons = keys;
