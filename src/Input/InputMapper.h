@@ -64,7 +64,7 @@ public:
                 {
                     // Set the key combination and run the callback.
                     info.buttons = keys;
-                    context.m_callbacks[index](info);
+                    m_callback_queue.emplace_back(info, context.m_callbacks[index]);
                 }
                 ++index;
             }
@@ -74,7 +74,18 @@ public:
         m_key_states[info.scancode] = info.pressed;
     }
 
+    void DispatchCallbacks()
+    {
+        for (auto &it : m_callback_queue)
+        {
+            it.second(it.first);
+        }
+        m_callback_queue.clear();
+    }
+
 private:
     std::vector<KeyboardContext> m_contexts;
     std::vector<bool> m_key_states;
+
+    std::vector<std::pair<KeyboardEventInfo, KeyboardEventCallback>> m_callback_queue;
 };

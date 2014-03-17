@@ -198,11 +198,11 @@ int main(int argc, const char *argv[])
     k.AddMapping({ SDL_SCANCODE_W }, &::callback);
     k.AddMapping({ SDL_SCANCODE_LCTRL, SDL_SCANCODE_X }, &::callback);
 
-    InputMapper m;
-    m.LoadContext(std::move(k));
+    InputMapper input;
+    input.LoadContext(std::move(k));
 
     using namespace std::placeholders;
-    sdl.RegisterKeyboardEventListener(std::bind(&InputMapper::ReceiveInput, &m, _1));
+    sdl.RegisterKeyboardEventListener(std::bind(&InputMapper::ReceiveInput, &input, _1));
 
     //GLuint tex = SOIL_load_OGL_texture(
     //    "../textures/jesusbond_feelingfresh.jpg", SOIL_LOAD_AUTO,
@@ -272,7 +272,7 @@ int main(int argc, const char *argv[])
             glBindVertexArray(0);
         glUseProgram(0);
         */
-
+        input.DispatchCallbacks();
         renderer->RenderScene(&cam, &scene);
         window.SwapBuffers();
     }
