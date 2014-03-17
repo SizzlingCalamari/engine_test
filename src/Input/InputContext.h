@@ -31,7 +31,7 @@ public:
     {
         // make sure the key combination doesn't have more than
         // the max number of keys
-        assert(s.size() <= ButtonCombination::MAX_BUTTON_COMBINATION);
+        assert(keys.size() <= ButtonCombination::MAX_BUTTON_COMBINATION);
         ButtonCombination b;
 
         // copy the buttons over
