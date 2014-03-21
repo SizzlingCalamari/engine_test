@@ -39,13 +39,13 @@ public:
     void AddChild(SceneGraphNode<T>* child)
     {
         assert(child);
-        m_children.emplace_back(node);
+        m_children.emplace_back(child);
     }
 
     void RemoveChild(SceneGraphNode<T>* child)
     {
         assert(child);
-        std::remove(m_children.begin(), m_children.end(), child)
+        std::remove(m_children.begin(), m_children.end(), child);
         m_children.pop_back();
     }
 
