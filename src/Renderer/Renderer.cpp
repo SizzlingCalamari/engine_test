@@ -5,7 +5,7 @@
 
 namespace Renderer
 {
-    Renderer3D *CreateAndInit3DRenderer(void *GLContext)
+    Renderer3D *CreateRenderer3D(void *GLContext)
     {
         assert(GLContext);
 
@@ -18,7 +18,6 @@ namespace Renderer
         });
 
         auto renderer = new Renderer3D(GLContext);
-        renderer->Init();
         return renderer;
     }
 

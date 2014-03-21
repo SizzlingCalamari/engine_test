@@ -170,7 +170,8 @@ int main(int argc, const char *argv[])
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
     SDLWindow window = sdl.CreateWindow("JORDAN", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_OPENGL);
-    auto renderer = Renderer::CreateAndInit3DRenderer(sdl.CreateGLContext(&window));
+    auto renderer = Renderer::CreateRenderer3D(sdl.CreateGLContext(&window));
+    renderer->Init();
 
     Camera cam;
     cam.CalcView();
