@@ -1,10 +1,9 @@
 
 #include <iostream>
-#include <cassert>
+
+#include "Application/Application.h"
 
 #include "World.h"
-
-#include "SDLWrap.h"
 
 #include "Renderer/Renderer.h"
 #include "Renderer/3DRenderer/3DRenderer.h"
@@ -18,8 +17,6 @@
 
 #include "Input/InputContext.h"
 #include "Input/InputMapper.h"
-
-#include "SOIL.h"
 
 static const float vertex_data[] = 
 {
@@ -155,22 +152,12 @@ void callback(const KeyboardEventInfo& info)
 
 int main(int argc, const char *argv[])
 {
-    std::cout << "Hello World!" << std::endl;
+    ApplicationService::Initialize();
 
-    SDLWrap sdl;
-    sdl.Init(INIT_VIDEO);
-
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-
-    SDLWindow window = sdl.CreateWindow("JORDAN", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_OPENGL);
-    auto renderer = Renderer::CreateRenderer3D(sdl.CreateGLContext(&window));
+    Window window = ApplicationService::CreateWindow(
+        "JORDAN", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_OPENGL);
+    auto gl_context = ApplicationService::CreateGLContext(window);
+    auto renderer = Renderer::CreateRenderer3D(gl_context);
 
     renderer3d_config config;
     config.x = 0;
@@ -211,90 +198,29 @@ int main(int argc, const char *argv[])
     InputMapper input;
     input.LoadContext(std::move(k));
 
-    using namespace std::placeholders;
-    sdl.RegisterKeyboardEventListener(std::bind(&InputMapper::ReceiveInput, &input, _1));
+    //using namespace std::placeholders;
+    //sdl.RegisterKeyboardEventListener(std::bind(&InputMapper::ReceiveInput, &input, _1));
 
-    //GLuint tex = SOIL_load_OGL_texture(
-    //    "../textures/jesusbond_feelingfresh.jpg", SOIL_LOAD_AUTO,
-    //    SOIL_CREATE_NEW_ID, SOIL_FLAG_POWER_OF_TWO | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT);
-    /*
-    GLuint VertexArrays[2];
-    glGenVertexArrays(sizeof(VertexArrays) / sizeof(GLuint), VertexArrays);
-
-    GLuint buffers[4];
-    glGenBuffers(sizeof(buffers) / sizeof(GLuint), buffers);
-
-    glBindVertexArray(VertexArrays[0]);
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-        glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data, GL_STATIC_DRAW);
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-        glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(colour_data), colour_data, GL_STREAM_DRAW);
-            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-    glBindVertexArray(0);
-
-    glBindVertexArray(VertexArrays[1]);
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-        glBindBuffer(GL_ARRAY_BUFFER, buffers[2]);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(tri_data), tri_data, GL_STATIC_DRAW);
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-        glBindBuffer(GL_ARRAY_BUFFER, buffers[3]);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(tri_uv), tri_uv, GL_STATIC_DRAW);
-            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
-    glBindVertexArray(0);
-    */
     World w;
     w.Initialize();
 
     const uint SERVER_FRAME_DT = 10000;
 
-    while (sdl.ProcessEvents())
+    while (ApplicationService::FlushAndRefreshEvents(),
+          !ApplicationService::QuitRequested())
     {
         w.Update(SERVER_FRAME_DT);
-        /*
-        GLContext::SetActiveProgram(&simple);
-            glBindVertexArray(VertexArrays[0]);
-                glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
-                glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
-                    //glBufferData(GL_ARRAY_BUFFER, sizeof(colour_data), nullptr, GL_STREAM_DRAW);
-                    {
-                        GLfloat *c = (GLfloat*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
-                        size_t count = sizeof(colour_data)/sizeof(colour_data[0]);
-                        for (size_t i = 0; i < count; ++i)
-                        {
-                            c[i] = c[(i+1)%count];
-                        }
-                        glUnmapBuffer(GL_ARRAY_BUFFER);
-                    }
-                glDrawArrays(GL_TRIANGLES, 0, sizeof(vertex_data) / 3 / sizeof(vertex_data[0]));
-            glBindVertexArray(0);
-        glUseProgram(0);
-        GLContext::SetActiveProgram(&texture);
-            glBindVertexArray(VertexArrays[1]);
-                glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVPTRI[0][0]);
-                glActiveTexture(GL_TEXTURE0);
-                    glBindTexture(GL_TEXTURE_2D, tex);
-                    glUniform1i(TextureID, 0);
-                glDrawArrays(GL_TRIANGLES, 0, sizeof(tri_data) / 3 / sizeof(tri_data[0]));
-            glBindVertexArray(0);
-        glUseProgram(0);
-        */
         input.DispatchCallbacks();
         renderer->RenderScene(&viewport1, &cam, &scene);
         renderer->RenderScene(&viewport2, &cam, &scene);
         window.SwapBuffers();
     }
 
+    w.Shutdown();
     renderer->Shutdown();
     Renderer::FreeRenderer(renderer);
-    w.Shutdown();
-    /*
-    glDeleteBuffers(sizeof(buffers) / sizeof(GLuint), buffers);
-    glDeleteVertexArrays(sizeof(VertexArrays) / sizeof(GLuint), VertexArrays);
-    glDeleteTextures(1, &tex);
-    */
-    sdl.Shutdown();
+    ApplicationService::FreeGLContext(gl_context);
+    ApplicationService::FreeWindow(window);
+    ApplicationService::Shutdown();
+    return 0;
 }
