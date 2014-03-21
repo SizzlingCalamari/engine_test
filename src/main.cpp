@@ -171,7 +171,16 @@ int main(int argc, const char *argv[])
 
     SDLWindow window = sdl.CreateWindow("JORDAN", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_OPENGL);
     auto renderer = Renderer::CreateRenderer3D(sdl.CreateGLContext(&window));
-    renderer->Init();
+
+    renderer3d_config config;
+    config.x = 0;
+    config.y = 0;
+    config.width = 640;
+    config.height = 480;
+    renderer->Init(config);
+
+    Viewport viewport1(0, 0, 320, 240);
+    Viewport viewport2(320, 240, 320, 240);
 
     Camera cam;
     cam.CalcView();
@@ -274,7 +283,8 @@ int main(int argc, const char *argv[])
         glUseProgram(0);
         */
         input.DispatchCallbacks();
-        renderer->RenderScene(&cam, &scene);
+        renderer->RenderScene(&viewport1, &cam, &scene);
+        renderer->RenderScene(&viewport2, &cam, &scene);
         window.SwapBuffers();
     }
 

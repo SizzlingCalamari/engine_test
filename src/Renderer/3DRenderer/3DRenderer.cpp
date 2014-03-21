@@ -33,10 +33,12 @@ Renderer3D::Renderer3D(void *GLContext):
     glBindVertexArray(m_vao);
 }
 
-void Renderer3D::Init()
+void Renderer3D::Init(const renderer3d_config& config)
 {
     GLContext::SetDebugMessageCallback(&GLErrorCallback);
     GLContext::EnableDepthTest(GL_LESS);
+
+    m_fullview.SetView(config.x, config.y, config.width, config.height);
     glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
     m_shader_manager = m_glcontext.CreateShaderManager();
@@ -78,8 +80,15 @@ void Renderer3D::Shutdown()
 {
 }
 
-void Renderer3D::RenderScene(const Camera* cam, const Scene* scene)
+void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const Scene* scene)
 {
+    bool do_scissor = (m_fullview != *viewport);
+    if (do_scissor)
+    {
+        glEnable(GL_SCISSOR_TEST);
+    }
+    viewport->SetActive();
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     auto pv = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f) * cam->GetView();
@@ -103,5 +112,9 @@ void Renderer3D::RenderScene(const Camera* cam, const Scene* scene)
     glDisableVertexAttribArray(1);
     glDisableVertexAttribArray(0);
     glUseProgram(0);
+    if (do_scissor)
+    {
+        glDisable(GL_SCISSOR_TEST);
+    }
     //glUseProgram(m_texture_shader);
 }
