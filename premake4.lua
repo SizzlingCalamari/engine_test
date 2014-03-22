@@ -69,7 +69,7 @@ solution "engine_test"
         forceincludes "platform.h"
 
         defines { "GLEW_STATIC", "SDL_MAIN_HANDLED" }
-        files { "**.h", "**.cpp", "**.vs", "**.fs" }
+        files { "**.h", "**.cpp", "**.vert", "**.frag" }
         includedirs {
             sdl_dir .. "include",
             bullet_dir .. "src",

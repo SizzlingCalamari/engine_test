@@ -47,8 +47,8 @@ void Renderer3D::Init(const renderer3d_config& config)
     std::vector<Shader> fragmentShaders;
 
     m_shader_manager->CompileShaders(
-        {"../src/shaders/simplevertex.vs", "../src/shaders/texturevertex.vs"},
-        {"../src/shaders/simplefragment.fs", "../src/shaders/texturefragment.fs"},
+        {"../src/shaders/simplevertex.vert", "../src/shaders/texturevertex.vert"},
+        {"../src/shaders/simplefragment.frag", "../src/shaders/texturefragment.frag"},
     vertexShaders, fragmentShaders);
 
     m_colour_shader = m_shader_manager->CreateProgram();
