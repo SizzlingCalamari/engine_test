@@ -5,6 +5,9 @@
 #include "SDL_events.h"
 #include "ButtonCombination.h"
 #include <vector>
+#include "../Application/Application.h"
+#include "SDL_keyboard.h"
+#include "SDL_mouse.h"
 
 class KeyboardContext;
 
@@ -76,9 +79,22 @@ public:
 
     void DispatchCallbacks()
     {
-        for (auto &it : m_callback_queue)
+        auto events = ApplicationService::GetEventsOfType(SDL_KEYDOWN, SDL_MOUSEWHEEL);
+        for (auto &e : events)
         {
-            it.second(it.first);
+            switch (e.type)
+            {
+            case SDL_KEYDOWN:
+            case SDL_KEYUP:
+                ReceiveInput(e.key);
+                break;
+            default:
+                break;
+            }
+        }
+        for (auto& func : m_callback_queue)
+        {
+            func.second(func.first);
         }
         m_callback_queue.clear();
     }
