@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "Model.h"
+#include "Mesh.h"
 #include "SceneGraphNode.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -23,6 +23,11 @@ void SceneGraphNode<matrix4x4>::ResetData(matrix4x4& data)
 class Renderable
 {
 public:
+    ~Renderable()
+    {
+        m_mesh.FreeVerticies();
+    }
+
     void SetTransform(const glm::mat4& transform)
     {
         m_transform = transform;
@@ -33,23 +38,13 @@ public:
         return m_transform;
     }
 
-    void LoadVerticies(const float* verticies, uint num_verticies)
+    Mesh* GetMesh()
     {
-        m_model.LoadVerticies(verticies, num_verticies);
-    }
-
-    uint GetNumVerticies() const
-    {
-        return m_model.GetNumVerticies();
-    }
-
-    uint GetVertexBufferId() const
-    {
-        return m_model.GetVertexBufferId();
+        return &m_mesh;
     }
 
 private:
     //SceneGraphNode<matrix4x4> m_transform;
     glm::mat4 m_transform;
-    Model m_model;
+    Mesh m_mesh;
 };

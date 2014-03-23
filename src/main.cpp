@@ -178,11 +178,21 @@ int main(int argc, const char *argv[])
 
     Renderable box;
     box.SetTransform(box_transform);
-    box.LoadVerticies(vertex_data, sizeof(vertex_data) / 3 / sizeof(vertex_data[0]));
+    {
+        auto mesh = box.GetMesh();
+        mesh->LoadVerticies(vertex_data,
+                            3 * sizeof(float),
+                            sizeof(vertex_data) / 3 / sizeof(vertex_data[0]));
+    }
 
     Renderable tri;
     tri.SetTransform(glm::mat4());
-    tri.LoadVerticies(tri_data, sizeof(tri_data) / 3 / sizeof(tri_data[0]));
+    {
+        auto mesh = tri.GetMesh();
+        mesh->LoadVerticies(tri_data,
+                            3 * sizeof(float),
+                            sizeof(tri_data) / 3 / sizeof(tri_data[0]));
+    }
 
     Scene scene;
     scene.AddObject(&box);

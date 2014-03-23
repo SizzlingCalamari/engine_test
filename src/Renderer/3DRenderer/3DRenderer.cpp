@@ -94,12 +94,13 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
     for (auto obj : scene->GetObjects())
     {
         auto mvp = pv * obj->GetTransform();
-
         m_colour_shader.SetUniform("MVP", &mvp[0][0]);
-        glBindBuffer(GL_ARRAY_BUFFER, obj->GetVertexBufferId());
+
+        auto *mesh = obj->GetMesh();
+        glBindBuffer(GL_ARRAY_BUFFER, mesh->GetVertexBufferId());
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
             glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-            glDrawArrays(GL_TRIANGLES, 0, obj->GetNumVerticies());
+            glDrawArrays(GL_TRIANGLES, 0, mesh->GetNumVerticies());
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     m_colour_shader.Unbind();
