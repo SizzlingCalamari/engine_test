@@ -87,7 +87,8 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    auto pv = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f) * cam->GetView();
+    auto aspect = viewport->GetAspectRatio();
+    auto pv = glm::perspective(45.0f, aspect, 0.1f, 100.0f) * cam->GetView();
 
     m_colour_shader.Bind();
     for (auto obj : scene->GetObjects())

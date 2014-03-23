@@ -38,6 +38,11 @@ public:
         glViewport(m_x, m_y, m_width, m_height);
     }
 
+    float GetAspectRatio() const
+    {
+        return static_cast<float>(m_width) / static_cast<float>(m_height);
+    }
+
     bool operator==(const Viewport& other)
     {
         return m_all == other.m_all;
