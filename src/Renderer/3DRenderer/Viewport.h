@@ -40,10 +40,7 @@ public:
 
     bool operator==(const Viewport& other)
     {
-        return (m_x == other.m_x) &&
-               (m_y == other.m_y) &&
-               (m_width == other.m_width) &&
-               (m_height == other.m_height);
+        return m_all == other.m_all;
     }
 
     bool operator!=(const Viewport& other)
@@ -52,8 +49,15 @@ public:
     }
 
 private:
-    uint m_x;
-    uint m_y;
-    uint m_width;
-    uint m_height;
+    union
+    {
+        uint64 m_all;
+        struct
+        {
+            uint16 m_x;
+            uint16 m_y;
+            uint16 m_width;
+            uint16 m_height;
+        };
+    };
 };
