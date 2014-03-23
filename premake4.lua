@@ -51,14 +51,23 @@ solution "engine_test"
     configuration "Release"
         targetdir "build/Release"
         defines { "NDEBUG" }
-        optimize "On"
+        optimize "Full"
         flags { "LinkTimeOptimization", "MultiProcessorCompile" }
+    configuration {}
     
     -- os specific configurations
     configuration "windows"
         defines "WIN32"
     configuration "linux"
         toolset "clang"
+    configuration {}
+    
+    -- hidden option to improve optimized code debugging
+    configuration "vs*"
+        buildoptions
+        {
+            "/d2Zi+"
+        }
     
     -- A project defines one build target
     project "engine_test"
