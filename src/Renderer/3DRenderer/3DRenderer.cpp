@@ -90,9 +90,6 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
     auto pv = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f) * cam->GetView();
 
     m_colour_shader.Bind();
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-
     for (auto obj : scene->GetObjects())
     {
         auto mvp = pv * obj->GetTransform();
@@ -104,9 +101,6 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
             glDrawArrays(GL_TRIANGLES, 0, obj->GetNumVerticies());
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
-        
-    glDisableVertexAttribArray(1);
-    glDisableVertexAttribArray(0);
     m_colour_shader.Unbind();
     if (do_scissor)
     {
