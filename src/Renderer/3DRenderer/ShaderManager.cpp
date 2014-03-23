@@ -40,16 +40,18 @@ ShaderProgram ShaderManager::CreateProgram()
 vector<GLuint> ShaderManager::CompileShaders(
     const vector<string> &shader_files, uint type)
 {
-    int num_shaders = shader_files.size();
+    auto num_shaders = shader_files.size();
     auto shader_list = CreateShaders(type, num_shaders);
 
-    for (auto i = 0; i < num_shaders; ++i)
+    int index = 0;
+    for (auto &file : shader_files)
     {
-        if (ReadBinaryFileToString(shader_files[i], m_codescratch))
+        if (ReadBinaryFileToString(file, m_codescratch))
         {
-            auto success = CompileShader(shader_list[i], m_codescratch);
+            auto success = CompileShader(shader_list[index], m_codescratch);
             assert(success);
         }
+        ++index;
     }
     return shader_list;
 }
