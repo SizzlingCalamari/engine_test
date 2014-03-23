@@ -23,21 +23,21 @@ ShaderManager::~ShaderManager()
 void ShaderManager::CompileShaders(
     const vector<string> &vshader_files,
     const vector<string> &fshader_files,
-    vector<Shader> &vertex_out,
-    vector<Shader> &fragment_out)
+    vector<GLuint> &vertex_out,
+    vector<GLuint> &fragment_out)
 {
     vertex_out = CompileShaders(vshader_files, GL_VERTEX_SHADER);
     fragment_out = CompileShaders(fshader_files, GL_FRAGMENT_SHADER);
 }
 
-uint ShaderManager::CreateProgram()
+ShaderProgram ShaderManager::CreateProgram()
 {
     uint program = glCreateProgram();
     m_programs.insert(program);
-    return program;
+    return ShaderProgram(program);
 }
 
-vector<Shader> ShaderManager::CompileShaders(
+vector<GLuint> ShaderManager::CompileShaders(
     const vector<string> &shader_files, uint type)
 {
     int num_shaders = shader_files.size();
@@ -54,9 +54,9 @@ vector<Shader> ShaderManager::CompileShaders(
     return shader_list;
 }
 
-vector<Shader> ShaderManager::CreateShaders(uint type, uint num)
+vector<GLuint> ShaderManager::CreateShaders(uint type, uint num)
 {
-    vector<Shader> shaders(num, 0);
+    vector<GLuint> shaders(num, 0);
     for (auto &s : shaders)
     {
         s = glCreateShader(type);

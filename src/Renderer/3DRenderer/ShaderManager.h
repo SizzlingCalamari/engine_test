@@ -4,11 +4,7 @@
 #include <vector>
 #include <string>
 #include <unordered_set>
-
-#include "GL/glew.h"
-
-typedef uint Shader;
-class ShaderProgram;
+#include "ShaderProgram.h"
 
 class ShaderManager
 {
@@ -19,17 +15,17 @@ public:
     void CompileShaders(
         const std::vector<std::string> &vshader_files,
         const std::vector<std::string> &fshader_files,
-        std::vector<Shader> &vertex_out,
-        std::vector<Shader> &fragment_out);
+        std::vector<uint> &vertex_out,
+        std::vector<uint> &fragment_out);
 
-    uint CreateProgram();
+    ShaderProgram CreateProgram();
 
 private:
     auto CompileShaders(
         const std::vector<std::string> &shader_files, uint type)
-            -> std::vector<Shader>;
+            -> std::vector<uint>;
 
-    auto CreateShaders(uint type, uint num) -> std::vector<Shader>;
+    auto CreateShaders(uint type, uint num) -> std::vector<uint>;
 
 private:
     std::unordered_set<uint> m_shaders;

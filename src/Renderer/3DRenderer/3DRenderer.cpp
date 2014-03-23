@@ -18,7 +18,9 @@ static void STDCALL GLErrorCallback(
 
 Renderer3D::Renderer3D(void *GLContext):
     m_glcontext(GLContext),
-    m_shader_manager(nullptr)
+    m_shader_manager(nullptr),
+    m_colour_shader(0),
+    m_texture_shader(0)
 {
     assert(GLContext);
     // glew needs to be initialized after 
@@ -43,8 +45,8 @@ void Renderer3D::Init(const renderer3d_config& config)
 
     m_shader_manager = m_glcontext.CreateShaderManager();
 
-    std::vector<Shader> vertexShaders;
-    std::vector<Shader> fragmentShaders;
+    std::vector<uint> vertexShaders;
+    std::vector<uint> fragmentShaders;
 
     m_shader_manager->CompileShaders(
         {"../src/shaders/simplevertex.vert", "../src/shaders/texturevertex.vert"},
@@ -52,18 +54,12 @@ void Renderer3D::Init(const renderer3d_config& config)
     vertexShaders, fragmentShaders);
 
     m_colour_shader = m_shader_manager->CreateProgram();
-    glAttachShader(m_colour_shader, vertexShaders[0]);
-    glAttachShader(m_colour_shader, fragmentShaders[0]);
-    glLinkProgram(m_colour_shader);
-    {
-        int res = GL_FALSE;
-        glGetProgramiv(m_colour_shader, GL_LINK_STATUS, &res);
-        bool linked = res == GL_TRUE;
-        assert(linked);
-    }
-    m_mvp_id = glGetUniformLocation(m_colour_shader, "MVP");
+    m_colour_shader.AttachShader(vertexShaders[0]);
+    m_colour_shader.AttachShader(fragmentShaders[0]);
+    bool linked = m_colour_shader.Link();
+    assert(linked);
 
-    m_texture_shader = m_shader_manager->CreateProgram();
+    /*m_texture_shader = m_shader_manager->CreateProgram();
     glAttachShader(m_texture_shader, vertexShaders[1]);
     glAttachShader(m_texture_shader, fragmentShaders[1]);
     glLinkProgram(m_texture_shader);
@@ -73,7 +69,7 @@ void Renderer3D::Init(const renderer3d_config& config)
         bool linked = res == GL_TRUE;
         assert(linked);
     }
-    m_tex_id = glGetUniformLocation(m_texture_shader, "myTextureSampler");
+    m_tex_id = glGetUniformLocation(m_texture_shader, "myTextureSampler");*/
 }
 
 void Renderer3D::Shutdown()
@@ -93,15 +89,15 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
 
     auto pv = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f) * cam->GetView();
 
-    glUseProgram(m_colour_shader);
+    m_colour_shader.Bind();
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
 
     for (auto obj : scene->GetObjects())
     {
         auto mvp = pv * obj->GetTransform();
-            
-        glUniformMatrix4fv(m_mvp_id, 1, GL_FALSE, &mvp[0][0]);
+
+        m_colour_shader.SetUniform("MVP", &mvp[0][0]);
         glBindBuffer(GL_ARRAY_BUFFER, obj->GetVertexBufferId());
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
             glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
@@ -111,10 +107,9 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
         
     glDisableVertexAttribArray(1);
     glDisableVertexAttribArray(0);
-    glUseProgram(0);
+    m_colour_shader.Unbind();
     if (do_scissor)
     {
         glDisable(GL_SCISSOR_TEST);
     }
-    //glUseProgram(m_texture_shader);
 }

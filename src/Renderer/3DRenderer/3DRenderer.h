@@ -3,6 +3,7 @@
 
 #include "GLContext.h"
 #include "Viewport.h"
+#include "ShaderProgram.h"
 
 class Camera;
 class Scene;
@@ -32,11 +33,8 @@ private:
     uint m_vao;
 
     ShaderManager *m_shader_manager;
-    uint m_colour_shader;
-    uint m_texture_shader;
-
-    uint m_mvp_id;
-    uint m_tex_id;
+    ShaderProgram m_colour_shader;
+    ShaderProgram m_texture_shader;
 
     Viewport m_fullview;
 };
