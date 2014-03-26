@@ -6,7 +6,7 @@
 class Mesh
 {
 public:
-    void LoadVerticies(const float* verticies, uint stride, uint num_verticies)
+    void LoadVerticies(const void* verticies, uint stride, uint num_verticies)
     {
         if (m_vertex_buffer == 0)
         {

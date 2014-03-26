@@ -10,7 +10,7 @@ class Camera
 public:
     void CalcView()
     {
-        m_view = glm::lookAt(glm::vec3(4, 3, 3), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+        m_view = glm::lookAt(glm::vec3(0, 0, 1), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
     }
 
     const glm::mat4& GetView() const

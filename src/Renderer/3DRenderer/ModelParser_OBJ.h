@@ -9,10 +9,14 @@
 
 std::vector<glm::vec3> ParseOBJ(const char *filename)
 {
-    std::vector<glm::vec3> verticies;
+    using namespace std;
+    vector<glm::vec3> verticies;
+    vector<glm::vec3> verticies_temp;
+    vector<glm::vec2> uvs_temp;
+    vector<glm::vec3> normals_temp;
 
-    std::ifstream file(filename);
-    std::string line_type;
+    ifstream file(filename);
+    string line_type;
 
     while (file >> line_type)
     {
@@ -20,9 +24,29 @@ std::vector<glm::vec3> ParseOBJ(const char *filename)
         {
             glm::vec3 vertex;
             file >> vertex.x >> vertex.y >> vertex.z;
-            verticies.emplace_back(vertex);
+            verticies_temp.emplace_back(vertex);
         }
-        file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        else if (line_type == "vt")
+        {
+            glm::vec2 uv;
+            file >> uv.x >> uv.y;
+            uvs_temp.emplace_back(uv);
+        }
+        else if (line_type == "vn")
+        {
+            glm::vec3 normal;
+            file >> normal.x >> normal.y >> normal.z;
+            normals_temp.emplace_back(normal);
+        }
+        else if (line_type == "f")
+        {
+            uint verts[3] = {};
+            file >> verts[0] >> verts[1] >> verts[2];
+            verticies.emplace_back(verticies_temp[verts[0] - 1]);
+            verticies.emplace_back(verticies_temp[verts[1] - 1]);
+            verticies.emplace_back(verticies_temp[verts[2] - 1]);
+        }
+        file.ignore(numeric_limits<streamsize>::max(), '\n');
     }
     return verticies;
 }

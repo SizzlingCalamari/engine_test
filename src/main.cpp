@@ -10,6 +10,7 @@
 #include "Renderer/3DRenderer/Camera.h"
 #include "Renderer/3DRenderer/Renderable.h"
 #include "Renderer/3DRenderer/Scene.h"
+#include "Renderer/3DRenderer/ModelParser_OBJ.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -185,13 +186,15 @@ int main(int argc, const char *argv[])
                             sizeof(vertex_data) / 3 / sizeof(vertex_data[0]));
     }
 
+    auto verts = ParseOBJ("../models/jiggy.obj");
+
     Renderable tri;
-    tri.SetTransform(glm::mat4());
+    tri.SetTransform(glm::translate(glm::vec3(0.0f, -20.0f, -150.0f)));
     {
         auto mesh = tri.GetMesh();
-        mesh->LoadVerticies(tri_data,
-                            3 * sizeof(float),
-                            sizeof(tri_data) / 3 / sizeof(tri_data[0]));
+        mesh->LoadVerticies(verts.data(),
+                            sizeof(glm::vec3),
+                            verts.size());
     }
 
     Scene scene;
