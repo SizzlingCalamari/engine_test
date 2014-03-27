@@ -19,6 +19,10 @@
 #include "Input/InputContext.h"
 #include "Input/InputMapper.h"
 
+#include "EntitySystem/ComponentTable.h"
+#include "EntitySystem/PhysicalComponent.h"
+#include "EntitySystem/RenderProxy.h"
+
 static const float vertex_data[] = 
 {
     -1.0f, -1.0f, -1.0f, // triangle 1 : begin
@@ -167,11 +171,21 @@ int main(int argc, const char *argv[])
     config.height = 480;
     renderer->Init(config);
 
+    RenderProxy render_proxy(renderer);
+
     Viewport viewport1(0, 0, 320, 240);
     Viewport viewport2(320, 240, 320, 240);
 
-    Camera cam;
-    cam.CalcView();
+    ComponentTable<PhysicalComponent> physical_components;
+    render_proxy.SetComponentTables(&physical_components);
+
+    uint camera = 0;
+    {
+        auto* physical = physical_components.AttachComponent(camera);
+        physical->position = glm::vec3(0.0f, -20.0f, -150.0f);
+        physical->forward = glm::vec3(0.0f, 0.0f, 1.0f);
+        physical->up = glm::vec3(0.0f, 1.0f, 0.0f);
+    }
 
     auto box_transform = glm::translate(glm::vec3(-3.0f, 0.0f, 0.0f))
         * glm::rotate(30.0f, glm::vec3(0, 0, 1.0f))
@@ -224,8 +238,8 @@ int main(int argc, const char *argv[])
     {
         w.Update(SERVER_FRAME_DT);
         input.DispatchCallbacks();
-        renderer->RenderScene(&viewport1, &cam, &scene);
-        renderer->RenderScene(&viewport2, &cam, &scene);
+        render_proxy.RenderScene(&viewport1, camera, &scene);
+        render_proxy.RenderScene(&viewport2, camera, &scene);
         window.SwapBuffers();
     }
 
