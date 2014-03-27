@@ -113,7 +113,7 @@ void ShaderProgram::QueryUniformInformation()
             name.resize(length);
 
             // insert the uniform info into the hash map
-            m_uniforms.emplace(std::move(name), UniformInfo{ i, type });
+            m_uniforms.emplace(std::move(name), UniformInfo{ static_cast<GLuint>(i), type });
         }
     }
 }
