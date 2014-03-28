@@ -58,6 +58,11 @@ public:
         }
     }
 
+    bool HasComponent(uint ent)
+    {
+        return (m_ent_to_component.find(ent) != m_ent_to_component.end());
+    }
+
     T* GetComponent(uint ent)
     {
         return m_components.data() + m_ent_to_component[ent];

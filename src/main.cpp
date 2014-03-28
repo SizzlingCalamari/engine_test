@@ -20,6 +20,7 @@
 #include "Input/InputMapper.h"
 
 #include "EntitySystem/ComponentTable.h"
+#include "EntitySystem/GraphicalComponent.h"
 #include "EntitySystem/PhysicalComponent.h"
 #include "EntitySystem/RenderProxy.h"
 
@@ -177,7 +178,10 @@ int main(int argc, const char *argv[])
     Viewport viewport2(320, 240, 320, 240);
 
     ComponentTable<PhysicalComponent> physical_components;
-    render_proxy.SetComponentTables(&physical_components);
+    ComponentTable<GraphicalComponent> graphical_components;
+
+    render_proxy.SetComponentTables(&physical_components, &graphical_components);
+    std::vector<uint> renderables;
 
     uint camera = 0;
     {
@@ -187,33 +191,19 @@ int main(int argc, const char *argv[])
         physical->up = glm::vec3(0.0f, 1.0f, 0.0f);
     }
 
-    auto box_transform = glm::translate(glm::vec3(-3.0f, 0.0f, 0.0f))
-        * glm::rotate(30.0f, glm::vec3(0, 0, 1.0f))
-        * glm::scale(glm::vec3(1.0f));
-
-    Renderable box;
-    box.SetTransform(box_transform);
+    uint jiggy = 1;
     {
-        auto mesh = box.GetMesh();
-        mesh->LoadVerticies(vertex_data,
-                            3 * sizeof(float),
-                            sizeof(vertex_data) / 3 / sizeof(vertex_data[0]));
+        auto* physical = physical_components.AttachComponent(jiggy);
+        physical->forward = glm::vec3(0.0f, 0.0f, 1.0f);
+        physical->position = glm::vec3(0.0f, -20.0f, -150.0f);
+        physical->up = glm::vec3(0.0f, 1.0f, 0.0f);
+
+        auto verts = ParseOBJ("../models/jiggy.obj");
+        auto* graphical = graphical_components.AttachComponent(jiggy);
+        graphical->mesh.LoadVerticies(verts.data(), sizeof(glm::vec3), verts.size());
+
+        renderables.emplace_back(jiggy);
     }
-
-    auto verts = ParseOBJ("../models/jiggy.obj");
-
-    Renderable tri;
-    tri.SetTransform(glm::translate(glm::vec3(0.0f, -20.0f, -150.0f)));
-    {
-        auto mesh = tri.GetMesh();
-        mesh->LoadVerticies(verts.data(),
-                            sizeof(glm::vec3),
-                            verts.size());
-    }
-
-    Scene scene;
-    scene.AddObject(&box);
-    scene.AddObject(&tri);
 
     KeyboardContext k;
     k.AddMapping({ SDL_SCANCODE_A }, &::callback);
@@ -238,8 +228,8 @@ int main(int argc, const char *argv[])
     {
         w.Update(SERVER_FRAME_DT);
         input.DispatchCallbacks();
-        render_proxy.RenderScene(&viewport1, camera, &scene);
-        render_proxy.RenderScene(&viewport2, camera, &scene);
+        render_proxy.RenderScene(&viewport1, camera, renderables);
+        render_proxy.RenderScene(&viewport2, camera, renderables);
         window.SwapBuffers();
     }
 

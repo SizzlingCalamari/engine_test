@@ -7,21 +7,21 @@
 class Scene
 {
 public:
-    void AddObject(Renderable* r)
+    void AddRenderable(const glm::mat4& transform, const Mesh& mesh)
     {
-        m_objects.emplace_back(r);
+        m_objects.emplace_back(Renderable{ transform, mesh });
     }
 
-    const std::vector<Renderable*>& GetObjects() const
+    const std::vector<Renderable>& GetRenderables() const
     {
         return m_objects;
     }
 
-    int GetNumObjects() const
+    void Clear()
     {
-        return m_objects.size();
+        m_objects.clear();
     }
 
 private:
-    std::vector<Renderable*> m_objects;
+    std::vector<Renderable> m_objects;
 };
