@@ -84,16 +84,16 @@ int main(int argc, const char *argv[])
     uint camera = 0;
     {
         auto* physical = physical_components.AttachComponent(camera);
-        physical->forward = glm::vec3(0.0f, 0.0f, 1.0f);
         physical->position = glm::vec3(0.0f, 0.0f, 0.0f);
+        physical->forward = glm::vec3(0.0f, 0.0f, 1.0f);
         physical->up = glm::vec3(0.0f, 1.0f, 0.0f);
     }
 
     uint jiggy = 1;
     {
         auto* physical = physical_components.AttachComponent(jiggy);
-        physical->forward = glm::vec3(0.0f, 0.0f, 1.0f);
-        physical->position = glm::vec3(0.0f, -20.0f, -150.0f);
+        physical->position = glm::vec3(0.0f, -20.0f, 150.0f);
+        physical->forward = glm::vec3(0.0f, 0.0f, -1.0f);
         physical->up = glm::vec3(0.0f, 1.0f, 0.0f);
 
         auto* graphical = graphical_components.AttachComponent(jiggy);
@@ -105,14 +105,22 @@ int main(int argc, const char *argv[])
     uint note = 2;
     {
         auto* physical = physical_components.AttachComponent(note);
-        physical->forward = glm::vec3(0.0f, 0.0f, 1.0f);
-        physical->position = glm::vec3(5.0f, 0.0f, -50.0f);
+        physical->position = glm::vec3(5.0f, 0.0f, 50.0f);
+        physical->forward = glm::vec3(0.0f, 0.0f, -1.0f);
         physical->up = glm::vec3(0.0f, 1.0f, 0.0f);
 
         auto* graphical = graphical_components.AttachComponent(note);
         graphical->mesh = LoadMeshFromOBJ("../models/note.obj");
 
         renderables.emplace_back(note);
+    }
+
+    uint camera2 = 3;
+    {
+        auto* physical = physical_components.AttachComponent(camera2);
+        physical->position = glm::vec3(0.0f, -10.0f, 300.0f);
+        physical->forward = glm::vec3(0.0f, 0.0f, -1.0f);
+        physical->up = glm::vec3(0.0f, 1.0f, 0.0f);
     }
 
     KeyboardContext k;
@@ -136,7 +144,7 @@ int main(int argc, const char *argv[])
         w.Update(SERVER_FRAME_DT);
         input.DispatchCallbacks();
         render_proxy.RenderScene(&viewport1, camera, renderables);
-        render_proxy.RenderScene(&viewport2, camera, renderables);
+        render_proxy.RenderScene(&viewport2, camera2, renderables);
         window.SwapBuffers();
     }
 

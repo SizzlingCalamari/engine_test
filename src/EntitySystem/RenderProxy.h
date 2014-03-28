@@ -43,7 +43,7 @@ private:
     {
         auto *physical = m_physical_components->GetComponent(camera);
         assert(physical);
-        m_camera.CalcView(physical->forward, physical->position, physical->up);
+        m_camera.CalcView(physical->position, physical->forward, physical->up);
     }
 
     void BuildScene(const std::vector<uint>& renderables)

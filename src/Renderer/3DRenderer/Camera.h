@@ -8,9 +8,10 @@
 class Camera
 {
 public:
-    void CalcView(const glm::vec3& forward, const glm::vec3& position, const glm::vec3& up)
+    void CalcView(const glm::vec3& position, const glm::vec3& forward, const glm::vec3& up)
     {
-        m_view = glm::lookAt(forward, position, up);
+        // target location is forward direction - current position
+        m_view = glm::lookAt(position, forward - position, up);
     }
 
     const glm::mat4& GetView() const
