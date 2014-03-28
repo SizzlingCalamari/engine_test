@@ -102,6 +102,19 @@ int main(int argc, const char *argv[])
         renderables.emplace_back(jiggy);
     }
 
+    uint note = 2;
+    {
+        auto* physical = physical_components.AttachComponent(note);
+        physical->forward = glm::vec3(0.0f, 0.0f, 1.0f);
+        physical->position = glm::vec3(5.0f, 0.0f, -50.0f);
+        physical->up = glm::vec3(0.0f, 1.0f, 0.0f);
+
+        auto* graphical = graphical_components.AttachComponent(note);
+        graphical->mesh = LoadMeshFromOBJ("../models/note.obj");
+
+        renderables.emplace_back(note);
+    }
+
     KeyboardContext k;
     k.AddMapping({ SDL_SCANCODE_A }, &::callback);
     k.AddMapping({ SDL_SCANCODE_S }, &::callback);
