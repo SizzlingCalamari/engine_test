@@ -50,3 +50,11 @@ std::vector<glm::vec3> ParseOBJ(const char *filename)
     }
     return verticies;
 }
+
+Mesh LoadMeshFromOBJ(const char *filename)
+{
+    Mesh mesh;
+    auto verts = ParseOBJ(filename);
+    mesh.LoadVerticies(verts.data(), sizeof(glm::vec3), verts.size());
+    return mesh;
+}

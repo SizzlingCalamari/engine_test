@@ -96,9 +96,8 @@ int main(int argc, const char *argv[])
         physical->position = glm::vec3(0.0f, -20.0f, -150.0f);
         physical->up = glm::vec3(0.0f, 1.0f, 0.0f);
 
-        auto verts = ParseOBJ("../models/jiggy.obj");
         auto* graphical = graphical_components.AttachComponent(jiggy);
-        graphical->mesh.LoadVerticies(verts.data(), sizeof(glm::vec3), verts.size());
+        graphical->mesh = LoadMeshFromOBJ("../models/jiggy.obj");
 
         renderables.emplace_back(jiggy);
     }
