@@ -25,7 +25,7 @@ private:
         const std::vector<std::string> &shader_files, uint type)
             -> std::vector<uint>;
 
-    auto CreateShaders(uint type, uint num) -> std::vector<uint>;
+    auto CreateShaders(uint type, size_t num) -> std::vector<uint>;
 
 private:
     std::unordered_set<uint> m_shaders;

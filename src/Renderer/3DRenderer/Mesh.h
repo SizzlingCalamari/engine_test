@@ -6,7 +6,7 @@
 class Mesh
 {
 public:
-    void LoadVerticies(const void* verticies, uint stride, uint num_verticies)
+    void LoadVerticies(const void* verticies, ptrdiff_t stride, size_t num_verticies)
     {
         if (m_vertex_buffer == 0)
         {
@@ -27,7 +27,7 @@ public:
         }
     }
 
-    uint GetNumVerticies() const
+    size_t GetNumVerticies() const
     {
         return m_num_verticies;
     }
@@ -39,5 +39,5 @@ public:
 
 private:
     GLuint m_vertex_buffer = 0;
-    uint m_num_verticies = 0;
+    size_t m_num_verticies = 0;
 };

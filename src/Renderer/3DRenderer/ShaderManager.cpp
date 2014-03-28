@@ -56,7 +56,7 @@ vector<GLuint> ShaderManager::CompileShaders(
     return shader_list;
 }
 
-vector<GLuint> ShaderManager::CreateShaders(uint type, uint num)
+vector<GLuint> ShaderManager::CreateShaders(uint type, size_t num)
 {
     vector<GLuint> shaders(num, 0);
     for (auto &s : shaders)

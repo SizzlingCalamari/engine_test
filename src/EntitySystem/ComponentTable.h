@@ -13,7 +13,7 @@ public:
         auto it = m_ent_to_component.find(ent);
         if (it == m_ent_to_component.end())
         {
-            uint index = m_components.size();
+            auto index = m_components.size();
 
             // add the component
             m_components.emplace_back();
@@ -74,7 +74,7 @@ public:
     }
 
 private:
-    std::unordered_map<uint, uint> m_ent_to_component;
-    std::unordered_map<uint, uint> m_component_to_ent;
+    std::unordered_map<size_t, size_t> m_ent_to_component;
+    std::unordered_map<size_t, size_t> m_component_to_ent;
     std::vector<T> m_components;
 };
