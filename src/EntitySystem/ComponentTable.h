@@ -32,18 +32,29 @@ public:
         auto it = m_ent_to_component.find(ent);
         if (it != m_ent_to_component.end())
         {
-            uint index = it.second;
-            uint last_elem = m_components.size()-1;
-            
-            // swap last and removed element
-            m_components[index] = m_components[last_elem];
+            uint removed_index = it->second;
+            uint tail_index = m_components.size()-1;
+            uint tail_ent = m_component_to_ent[tail_index];
+            if (removed_index != tail_index)
+            {
+                // swap last and removed element
+                m_components[removed_index] = std::move(m_components[tail_index]);
 
-            // fix map indices
-            m_ent_to_component[last_elem] = m_ent_to_component[index];
-            m_component_to_ent[index] = m_component_to_ent[last_elem];
+                // fix map indices
+                m_ent_to_component[tail_ent] = removed_index;
+                m_component_to_ent[removed_index] = tail_ent;
 
-            // remove element from map
-            m_ent_to_component.erase(it);
+                // remove element from map
+                m_ent_to_component.erase(it);
+                m_component_to_ent.erase(tail_index);
+            }
+            else
+            {
+                // erase mapping from removed ent
+                m_ent_to_component.erase(it);
+                m_component_to_ent.erase(removed_index);
+            }
+            m_components.pop_back();
         }
     }
 
