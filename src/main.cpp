@@ -9,7 +9,6 @@
 #include "Renderer/3DRenderer/3DRenderer.h"
 #include "Renderer/3DRenderer/Camera.h"
 #include "Renderer/3DRenderer/Renderable.h"
-#include "Renderer/3DRenderer/Scene.h"
 #include "Renderer/3DRenderer/ModelParser_OBJ.h"
 
 #include <glm/glm.hpp>

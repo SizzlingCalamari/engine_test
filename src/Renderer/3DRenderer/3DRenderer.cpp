@@ -4,7 +4,6 @@
 #include <iostream>
 #include "ShaderManager.h"
 #include "Camera.h"
-#include "Scene.h"
 #include "utils.h"
 
 static void STDCALL GLErrorCallback(
@@ -76,7 +75,7 @@ void Renderer3D::Shutdown()
 {
 }
 
-void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const Scene* scene)
+void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const std::vector<Renderable>& scene)
 {
     bool do_scissor = (m_fullview != *viewport);
     if (do_scissor)
@@ -91,7 +90,7 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
     auto pv = glm::perspective(45.0f, aspect, 0.1f, 1000.0f) * cam->GetView();
 
     m_colour_shader.Bind();
-    for (auto obj : scene->GetRenderables())
+    for (auto obj : scene)
     {
         auto mvp = pv * obj.transform;
         m_colour_shader.SetUniform("MVP", &mvp[0][0]);

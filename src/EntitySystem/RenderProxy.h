@@ -3,11 +3,12 @@
 
 #include "../Renderer/3DRenderer/3DRenderer.h"
 #include "../Renderer/3DRenderer/Camera.h"
+#include "../Renderer/3DRenderer/Renderable.h"
 #include "ComponentTable.h"
 #include "PhysicalComponent.h"
+#include <vector>
 
 class Viewport;
-class Scene;
 
 class RenderProxy
 {
@@ -34,7 +35,7 @@ public:
 
         SetActiveCamera(camera);
         BuildScene(renderables);
-        m_renderer->RenderScene(viewport, &m_camera, &m_scene);
+        m_renderer->RenderScene(viewport, &m_camera, m_scene);
     }
 
 private:
@@ -47,7 +48,7 @@ private:
 
     void BuildScene(const std::vector<uint>& renderables)
     {
-        m_scene.Clear();
+        m_scene.clear();
         for (uint ent : renderables)
         {
             assert(m_physical_components->HasComponent(ent));
@@ -57,7 +58,7 @@ private:
             auto *graphical = m_graphical_components->GetComponent(ent);
 
             // TODO: rotation, scale
-            m_scene.AddRenderable(glm::translate(physical->position), graphical->mesh);
+            m_scene.emplace_back(Renderable{ glm::translate(physical->position), graphical->mesh });
         }
     }
 
@@ -67,5 +68,5 @@ private:
     ComponentTable<GraphicalComponent> *m_graphical_components;
 
     Camera m_camera;
-    Scene m_scene;
+    std::vector<Renderable> m_scene;
 };

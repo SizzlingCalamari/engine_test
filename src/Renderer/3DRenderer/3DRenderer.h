@@ -4,9 +4,9 @@
 #include "GLContext.h"
 #include "Viewport.h"
 #include "ShaderProgram.h"
+#include "Renderable.h"
 
 class Camera;
-class Scene;
 class ShaderManager;
 
 struct renderer3d_config
@@ -26,7 +26,7 @@ public:
 
     void Shutdown();
 
-    void RenderScene(const Viewport* viewport, const Camera* cam, const Scene* scene);
+    void RenderScene(const Viewport* viewport, const Camera* cam, const std::vector<Renderable>& scene);
 
 private:
     GLContext m_glcontext;
