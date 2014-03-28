@@ -182,8 +182,8 @@ int main(int argc, const char *argv[])
     uint camera = 0;
     {
         auto* physical = physical_components.AttachComponent(camera);
-        physical->position = glm::vec3(0.0f, -20.0f, -150.0f);
         physical->forward = glm::vec3(0.0f, 0.0f, 1.0f);
+        physical->position = glm::vec3(0.0f, 0.0f, 0.0f);
         physical->up = glm::vec3(0.0f, 1.0f, 0.0f);
     }
 
