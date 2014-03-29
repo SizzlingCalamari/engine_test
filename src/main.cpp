@@ -3,8 +3,6 @@
 
 #include "Application/Application.h"
 
-#include "World.h"
-
 #include "Renderer/Renderer.h"
 #include "Renderer/3DRenderer/3DRenderer.h"
 #include "Renderer/3DRenderer/Camera.h"
@@ -22,6 +20,8 @@
 #include "EntitySystem/GraphicalComponent.h"
 #include "EntitySystem/PhysicalComponent.h"
 #include "EntitySystem/RenderProxy.h"
+
+#include "EntitySystem/EntitySystem.h"
 
 void callback(const KeyboardEventInfo& info)
 {
@@ -75,52 +75,56 @@ int main(int argc, const char *argv[])
     Viewport viewport1(0, 0, 320, 240);
     Viewport viewport2(320, 240, 320, 240);
 
-    ComponentTable<PhysicalComponent> physical_components;
-    ComponentTable<GraphicalComponent> graphical_components;
+    EntitySystem entity_system;
 
-    render_proxy.SetComponentTables(&physical_components, &graphical_components);
+    render_proxy.SetComponentTables(entity_system.GetTable<PhysicalComponent>(),
+                                    entity_system.GetTable<GraphicalComponent>());
     std::vector<uint> renderables;
 
     uint camera = 0;
     {
-        auto* physical = physical_components.AttachComponent(camera);
-        physical->position = glm::vec3(0.0f, 0.0f, 0.0f);
-        physical->forward = glm::vec3(0.0f, 0.0f, 1.0f);
-        physical->up = glm::vec3(0.0f, 1.0f, 0.0f);
+        PhysicalComponent physical;
+        physical.position = glm::vec3(0.0f, 0.0f, 0.0f);
+        physical.forward = glm::vec3(0.0f, 0.0f, 1.0f);
+        physical.up = glm::vec3(0.0f, 1.0f, 0.0f);
+        entity_system.AttachComponent(camera, &physical);
     }
 
     uint jiggy = 1;
     {
-        auto* physical = physical_components.AttachComponent(jiggy);
-        physical->position = glm::vec3(0.0f, -20.0f, 150.0f);
-        physical->forward = glm::vec3(0.0f, 0.0f, -1.0f);
-        physical->up = glm::vec3(0.0f, 1.0f, 0.0f);
+        PhysicalComponent physical;
+        physical.position = glm::vec3(0.0f, -20.0f, 150.0f);
+        physical.forward = glm::vec3(0.0f, 0.0f, -1.0f);
+        physical.up = glm::vec3(0.0f, 1.0f, 0.0f);
+        entity_system.AttachComponent(jiggy, &physical);
 
-        auto* graphical = graphical_components.AttachComponent(jiggy);
-        graphical->mesh = LoadMeshFromOBJ("../models/jiggy.obj");
-
+        GraphicalComponent graphical;
+        graphical.mesh = LoadMeshFromOBJ("../models/jiggy.obj");
+        entity_system.AttachComponent(jiggy, &graphical);
         renderables.emplace_back(jiggy);
     }
 
     uint note = 2;
     {
-        auto* physical = physical_components.AttachComponent(note);
-        physical->position = glm::vec3(5.0f, 0.0f, 50.0f);
-        physical->forward = glm::vec3(0.0f, 0.0f, -1.0f);
-        physical->up = glm::vec3(0.0f, 1.0f, 0.0f);
+        PhysicalComponent physical;
+        physical.position = glm::vec3(5.0f, 0.0f, 50.0f);
+        physical.forward = glm::vec3(0.0f, 0.0f, -1.0f);
+        physical.up = glm::vec3(0.0f, 1.0f, 0.0f);
+        entity_system.AttachComponent(note, &physical);
 
-        auto* graphical = graphical_components.AttachComponent(note);
-        graphical->mesh = LoadMeshFromOBJ("../models/note.obj");
-
+        GraphicalComponent graphical;
+        graphical.mesh = LoadMeshFromOBJ("../models/note.obj");
+        entity_system.AttachComponent(note, &graphical);
         renderables.emplace_back(note);
     }
 
     uint camera2 = 3;
     {
-        auto* physical = physical_components.AttachComponent(camera2);
-        physical->position = glm::vec3(0.0f, -10.0f, 300.0f);
-        physical->forward = glm::vec3(0.0f, 0.0f, -1.0f);
-        physical->up = glm::vec3(0.0f, 1.0f, 0.0f);
+        PhysicalComponent physical;
+        physical.position = glm::vec3(0.0f, -10.0f, 300.0f);
+        physical.forward = glm::vec3(0.0f, 0.0f, 1.0f);
+        physical.up = glm::vec3(0.0f, 1.0f, 0.0f);
+        entity_system.AttachComponent(camera2, &physical);
     }
 
     KeyboardContext k;
@@ -133,22 +137,18 @@ int main(int argc, const char *argv[])
     InputMapper input;
     input.LoadContext(std::move(k));
 
-    World w;
-    w.Initialize();
-
     const uint SERVER_FRAME_DT = 10000;
 
     while (ApplicationService::FlushAndRefreshEvents(),
           !ApplicationService::QuitRequested())
     {
-        w.Update(SERVER_FRAME_DT);
+        entity_system.CommitChanges();
         input.DispatchCallbacks();
         render_proxy.RenderScene(&viewport1, camera, renderables);
         render_proxy.RenderScene(&viewport2, camera2, renderables);
         window.SwapBuffers();
     }
 
-    w.Shutdown();
     renderer->Shutdown();
     Renderer::FreeRenderer(renderer);
     ApplicationService::FreeGLContext(gl_context);

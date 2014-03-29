@@ -6,4 +6,9 @@
 struct GraphicalComponent
 {
     Mesh mesh;
+
+    void FreeComponent()
+    {
+        mesh.FreeVerticies();
+    }
 };
