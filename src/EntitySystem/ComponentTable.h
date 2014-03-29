@@ -105,14 +105,24 @@ public:
             {
                 auto removing_index = pair.first;
                 auto replacement_index = pair.second;
-                auto replacement_ent = m_component_to_ent[pair.second];
-                auto &component = m_components[removing_index];
+                // if there is a valid replacement, replace
+                if (replacement_index > 0)
+                {
+                    auto replacement_ent = m_component_to_ent[pair.second];
+                    auto &component = m_components[removing_index];
 
-                component.FreeComponent();
-                component = std::move(m_components[replacement_index]);
-                m_ent_to_component[replacement_ent] = removing_index;
-                m_component_to_ent[removing_index] = replacement_ent;
-                m_component_to_ent.erase(replacement_index);
+                    component.FreeComponent();
+                    component = std::move(m_components[replacement_index]);
+                    m_ent_to_component[replacement_ent] = removing_index;
+                    m_component_to_ent[removing_index] = replacement_ent;
+                    m_component_to_ent.erase(replacement_index);
+                }
+                else
+                {
+                    // otherwise, remove the element mapping
+                    // for the removed element
+                    m_component_to_ent.erase(removing_index);
+                }
             }
 
             for (auto &pair : remove_pairs)
