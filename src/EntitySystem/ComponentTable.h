@@ -32,9 +32,9 @@ public:
         auto it = m_ent_to_component.find(ent);
         if (it != m_ent_to_component.end())
         {
-            uint removed_index = it->second;
-            uint tail_index = m_components.size()-1;
-            uint tail_ent = m_component_to_ent[tail_index];
+            auto removed_index = it->second;
+            auto tail_index = m_components.size() - 1;
+            auto tail_ent = m_component_to_ent[tail_index];
             if (removed_index != tail_index)
             {
                 // swap last and removed element
