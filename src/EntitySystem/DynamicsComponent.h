@@ -13,15 +13,6 @@ struct DynamicsComponent
 
     void FreeComponent()
     {
-        auto *object = static_cast<btCollisionObject*>(shape->getUserPointer());
-        assert(object);
-
-        auto *rigid_body = btRigidBody::upcast(object);
-        if (rigid_body)
-        {
-            delete rigid_body->getMotionState();
-        }
-        delete object;
         delete shape;
     }
 };

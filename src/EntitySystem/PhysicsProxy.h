@@ -10,12 +10,11 @@
 class PhysicsProxy
 {
 public:
-    PhysicsProxy(DynamicsWorld* dynamics):
+    PhysicsProxy(DynamicsWorld* dynamics = nullptr):
         m_dynamics(dynamics),
         m_physical_components(nullptr),
         m_dynamics_components(nullptr)
     {
-        assert(dynamics);
     }
 
     void SetComponentTables(ComponentTable<PhysicalComponent>* physical,
@@ -25,13 +24,13 @@ public:
         m_dynamics_components = dynamics;
     }
 
-    void Simulate(float dt)
+    void Simulate(uint32 dt)
     {
         assert(m_physical_components);
         assert(m_dynamics_components);
 
         CheckEntChanges();
-        m_dynamics->Simulate(dt);
+        m_dynamics->Simulate(static_cast<float>(dt)/1000.0f);
         WriteBackSimulation();
     }
     
@@ -46,6 +45,13 @@ private:
             auto *component = m_dynamics_components->GetComponent(ent);
             auto *collision_obj = static_cast<btCollisionObject*>(component->shape->getUserPointer());
             bullet_dynamics->removeCollisionObject(collision_obj);
+
+            auto *rigid_body = btRigidBody::upcast(collision_obj);
+            if (rigid_body)
+            {
+                delete rigid_body->getMotionState();
+            }
+            delete collision_obj;
         }
 
         auto &additions = m_dynamics_components->GetAdditions();
