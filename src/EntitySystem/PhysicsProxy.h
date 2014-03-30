@@ -22,6 +22,12 @@ public:
     {
         m_physical_components = physical;
         m_dynamics_components = dynamics;
+        CheckEntChanges();
+    }
+
+    void Cleanup()
+    {
+        CheckEntChanges();
     }
 
     void Simulate(uint32 dt)
@@ -50,8 +56,10 @@ private:
             if (rigid_body)
             {
                 delete rigid_body->getMotionState();
+                rigid_body->setMotionState(nullptr);
             }
             delete collision_obj;
+            component->shape->setUserPointer(nullptr);
         }
 
         auto &additions = m_dynamics_components->GetAdditions();

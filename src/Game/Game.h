@@ -73,6 +73,7 @@ public:
         m_entity_system.DestroyEntity(m_note);
         m_entity_system.DestroyEntity(m_jiggy);
         m_entity_system.DestroyEntity(m_camera);
+        m_physics->Cleanup();
         m_entity_system.CommitChanges();
     }
 

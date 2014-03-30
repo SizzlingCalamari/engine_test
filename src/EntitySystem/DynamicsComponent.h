@@ -14,5 +14,6 @@ struct DynamicsComponent
     void FreeComponent()
     {
         delete shape;
+        shape = nullptr;
     }
 };
