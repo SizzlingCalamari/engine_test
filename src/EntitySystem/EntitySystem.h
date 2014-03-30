@@ -9,6 +9,23 @@
 class EntitySystem
 {
 public:
+    EntitySystem():
+        m_ent_counter(0)
+    {
+    }
+
+    uint CreateEntity()
+    {
+        return m_ent_counter++;
+    }
+
+    void DestroyEntity(uint ent)
+    {
+        m_physical_components.RemoveComponent(ent);
+        m_graphical_components.RemoveComponent(ent);
+        m_dynamics_components.RemoveComponent(ent);
+    }
+
     void CommitChanges()
     {
         m_physical_components.CommitChanges();
@@ -80,4 +97,6 @@ private:
     ComponentTable<PhysicalComponent> m_physical_components;
     ComponentTable<GraphicalComponent> m_graphical_components;
     ComponentTable<DynamicsComponent> m_dynamics_components;
+
+    uint m_ent_counter;
 };

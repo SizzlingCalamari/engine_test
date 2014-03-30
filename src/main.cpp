@@ -92,7 +92,7 @@ int main(int argc, const char *argv[])
     physics_proxy.SetComponentTables(entity_system.GetTable<PhysicalComponent>(),
                                      entity_system.GetTable<DynamicsComponent>());
 
-    uint camera = 0;
+    uint camera = entity_system.CreateEntity();
     {
         PhysicalComponent physical;
         physical.position = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -101,7 +101,7 @@ int main(int argc, const char *argv[])
         entity_system.AttachComponent(camera, &physical);
     }
 
-    uint jiggy = 1;
+    uint jiggy = entity_system.CreateEntity();
     {
         PhysicalComponent physical;
         physical.position = glm::vec3(0.0f, -20.0f, 150.0f);
@@ -121,7 +121,7 @@ int main(int argc, const char *argv[])
         entity_system.AttachComponent(jiggy, &dynamics);
     }
 
-    uint note = 2;
+    uint note = entity_system.CreateEntity();
     {
         PhysicalComponent physical;
         physical.position = glm::vec3(5.0f, 0.0f, 50.0f);
@@ -135,7 +135,7 @@ int main(int argc, const char *argv[])
         renderables.emplace_back(note);
     }
 
-    uint camera2 = 3;
+    uint camera2 = entity_system.CreateEntity();
     {
         PhysicalComponent physical;
         physical.position = glm::vec3(0.0f, -10.0f, 300.0f);
