@@ -77,7 +77,16 @@ void Renderer3D::Shutdown()
 
 void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const std::vector<Renderable>& scene)
 {
-    bool do_scissor = (m_fullview != *viewport);
+    bool do_scissor = false;
+    if (viewport)
+    {
+        do_scissor = (m_fullview != *viewport);
+    }
+    else
+    {
+        viewport = &m_fullview;
+    }
+    
     if (do_scissor)
     {
         glEnable(GL_SCISSOR_TEST);
