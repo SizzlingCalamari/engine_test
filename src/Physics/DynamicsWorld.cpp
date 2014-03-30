@@ -31,6 +31,12 @@ void DynamicsWorld::Initialize()
 
 void DynamicsWorld::Shutdown()
 {
+    auto objects = m_DynamicsWorld->getCollisionObjectArray();
+    auto num_objects = m_DynamicsWorld->getNumCollisionObjects();
+    for (auto i = 0; i < num_objects; ++i)
+    {
+        m_DynamicsWorld->removeCollisionObject(objects[i]);
+    }
 }
 
 void DynamicsWorld::Simulate(float dt)

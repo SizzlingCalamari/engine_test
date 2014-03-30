@@ -13,12 +13,11 @@ class Viewport;
 class RenderProxy
 {
 public:
-    RenderProxy(Renderer3D* renderer):
+    RenderProxy(Renderer3D* renderer = nullptr):
         m_renderer(renderer),
         m_physical_components(nullptr),
         m_graphical_components(nullptr)
     {
-        assert(m_renderer);
     }
 
     void SetComponentTables(ComponentTable<PhysicalComponent>* physical,

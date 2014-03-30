@@ -7,7 +7,7 @@ typedef struct SDL_Window SDL_Window;
 class Window
 {
 public:
-    explicit Window(SDL_Window *window):
+    explicit Window(SDL_Window *window = nullptr):
         m_window(window)
     {
     }
