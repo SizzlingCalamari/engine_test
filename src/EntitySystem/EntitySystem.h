@@ -4,6 +4,7 @@
 #include "ComponentTable.h"
 #include "PhysicalComponent.h"
 #include "GraphicalComponent.h"
+#include "DynamicsComponent.h"
 
 class EntitySystem
 {
@@ -12,6 +13,7 @@ public:
     {
         m_physical_components.CommitChanges();
         m_graphical_components.CommitChanges();
+        m_dynamics_components.CommitChanges();
     }
 
     //
@@ -25,6 +27,11 @@ public:
     void AttachComponent(uint ent, GraphicalComponent* component)
     {
         return m_graphical_components.AttachComponent(ent, component);
+    }
+
+    void AttachComponent(uint ent, DynamicsComponent* component)
+    {
+        return m_dynamics_components.AttachComponent(ent, component);
     }
 
     //
@@ -63,7 +70,14 @@ public:
         return &m_graphical_components;
     }
 
+    template<>
+    ComponentTable<DynamicsComponent>* GetTable()
+    {
+        return &m_dynamics_components;
+    }
+
 private:
     ComponentTable<PhysicalComponent> m_physical_components;
     ComponentTable<GraphicalComponent> m_graphical_components;
+    ComponentTable<DynamicsComponent> m_dynamics_components;
 };

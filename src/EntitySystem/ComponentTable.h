@@ -7,23 +7,46 @@
 template<typename T>
 class ComponentTable
 {
+    struct Entry
+    {
+        uint ent;
+        T component;
+    };
 public:
+    // Components are attached right away.
+    // The ent indices are added to an additions list
+    // for the current frame.
     void AttachComponent(uint ent, T* component)
     {
         auto it = m_ent_to_component.find(ent);
         if (it == m_ent_to_component.end())
         {
-            m_additions.emplace_back(std::make_pair(ent, std::move(*component)));
+            // add the ent to the additions list
+            m_additions.emplace_back(ent);
+
+            auto index = m_components.size();
+
+            // add the component
+            Entry e;
+            e.ent = ent;
+            e.component = std::move(*component);
+            m_components.emplace_back(e);
+
+            // map the ent to an array index
+            m_ent_to_component.emplace(ent, index);
+            m_component_to_ent.emplace(index, ent);
         }
     }
 
+    // Removing a component is queued until the next
+    // call to CommitChanges.
+    // The ent indices are added to a pending remove list.
     void RemoveComponent(uint ent)
     {
         auto it = m_ent_to_component.find(ent);
         if (it != m_ent_to_component.end())
         {
-            auto *component = m_components.data() + it->second;
-            m_removals.emplace_back(std::make_pair(ent, component));
+            m_removals.emplace_back(ent);
         }
     }
 
@@ -34,20 +57,20 @@ public:
 
     T* GetComponent(uint ent)
     {
-        return m_components.data() + m_ent_to_component[ent];
+        return &m_components[m_ent_to_component[ent]].component;
     }
 
-    const std::vector<T>& GetComponentArray() const
+    const std::vector<Entry>& GetComponentArray() const
     {
         return m_components;
     }
 
-    const std::vector<std::pair<uint, T>>& GetAdditions() const
+    const std::vector<uint>& GetAdditions() const
     {
         return m_additions;
     }
 
-    const std::vector<std::pair<uint, T*>>& GetRemovals() const
+    const std::vector<uint>& GetRemovals() const
     {
         return m_removals;
     }
@@ -58,20 +81,13 @@ public:
         {
             return a.first < b.first;
         };
-       
-        auto equals_compare = [](std::pair<size_t, size_t> a, std::pair<size_t, size_t> b)
-        {
-            return a.first == b.first;
-        };
-
 
         // Get removed component indices.
         std::vector<std::pair<size_t, size_t>> remove_pairs;
         remove_pairs.reserve(m_removals.size());
         {
-            for (auto &pair : m_removals)
+            for (auto ent : m_removals)
             {
-                auto ent = pair.first;
                 auto it = m_ent_to_component.find(ent);
                 remove_pairs.emplace_back(it->second, 0);
                 m_ent_to_component.erase(it);
@@ -109,10 +125,10 @@ public:
                 if (replacement_index > 0)
                 {
                     auto replacement_ent = m_component_to_ent[pair.second];
-                    auto &component = m_components[removing_index];
+                    auto &entry = m_components[removing_index];
 
-                    component.FreeComponent();
-                    component = std::move(m_components[replacement_index]);
+                    entry.component.FreeComponent();
+                    entry = std::move(m_components[replacement_index]);
                     m_ent_to_component[replacement_ent] = removing_index;
                     m_component_to_ent[removing_index] = replacement_ent;
                     m_component_to_ent.erase(replacement_index);
@@ -131,29 +147,14 @@ public:
             }
         }
         m_removals.clear();
-
-        // Perform additions
-        for (auto &pair : m_additions)
-        {
-            auto ent = pair.first;
-            auto index = m_components.size();
-
-            // add the component
-            m_components.emplace_back(std::move(pair.second));
-
-            // map the ent to an array index
-            m_ent_to_component.emplace(ent, index);
-            m_component_to_ent.emplace(index, ent);
-        }
         m_additions.clear();
     }
 
 private:
     std::unordered_map<size_t, size_t> m_ent_to_component;
     std::unordered_map<size_t, size_t> m_component_to_ent;
-    std::vector<T> m_components;
+    std::vector<Entry> m_components;
 
-    // <ent, component> for additions and removals
-    std::vector<std::pair<uint, T>> m_additions;
-    std::vector<std::pair<uint, T*>> m_removals;
+    std::vector<uint> m_additions;
+    std::vector<uint> m_removals;
 };

@@ -28,14 +28,18 @@ public:
         m_graphical_components = graphical;
     }
 
-    void RenderScene(const Viewport* viewport, uint camera, const std::vector<uint>& renderables)
+    void RenderScene(const Viewport* viewport, uint camera)
     {
         assert(m_physical_components);
         assert(m_graphical_components);
 
         SetActiveCamera(camera);
-        BuildScene(renderables);
         m_renderer->RenderScene(viewport, &m_camera, m_scene);
+    }
+
+    void Update()
+    {
+        BuildScene();
     }
 
 private:
@@ -46,16 +50,15 @@ private:
         m_camera.CalcView(physical->position, physical->forward, physical->up);
     }
 
-    void BuildScene(const std::vector<uint>& renderables)
+    void BuildScene()
     {
         m_scene.clear();
-        for (uint ent : renderables)
-        {
-            assert(m_physical_components->HasComponent(ent));
-            assert(m_graphical_components->HasComponent(ent));
 
-            auto *physical = m_physical_components->GetComponent(ent);
-            auto *graphical = m_graphical_components->GetComponent(ent);
+        auto &graphical = m_graphical_components->GetComponentArray();
+        for (auto &entry : graphical)
+        {
+            auto *physical = m_physical_components->GetComponent(entry.ent);
+            auto *graphical = m_graphical_components->GetComponent(entry.ent);
 
             // TODO: rotation, scale
             m_scene.emplace_back(Renderable{ glm::translate(physical->position), graphical->mesh });
