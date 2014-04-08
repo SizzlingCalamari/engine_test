@@ -2,12 +2,12 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 struct PhysicalComponent
 {
     glm::vec3 position;
-    glm::vec3 forward;
-    glm::vec3 up;
+    glm::quat orientation;
 
     void FreeComponent()
     {

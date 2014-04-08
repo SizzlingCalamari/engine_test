@@ -90,6 +90,7 @@ private:
         {
             auto *physical = m_physical_components->GetComponent(obj->GetEnt());
             physical->position = obj->GetPosition();
+            physical->orientation = obj->GetOrientation();
         }
         m_moved_objects.clear();
     }

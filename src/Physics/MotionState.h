@@ -27,16 +27,28 @@ public:
     // Bullet only calls the update of worldtransform for active objects
     virtual void setWorldTransform(const btTransform& worldTrans)
     {
-        auto origin = worldTrans.getOrigin();
+        auto &origin = worldTrans.getOrigin();
         m_position.x = origin.x();
         m_position.y = origin.y();
         m_position.z = origin.z();
+
+        auto orientation = worldTrans.getRotation();
+        m_orientation.x = orientation.x();
+        m_orientation.y = orientation.y();
+        m_orientation.z = orientation.z();
+        m_orientation.w = orientation.w();
+
         m_changelist->emplace_back(this);
     }
 
     const glm::vec3& GetPosition() const
     {
         return m_position;
+    }
+
+    const glm::quat& GetOrientation() const
+    {
+        return m_orientation;
     }
 
     uint GetEnt() const
@@ -47,5 +59,6 @@ public:
 private:
     std::vector<MotionState*> *m_changelist;
     glm::vec3 m_position;
+    glm::quat m_orientation;
     uint m_ent;
 };

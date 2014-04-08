@@ -46,7 +46,7 @@ private:
     {
         auto *physical = m_physical_components->GetComponent(camera);
         assert(physical);
-        m_camera.CalcView(physical->position, physical->forward, physical->up);
+        m_camera.CalcView(physical->position, physical->orientation);
     }
 
     void BuildScene()
@@ -57,10 +57,14 @@ private:
         for (auto &entry : graphical)
         {
             auto *physical = m_physical_components->GetComponent(entry.ent);
-            auto *graphical = m_graphical_components->GetComponent(entry.ent);
+            auto *graphical = &entry.component;
 
-            // TODO: rotation, scale
-            m_scene.emplace_back(Renderable{ glm::translate(physical->position), graphical->mesh });
+            // TODO: scale
+            auto translation = glm::translate(physical->position);
+            auto orientation = glm::mat4_cast(physical->orientation);
+            auto transform = translation * orientation;
+
+            m_scene.emplace_back(Renderable{ transform, graphical->mesh });
         }
     }
 
