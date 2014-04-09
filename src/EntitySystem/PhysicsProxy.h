@@ -27,7 +27,14 @@ public:
 
     void Cleanup()
     {
-        CheckEntChanges();
+        auto *bullet_dynamics = m_dynamics->GetDynamicsWorld();
+
+        auto &collision_objects = bullet_dynamics->getCollisionObjectArray();
+        auto num_obj = collision_objects.size();
+        for (auto i = 0; i < num_obj; ++i)
+        {
+            RemoveCollisionObject(collision_objects[i]);
+        }
     }
 
     void Simulate(uint32 dt)
@@ -50,16 +57,7 @@ private:
         {
             auto *component = m_dynamics_components->GetComponent(ent);
             auto *collision_obj = static_cast<btCollisionObject*>(component->shape->getUserPointer());
-            bullet_dynamics->removeCollisionObject(collision_obj);
-
-            auto *rigid_body = btRigidBody::upcast(collision_obj);
-            if (rigid_body)
-            {
-                delete rigid_body->getMotionState();
-                rigid_body->setMotionState(nullptr);
-            }
-            delete collision_obj;
-            component->shape->setUserPointer(nullptr);
+            RemoveCollisionObject(collision_obj);
         }
 
         auto &additions = m_dynamics_components->GetAdditions();
@@ -78,6 +76,10 @@ private:
             dynamics->shape->calculateLocalInertia(dynamics->mass, inertia);
             auto *body = new btRigidBody(dynamics->mass, motionState, dynamics->shape, inertia);
 
+            // Setting the user pointer to the shape allows accessing
+            // accessing of the shape from the collision object.
+            body->setUserPointer(dynamics->shape);
+
             // Setting the user pointer to the collision object allows
             // accessing of the rigid body from the component.
             dynamics->shape->setUserPointer(static_cast<btCollisionObject*>(body));
@@ -94,6 +96,21 @@ private:
             physical->orientation = obj->GetOrientation();
         }
         m_moved_objects.clear();
+    }
+
+    void RemoveCollisionObject(btCollisionObject *collision_obj)
+    {
+        m_dynamics->GetDynamicsWorld()->removeCollisionObject(collision_obj);
+
+        auto *rigid_body = btRigidBody::upcast(collision_obj);
+        if (rigid_body)
+        {
+            delete rigid_body->getMotionState();
+            rigid_body->setMotionState(nullptr);
+        }
+        auto *shape = static_cast<btCollisionShape*>(collision_obj->getUserPointer());
+        shape->setUserPointer(nullptr);
+        delete collision_obj;
     }
 
 private:
