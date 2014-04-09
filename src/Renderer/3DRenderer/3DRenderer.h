@@ -5,6 +5,7 @@
 #include "Viewport.h"
 #include "ShaderProgram.h"
 #include "Renderable.h"
+#include <vector>
 
 class Camera;
 class ShaderManager;

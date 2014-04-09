@@ -1,8 +1,9 @@
 
 #pragma once
 
-#include <tuple>
-#include <iostream>
+#include <vector>
+#include <unordered_map>
+#include <algorithm>
 
 template<typename T>
 class ComponentTable

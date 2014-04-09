@@ -57,41 +57,11 @@ public:
     template<typename T>
     void RemoveComponent(uint ent);
 
-    template<>
-    void RemoveComponent<PhysicalComponent>(uint ent)
-    {
-        m_physical_components.RemoveComponent(ent);
-    }
-
-    template<>
-    void RemoveComponent<GraphicalComponent>(uint ent)
-    {
-        m_graphical_components.RemoveComponent(ent);
-    }
-
     //
     // Getting component tables
     //
     template<typename T>
     ComponentTable<T>* GetTable();
-
-    template<>
-    ComponentTable<PhysicalComponent>* GetTable()
-    {
-        return &m_physical_components;
-    }
-
-    template<>
-    ComponentTable<GraphicalComponent>* GetTable()
-    {
-        return &m_graphical_components;
-    }
-
-    template<>
-    ComponentTable<DynamicsComponent>* GetTable()
-    {
-        return &m_dynamics_components;
-    }
 
 private:
     ComponentTable<PhysicalComponent> m_physical_components;
@@ -100,3 +70,33 @@ private:
 
     uint m_ent_counter;
 };
+
+template<>
+inline void EntitySystem::RemoveComponent<PhysicalComponent>(uint ent)
+{
+    m_physical_components.RemoveComponent(ent);
+}
+
+template<>
+inline void EntitySystem::RemoveComponent<GraphicalComponent>(uint ent)
+{
+    m_graphical_components.RemoveComponent(ent);
+}
+
+template<>
+inline ComponentTable<PhysicalComponent>* EntitySystem::GetTable()
+{
+    return &m_physical_components;
+}
+
+template<>
+inline ComponentTable<GraphicalComponent>* EntitySystem::GetTable()
+{
+    return &m_graphical_components;
+}
+
+template<>
+inline ComponentTable<DynamicsComponent>* EntitySystem::GetTable()
+{
+    return &m_dynamics_components;
+}
