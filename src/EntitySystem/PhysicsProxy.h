@@ -71,7 +71,8 @@ private:
             auto *physical = m_physical_components->GetComponent(ent);
             auto *dynamics = m_dynamics_components->GetComponent(ent);
 
-            auto *motionState = new MotionState(&m_moved_objects, physical->position, ent);
+            auto *motionState = new MotionState(&m_moved_objects, physical->position,
+                                                physical->orientation, ent);
             btVector3 inertia(dynamics->inertia.x, dynamics->inertia.y, dynamics->inertia.z);
 
             dynamics->shape->calculateLocalInertia(dynamics->mass, inertia);
