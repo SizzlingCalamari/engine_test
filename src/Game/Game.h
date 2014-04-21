@@ -84,11 +84,11 @@ public:
     {
         auto *physical_table = m_entity_system.GetTable<PhysicalComponent>();
 
-        float angle = 135.0f * ((float)dt / 1000.0f);
+        float angle = glm::radians(135.0f * ((float)dt / 1000.0f));
         float amount = glm::sin(tick / 200.0f) * 0.05f;
 
         auto *camera_physical = physical_table->GetComponent(m_camera);
-        camera_physical->orientation = glm::rotate(camera_physical->orientation, amount*3.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+        camera_physical->orientation = glm::rotate(camera_physical->orientation, glm::radians(amount*3.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
         for (uint note : m_notes)
         {
