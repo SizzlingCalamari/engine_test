@@ -6,14 +6,15 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 
+#include "mathutils.h"
+
 class Camera
 {
 public:
     void CalcView(const glm::vec3& position, const glm::quat& orientation)
     {
-        auto conj = glm::conjugate(orientation);
-        glm::vec3 up = orientation * glm::vec3(0.0f, 1.0f, 0.0f) * conj;
-        glm::vec3 forward = orientation * glm::vec3(0.0f, 0.0f, 1.0f) * conj;
+        auto up = math::up(orientation);
+        auto forward = math::forward(orientation);
 
         m_view = glm::lookAt(position, position + forward, up);
     }
