@@ -1,9 +1,10 @@
 
 #pragma once
 
-#include "btBulletDynamicsCommon.h"
+#include "BulletCollision/CollisionShapes/btCollisionShape.h"
 #include <glm/glm.hpp>
-#include <vector>
+
+class btCollisionShape;
 
 struct DynamicsComponent
 {

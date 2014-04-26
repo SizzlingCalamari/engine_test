@@ -3,6 +3,7 @@
 
 #include <glm/detail/type_vec3.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/projection.hpp>
 #include <cmath>
 #include <iomanip>
@@ -145,7 +146,6 @@ namespace math
         }
 
         // find the closest angle within the bounds
-        std::cout << "asdf" << std::endl;
         // compare q and -q to the min angle
         auto dot_min = q.w*cos_min + q.x*sin_min;
         if (dot_min < T(0.0))
