@@ -14,7 +14,6 @@ sdl_dir = vs_include_prefix .. "../sdl-dev/"
 bullet_dir = vs_include_prefix .. "../bullet-2.82-r2704/"
 glew_dir = vs_include_prefix .. "../glew-1.10.0/"
 glm_dir = vs_include_prefix .. "../glm/"
-soil_dir = vs_include_prefix .. "../soil-july07-2008/"
 
 src_dir = vs_include_prefix .. "src/"
 
@@ -84,7 +83,6 @@ solution "engine_test"
             bullet_dir .. "src",
             glew_dir .. "include",
             glm_dir,
-            soil_dir .. "src",
             src_dir .. "public/"
         }
         
@@ -143,7 +141,7 @@ solution "engine_test"
             }
         configuration {}
         
-        links { "glew", "soil" }
+        links { "glew" }
         configuration "linux"
             links { "GL", "rt", "m", "pthread", "X11", "Xrandr", "Xi", "Xxf86vm" }
             buildoptions { "-std=c++11" }
@@ -159,15 +157,3 @@ solution "engine_test"
             glew_dir .. "src/glew.c",
             glew_dir .. "src/glewinfo.c"
         }
-    
-    project "soil"
-        kind "StaticLib"
-        language "C"
-        includedirs (soil_dir .. "src")
-        files {
-            soil_dir .. "src/image_helper.c",
-            soil_dir .. "src/stb_image_aug.c",
-            soil_dir .. "src/image_DXT.c",
-            soil_dir .. "src/SOIL.c"
-        }
-
