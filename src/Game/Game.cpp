@@ -25,6 +25,8 @@ void Game::Initialize(const EngineContext& engine)
     m_physics->SetComponentTables(m_entity_system.GetTable<PhysicalComponent>(),
                                     m_entity_system.GetTable<DynamicsComponent>());
 
+    m_thirdperson_controller.SetComponentTables(m_entity_system.GetTable<PhysicalComponent>());
+
     m_camera = m_entity_system.CreateEntity();
     {
         PhysicalComponent physical;
@@ -65,6 +67,10 @@ void Game::Initialize(const EngineContext& engine)
         m_entity_system.AttachComponent(note, &graphical);
         pos += 16;
     }
+
+    m_thirdperson_controller.SetCameraEnt(m_camera);
+    m_thirdperson_controller.SetTargetEnt(m_notes[1]);
+    m_thirdperson_controller.SetRadiusFromTarget(75.0f);
 }
 
 void Game::Shutdown()
@@ -87,7 +93,8 @@ void Game::Simulate(uint64 tick, uint32 dt)
     float amount = glm::sin(tick / 200.0f) * 0.05f;
 
     auto *camera_physical = physical_table->GetComponent(m_camera);
-    HandleCameraMovement(camera_physical, dt);
+    //HandleCameraMovement(camera_physical, dt);
+    m_thirdperson_controller.Update(dt);
 
     for (uint note : m_notes)
     {

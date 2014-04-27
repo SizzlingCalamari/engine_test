@@ -2,6 +2,7 @@
 #pragma once
 
 #include "../EntitySystem/EntitySystem.h"
+#include "CameraController_ThirdPerson.h"
 
 class RenderProxy;
 class PhysicsProxy;
@@ -35,4 +36,6 @@ private:
     uint m_camera;
     uint m_jiggy;
     uint m_notes[4];
+
+    CameraController_ThirdPerson m_thirdperson_controller;
 };
