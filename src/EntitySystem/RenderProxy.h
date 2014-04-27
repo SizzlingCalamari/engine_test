@@ -37,3 +37,17 @@ private:
     Camera m_camera;
     std::vector<Renderable> m_scene;
 };
+
+inline RenderProxy::RenderProxy(Renderer3D* renderer /*= nullptr*/):
+    m_renderer(renderer),
+    m_physical_components(nullptr),
+    m_graphical_components(nullptr)
+{
+}
+
+inline void RenderProxy::SetComponentTables(ComponentTable<PhysicalComponent>* physical,
+                                            ComponentTable<GraphicalComponent>* graphical)
+{
+    m_physical_components = physical;
+    m_graphical_components = graphical;
+}

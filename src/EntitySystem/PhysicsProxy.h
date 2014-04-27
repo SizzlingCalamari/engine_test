@@ -18,10 +18,11 @@ public:
 
     void SetComponentTables(ComponentTable<PhysicalComponent>* physical,
                             ComponentTable<DynamicsComponent>* dynamics);
+
     void Cleanup();
 
     void Simulate(uint32 dt);
-    
+
 private:
     void CheckEntChanges();
 
@@ -36,3 +37,18 @@ private:
 
     std::vector<MotionState*> m_moved_objects;
 };
+
+inline PhysicsProxy::PhysicsProxy(DynamicsWorld* dynamics /*= nullptr*/):
+    m_dynamics(dynamics),
+    m_physical_components(nullptr),
+    m_dynamics_components(nullptr)
+{
+}
+
+inline void PhysicsProxy::SetComponentTables(ComponentTable<PhysicalComponent>* physical,
+                                             ComponentTable<DynamicsComponent>* dynamics)
+{
+    m_physical_components = physical;
+    m_dynamics_components = dynamics;
+    CheckEntChanges();
+}

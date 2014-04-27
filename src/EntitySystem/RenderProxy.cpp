@@ -9,20 +9,6 @@
 
 #include <glm/gtx/transform.hpp>
 
-RenderProxy::RenderProxy(Renderer3D* renderer /*= nullptr*/) :
-    m_renderer(renderer),
-    m_physical_components(nullptr),
-    m_graphical_components(nullptr)
-{
-}
-
-void RenderProxy::SetComponentTables(ComponentTable<PhysicalComponent>* physical,
-                                     ComponentTable<GraphicalComponent>* graphical)
-{
-    m_physical_components = physical;
-    m_graphical_components = graphical;
-}
-
 void RenderProxy::RenderScene(const Viewport* viewport, uint camera)
 {
     assert(m_physical_components);

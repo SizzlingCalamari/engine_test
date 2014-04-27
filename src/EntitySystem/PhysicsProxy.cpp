@@ -8,21 +8,6 @@
 #include "PhysicalComponent.h"
 #include "DynamicsComponent.h"
 
-PhysicsProxy::PhysicsProxy(DynamicsWorld* dynamics /*= nullptr*/) :
-    m_dynamics(dynamics),
-    m_physical_components(nullptr),
-    m_dynamics_components(nullptr)
-{
-}
-
-void PhysicsProxy::SetComponentTables(ComponentTable<PhysicalComponent>* physical,
-                                      ComponentTable<DynamicsComponent>* dynamics)
-{
-    m_physical_components = physical;
-    m_dynamics_components = dynamics;
-    CheckEntChanges();
-}
-
 void PhysicsProxy::Cleanup()
 {
     auto *bullet_dynamics = m_dynamics->GetDynamicsWorld();
@@ -44,7 +29,7 @@ void PhysicsProxy::Simulate(uint32 dt)
     m_dynamics->Simulate(static_cast<float>(dt)/1000.0f);
     WriteBackSimulation();
 }
-    
+
 void PhysicsProxy::CheckEntChanges()
 {
     auto *bullet_dynamics = m_dynamics->GetDynamicsWorld();
