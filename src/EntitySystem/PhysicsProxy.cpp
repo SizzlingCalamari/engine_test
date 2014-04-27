@@ -1,6 +1,4 @@
 
-#pragma once
-
 #include "PhysicsProxy.h"
 
 #include "../Physics/DynamicsWorld.h"
@@ -15,7 +13,7 @@ PhysicsProxy::PhysicsProxy(DynamicsWorld* dynamics /*= nullptr*/) :
 }
 
 void PhysicsProxy::SetComponentTables(ComponentTable<PhysicalComponent>* physical,
-                        ComponentTable<DynamicsComponent>* dynamics)
+                                      ComponentTable<DynamicsComponent>* dynamics)
 {
     m_physical_components = physical;
     m_dynamics_components = dynamics;

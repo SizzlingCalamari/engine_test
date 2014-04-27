@@ -1,6 +1,4 @@
 
-#pragma once
-
 #include "ModelParser_OBJ.h"
 #include <glm/glm.hpp>
 #include <vector>

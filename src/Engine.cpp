@@ -1,6 +1,4 @@
 
-#pragma once
-
 #include "Engine.h"
 #include "SDL_timer.h"
 #include "Application/Application.h"

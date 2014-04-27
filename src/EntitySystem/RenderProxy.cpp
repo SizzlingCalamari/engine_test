@@ -1,6 +1,4 @@
 
-#pragma once
-
 #include "RenderProxy.h"
 #include "../Renderer/3DRenderer/3DRenderer.h"
 #include <glm/gtx/transform.hpp>
@@ -13,7 +11,7 @@ RenderProxy::RenderProxy(Renderer3D* renderer /*= nullptr*/) :
 }
 
 void RenderProxy::SetComponentTables(ComponentTable<PhysicalComponent>* physical,
-                        ComponentTable<GraphicalComponent>* graphical)
+                                     ComponentTable<GraphicalComponent>* graphical)
 {
     m_physical_components = physical;
     m_graphical_components = graphical;
