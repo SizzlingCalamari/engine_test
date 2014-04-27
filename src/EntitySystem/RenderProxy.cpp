@@ -1,6 +1,12 @@
 
 #include "RenderProxy.h"
+
 #include "../Renderer/3DRenderer/3DRenderer.h"
+
+#include "ComponentTable.h"
+#include "PhysicalComponent.h"
+#include "GraphicalComponent.h"
+
 #include <glm/gtx/transform.hpp>
 
 RenderProxy::RenderProxy(Renderer3D* renderer /*= nullptr*/) :

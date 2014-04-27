@@ -4,6 +4,9 @@
 #include "../Physics/DynamicsWorld.h"
 #include "../Physics/MotionState.h"
 
+#include "ComponentTable.h"
+#include "PhysicalComponent.h"
+#include "DynamicsComponent.h"
 
 PhysicsProxy::PhysicsProxy(DynamicsWorld* dynamics /*= nullptr*/) :
     m_dynamics(dynamics),

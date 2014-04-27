@@ -3,13 +3,14 @@
 
 #include "../Renderer/3DRenderer/Camera.h"
 #include "../Renderer/3DRenderer/Renderable.h"
-#include "ComponentTable.h"
-#include "PhysicalComponent.h"
-#include "GraphicalComponent.h"
 #include <vector>
 
 class Renderer3D;
 class Viewport;
+
+template<typename T> class ComponentTable;
+struct PhysicalComponent;
+struct GraphicalComponent;
 
 class RenderProxy
 {

@@ -1,14 +1,15 @@
 
 #pragma once
 
-#include "ComponentTable.h"
-#include "PhysicalComponent.h"
-#include "DynamicsComponent.h"
 #include <vector>
 
 class DynamicsWorld;
 class btCollisionObject;
 class MotionState;
+
+template<typename T> class ComponentTable;
+struct PhysicalComponent;
+struct DynamicsComponent;
 
 class PhysicsProxy
 {

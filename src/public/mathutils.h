@@ -5,8 +5,6 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/projection.hpp>
-#include <cmath>
-#include <iomanip>
 
 namespace math
 {
