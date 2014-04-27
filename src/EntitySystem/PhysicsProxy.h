@@ -50,5 +50,4 @@ inline void PhysicsProxy::SetComponentTables(ComponentTable<PhysicalComponent>* 
 {
     m_physical_components = physical;
     m_dynamics_components = dynamics;
-    CheckEntChanges();
 }
