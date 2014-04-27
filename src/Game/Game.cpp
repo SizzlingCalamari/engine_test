@@ -20,10 +20,10 @@ void Game::Initialize(const EngineContext& engine)
     m_physics = engine.physics;
 
     m_renderer->SetComponentTables(m_entity_system.GetTable<PhysicalComponent>(),
-                                    m_entity_system.GetTable<GraphicalComponent>());
+                                   m_entity_system.GetTable<GraphicalComponent>());
 
     m_physics->SetComponentTables(m_entity_system.GetTable<PhysicalComponent>(),
-                                    m_entity_system.GetTable<DynamicsComponent>());
+                                  m_entity_system.GetTable<DynamicsComponent>());
 
     m_thirdperson_controller.SetComponentTables(m_entity_system.GetTable<PhysicalComponent>());
 
