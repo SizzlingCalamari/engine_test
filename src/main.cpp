@@ -35,6 +35,10 @@
     std::cout << std::endl;
 }*/
 
+#include <type_traits>
+
+using EngineStorage = std::aligned_storage<sizeof(Engine), 16U>::type;
+
 int main(int argc, const char *argv[])
 {
     ApplicationService::Initialize();
@@ -49,11 +53,15 @@ int main(int argc, const char *argv[])
     InputMapper input;
     input.LoadContext(std::move(k));*/
 
-    Engine *engine = new Engine;
+    auto *engine_storage = new EngineStorage;
+
+    Engine *engine = new(engine_storage) Engine;
     engine->Initialize();
     engine->Run();
     engine->Shutdown();
-    delete engine;
+    engine->~Engine();
+
+    delete engine_storage;
 
     ApplicationService::Shutdown();
     return 0;
