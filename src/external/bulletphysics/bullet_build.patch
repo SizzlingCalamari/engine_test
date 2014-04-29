@@ -1,0 +1,51 @@
+diff --git a/build/premake4.lua b/build/premake4.lua
+index b806564..6eaf99d 100644
+--- a/build/premake4.lua
++++ b/build/premake4.lua
+@@ -48,28 +48,27 @@ solution "0BulletSolution"
+     description = "Enable OpenCL builds (NVIDIA SDK)"
+   }
+ 
+-  
++    if os.is("Linux") then
++        if os.is64bit() then
++            platforms {"x64"}
++        else
++            platforms {"x32"}
++        end
++    else
++        platforms {"x32", "x64"}
++    end
++
+ 	configurations {"Release", "Debug"}
+ 	configuration "Release"
+-		flags { "Optimize", "EnableSSE", "StaticRuntime", "NoMinimalRebuild", "FloatFast"}
++        optimize "On"
++        vectorextensions "SSE"
++        floatingpoint "Fast"
++		flags { "StaticRuntime", "NoMinimalRebuild", "MultiProcessorCompile" }
+ 	configuration "Debug"
+-		flags { "Symbols", "StaticRuntime" , "NoMinimalRebuild", "NoEditAndContinue" ,"FloatFast"}
+-		
+- if os.is("Linux") then
+-                if os.is64bit() then
+-                        platforms {"x64"}
+-                else
+-                        platforms {"x32"}
+-                end
+-        else
+-                platforms {"x32", "x64"}
+-        end
+-
+-	--platforms {"x32"}
+-
+-  configuration {"Windows"}
+-  	defines { "_CRT_SECURE_NO_WARNINGS","_CRT_SECURE_NO_DEPRECATE"}
+-  
++        floatingpoint "Fast"
++		flags { "Symbols", "StaticRuntime" , "NoMinimalRebuild", "NoEditAndContinue", "MultiProcessorCompile" }
++    configuration {"Windows"}
++        defines { "_CRT_SECURE_NO_WARNINGS","_CRT_SECURE_NO_DEPRECATE"}
+ 	configuration{}
+ 
+ 	postfix="";

@@ -30,3 +30,7 @@ _ReSharper*/
 *.sln
 *.idb
 *.sdf
+
+src/external/bulletphysics/**/
+src/external/glm/**/
+src/external/sdl/**/
