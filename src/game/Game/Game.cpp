@@ -43,7 +43,7 @@ void Game::Initialize(const EngineContext& engine)
         m_entity_system.AttachComponent(m_jiggy, &physical);
 
         GraphicalComponent graphical;
-        graphical.mesh = LoadMeshFromOBJ("../models/jiggy.obj");
+        graphical.mesh = LoadMeshFromOBJ("models/jiggy.obj");
         m_entity_system.AttachComponent(m_jiggy, &graphical);
 
         DynamicsComponent dynamics;
@@ -63,7 +63,7 @@ void Game::Initialize(const EngineContext& engine)
         m_entity_system.AttachComponent(note, &physical);
 
         GraphicalComponent graphical;
-        graphical.mesh = LoadMeshFromOBJ("../models/note.obj");
+        graphical.mesh = LoadMeshFromOBJ("models/note.obj");
         m_entity_system.AttachComponent(note, &graphical);
         pos += 16;
     }

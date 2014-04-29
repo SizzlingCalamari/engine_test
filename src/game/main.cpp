@@ -39,8 +39,26 @@
 
 using EngineStorage = std::aligned_storage<sizeof(Engine), 16U>::type;
 
+#ifdef _WIN32
+#include <direct.h>
+#else
+#include <unistd.h>
+#endif
+
 int main(int argc, const char *argv[])
 {
+    // fix up working directory
+    {
+        char temp[128] = {};
+        const char *dir = getcwd(temp, sizeof(temp));
+        const char *bin_pos = strstr(dir, "bin");
+        const char *build_pos = strstr(dir, "build");
+        chdir("..");
+        if (build_pos > bin_pos)
+        {
+            chdir("..");
+        }
+    }
     ApplicationService::Initialize();
 
     /*KeyboardContext k;
