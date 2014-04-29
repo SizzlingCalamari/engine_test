@@ -8,12 +8,14 @@ end
 vs_include_prefix = ""
 if string.find(_ACTION, "vs20") then
     vs_include_prefix = "$(SolutionDir)../"
+else
+    vs_include_prefix = os.getcwd()
 end
 
 src_dir = vs_include_prefix .. "game/"
 
 g_output_dir = os.getcwd() .. "/../bin/"
-g_externals_dir = os.getcwd() .. "/external/"
+g_externals_dir = vs_include_prefix .. "/external/"
 
 -- A solution contains projects, and defines the available configurations
 solution "engine_test"

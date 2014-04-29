@@ -1,5 +1,5 @@
 
-includedirs ("bullet3/src")
+includedirs (g_externals_dir .. "bulletphysics/bullet3/src")
 libdirs ("bullet3/lib")
 
 configuration { "x32", "Debug" }

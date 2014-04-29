@@ -1,5 +1,5 @@
 
-includedirs ("glew/include")
+includedirs (g_externals_dir .. "glew/glew/include")
 libdirs ("glew/lib")
 
 configuration { "x32", "Debug" }

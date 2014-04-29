@@ -5,7 +5,7 @@ local copy_cmd = "copy " .. sdl_vc_dir
 local copy_dest = g_output_dir .. "SDL2.dll"
 local full_cmd = ""
 
-includedirs ("SDL/include")
+includedirs (g_externals_dir .. "sdl/SDL/include")
 libdirs ("SDL/VisualC/SDL")
 
 configuration { "windows", "x32", "Debug" }
