@@ -36,3 +36,6 @@ src/external/glew/glew/build/
 src/external/glew/glew/lib/
 src/external/glm/**/
 src/external/sdl/**/
+
+shaders/
+!shaders/placeholder
