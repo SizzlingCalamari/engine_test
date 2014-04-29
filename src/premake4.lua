@@ -97,3 +97,10 @@ solution "engine_test"
             buildoptions { "-std=c++11" }
         configuration "windows"
             links "opengl32"
+        configuration {}
+        
+        local shader_src = path.translate(os.getcwd() .. "/game/shaders/*")
+        local shader_dest = path.translate(os.getcwd() .. "/../shaders/")
+        postbuildcommands {
+            "copy /Y \"" .. shader_src .. "\" " .. shader_dest .. "\""
+        }
