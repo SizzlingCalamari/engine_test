@@ -32,6 +32,7 @@ _ReSharper*/
 *.sdf
 
 src/external/bulletphysics/**/
+src/external/fbxsdk/**/
 src/external/glew/glew/build/
 src/external/glew/glew/lib/
 src/external/glm/**/

@@ -94,6 +94,9 @@ solution "engine_test"
         -- Glew linking
         dofile "external/glew/include_config.lua"
         
+        -- fbxsdk linking
+        dofile "external/fbxsdk/include_config.lua"
+        
         configuration "linux"
             links { "GL", "rt", "m", "pthread", "X11", "Xrandr", "Xi", "Xxf86vm" }
             buildoptions { "-std=c++11" }
