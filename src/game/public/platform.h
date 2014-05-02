@@ -25,6 +25,9 @@
 // msvc doesn't support noexcept yet
 #ifdef _MSC_VER
   #define noexcept
+
+  // disable array initialization new behaviour warning
+  #pragma warning(disable : 4351)
 #endif
 
 // types
