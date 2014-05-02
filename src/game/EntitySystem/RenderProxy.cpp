@@ -45,6 +45,11 @@ void RenderProxy::BuildScene()
         auto orientation = glm::mat4_cast(physical->orientation);
         auto transform = translation * orientation;
 
-        m_scene.emplace_back(Renderable{ transform, graphical->mesh });
+        Renderable r;
+        r.transform = transform;
+        r.mesh = graphical->mesh;
+        r.texture = graphical->texture;
+
+        m_scene.emplace_back(r);
     }
 }

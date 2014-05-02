@@ -8,6 +8,8 @@
 #include "../EntitySystem/GraphicalComponent.h"
 
 #include "../Renderer/3DRenderer/ModelParser_OBJ.h"
+#include "../Renderer/3DRenderer/ModelParser_FBX.h"
+#include "../Renderer/3DRenderer/TextureLoader_JPG.h"
 #include "BulletCollision/CollisionShapes/btBoxShape.h"
 #include "mathutils.h"
 
@@ -30,9 +32,30 @@ void Game::Initialize(const EngineContext& engine)
     m_camera = m_entity_system.CreateEntity();
     {
         PhysicalComponent physical;
-        physical.position = glm::vec3(0.0f, 0.0f, 0.0f);
+        physical.position = glm::vec3(0.0f, 20.0f, -150.0f);
         physical.orientation = glm::quat();
         m_entity_system.AttachComponent(m_camera, &physical);
+    }
+
+    m_floor = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        m_entity_system.AttachComponent(m_floor, &physical);
+
+        GraphicalComponent graphical;
+        graphical.mesh = LoadMeshFromOBJ("models/floor.obj");
+        graphical.texture = LoadTextureFromJPG("textures/jesusbond_feelingfresh.jpg");
+        m_entity_system.AttachComponent(m_floor, &graphical);
+    }
+
+    m_humanoid = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        m_entity_system.AttachComponent(m_humanoid, &physical);
+
+        GraphicalComponent graphical;
+        graphical.mesh = LoadMeshFromFBX("models/humanoid.fbx");
+        m_entity_system.AttachComponent(m_humanoid, &graphical);
     }
 
     m_jiggy = m_entity_system.CreateEntity();
@@ -59,7 +82,7 @@ void Game::Initialize(const EngineContext& engine)
         note = m_entity_system.CreateEntity();
 
         PhysicalComponent physical;
-        physical.position = glm::vec3((float)pos, 0.0f, 50.0f);
+        physical.position = glm::vec3((float)pos, 10.0f, 50.0f);
         m_entity_system.AttachComponent(note, &physical);
 
         GraphicalComponent graphical;
@@ -80,6 +103,8 @@ void Game::Shutdown()
         m_entity_system.DestroyEntity(note);
     }
     m_entity_system.DestroyEntity(m_jiggy);
+    m_entity_system.DestroyEntity(m_humanoid);
+    m_entity_system.DestroyEntity(m_floor);
     m_entity_system.DestroyEntity(m_camera);
     m_physics->Cleanup();
     m_entity_system.CommitChanges();
@@ -93,8 +118,8 @@ void Game::Simulate(uint64 tick, uint32 dt)
     float amount = glm::sin(tick / 200.0f) * 0.05f;
 
     auto *camera_physical = physical_table->GetComponent(m_camera);
-    //HandleCameraMovement(camera_physical, dt);
-    m_thirdperson_controller.Update(dt);
+    HandleCameraMovement(camera_physical, dt);
+    //m_thirdperson_controller.Update(dt);
 
     for (uint note : m_notes)
     {
@@ -117,7 +142,7 @@ void Game::HandleCameraMovement(PhysicalComponent *camera, uint32 dt)
 {
     // keyboard camera handling
     {
-        float key_factor = float(dt * 0.1);
+        float key_factor = float(dt * 0.5);
         auto *keys = SDL_GetKeyboardState(nullptr);
             
         if (!keys[SDL_SCANCODE_W] || !keys[SDL_SCANCODE_S])

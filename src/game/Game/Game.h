@@ -34,6 +34,8 @@ private:
     PhysicsProxy *m_physics;
 
     uint m_camera;
+    uint m_floor;
+    uint m_humanoid;
     uint m_jiggy;
     uint m_notes[4];
 

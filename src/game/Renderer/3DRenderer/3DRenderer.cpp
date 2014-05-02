@@ -34,6 +34,18 @@ Renderer3D::Renderer3D(void *GLContext):
     glBindVertexArray(m_vao);
 }
 
+static const GLfloat floor_uv[] =
+{
+    1.0f, 0.0f,
+    0.0f, 0.0f,
+    0.0f, 1.0f,
+    1.0f, 1.0f,
+    1.0f, 0.0f,
+    0.0f, 1.0f
+};
+
+static GLuint floor_buffer = 0;
+
 void Renderer3D::Init(const renderer3d_config& config)
 {
     GLContext::SetDebugMessageCallback(&GLErrorCallback);
@@ -58,21 +70,20 @@ void Renderer3D::Init(const renderer3d_config& config)
     bool linked = m_colour_shader.Link();
     assert(linked);
 
-    /*m_texture_shader = m_shader_manager->CreateProgram();
-    glAttachShader(m_texture_shader, vertexShaders[1]);
-    glAttachShader(m_texture_shader, fragmentShaders[1]);
-    glLinkProgram(m_texture_shader);
-    {
-        int res = GL_FALSE;
-        glGetProgramiv(m_texture_shader, GL_LINK_STATUS, &res);
-        bool linked = res == GL_TRUE;
-        assert(linked);
-    }
-    m_tex_id = glGetUniformLocation(m_texture_shader, "myTextureSampler");*/
+    m_texture_shader = m_shader_manager->CreateProgram();
+    m_texture_shader.AttachShader(vertexShaders[1]);
+    m_texture_shader.AttachShader(fragmentShaders[1]);
+    linked = m_texture_shader.Link();
+    assert(linked);
+
+    glGenBuffers(1, &floor_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, floor_buffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(floor_uv), floor_uv, GL_STATIC_DRAW);
 }
 
 void Renderer3D::Shutdown()
 {
+    glDeleteBuffers(1, &floor_buffer);
 }
 
 void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const std::vector<Renderable>& scene)
@@ -98,14 +109,30 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
     auto aspect = viewport->GetAspectRatio();
     auto pv = glm::perspective(glm::quarter_pi<float>(), aspect, 0.1f, 1000.0f) * cam->GetView();
 
-    m_colour_shader.Bind();
-    for (auto obj : scene)
+    // categorize the renderables by shader
+    m_colour_shader_cache.clear();
+    m_texture_shader_cache.clear();
+    for (auto &obj : scene)
     {
-        auto mvp = pv * obj.transform;
+        if (obj.texture.GetGLId() > 0)
+        {
+            m_texture_shader_cache.emplace_back(&obj);
+        }
+        else
+        {
+            m_colour_shader_cache.emplace_back(&obj);
+        }
+    }
+
+    // render using the colour shader
+    m_colour_shader.Bind();
+    for (auto obj : m_colour_shader_cache)
+    {
+        auto mvp = pv * obj->transform;
         m_colour_shader.SetUniform("MVP", &mvp[0][0]);
 
-        GLuint buffer_id = obj.mesh.GetVertexBufferId();
-        GLsizei num_verticies = static_cast<GLsizei>(obj.mesh.GetNumVerticies());
+        GLuint buffer_id = obj->mesh.GetVertexBufferId();
+        GLsizei num_verticies = static_cast<GLsizei>(obj->mesh.GetNumVerticies());
 
         glBindBuffer(GL_ARRAY_BUFFER, buffer_id);
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
@@ -114,6 +141,34 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     m_colour_shader.Unbind();
+
+    // render using the texture shader
+    m_texture_shader.Bind();
+    for (auto &obj : m_texture_shader_cache)
+    {
+        auto mvp = pv * obj->transform;
+        m_texture_shader.SetUniform("MVP", &mvp[0][0]);
+
+        int texture_sampler = 0;
+        m_texture_shader.SetUniform("myTextureSampler", &texture_sampler);
+
+        glBindBuffer(GL_ARRAY_BUFFER, obj->mesh.GetVertexBufferId());
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+        glBindBuffer(GL_ARRAY_BUFFER, floor_buffer);
+            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+        glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, obj->texture.GetGLId());
+            
+        auto num_verticies = static_cast<GLsizei>(obj->mesh.GetNumVerticies());
+        glDrawArrays(GL_TRIANGLES, 0, num_verticies);
+
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+    m_texture_shader.Unbind();
+
     if (do_scissor)
     {
         glDisable(GL_SCISSOR_TEST);

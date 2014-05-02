@@ -37,5 +37,8 @@ private:
     ShaderProgram m_colour_shader;
     ShaderProgram m_texture_shader;
 
+    std::vector<const Renderable*> m_colour_shader_cache;
+    std::vector<const Renderable*> m_texture_shader_cache;
+
     Viewport m_fullview;
 };

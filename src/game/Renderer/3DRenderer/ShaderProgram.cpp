@@ -75,10 +75,16 @@ bool ShaderProgram::SetUniform(const char* name, void* data)
     switch (info.type)
     {
     case GL_FLOAT_MAT4:
-    {
-        float* data_float = static_cast<float*>(data);
-        glUniformMatrix4fv(info.index, 1, GL_FALSE, data_float);
-    }
+        {
+            float* data_float = static_cast<float*>(data);
+            glUniformMatrix4fv(info.index, 1, GL_FALSE, data_float);
+        }
+        break;
+    case GL_SAMPLER_2D:
+        {
+            int* data_int = static_cast<int*>(data);
+            glUniform1i(info.index, *data_int);
+        }
         break;
     default:
         return false;
