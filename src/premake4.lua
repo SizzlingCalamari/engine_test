@@ -68,6 +68,12 @@ solution "engine_test"
             "/d2Zi+"
         }
     
+    -- Remove sse2 specification on windows 64 bit compile to 
+    -- get rid of unknown option /arch:SSE2 warning.
+    -- Note: SSE2 is still generated
+    configuration { "vs*", "x64" }
+        vectorextensions "Default"
+    
     -- A project defines one build target
     project "engine_test"
         kind "ConsoleApp"
