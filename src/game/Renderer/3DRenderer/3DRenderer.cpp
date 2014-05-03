@@ -21,17 +21,6 @@ Renderer3D::Renderer3D(void *GLContext):
     m_colour_shader(0),
     m_texture_shader(0)
 {
-    assert(GLContext);
-    // glew needs to be initialized after 
-    // the gl_createcontext call
-    static RunOnce glew([]
-    {
-        glewExperimental = true;
-        glewInit();
-    });
-
-    glGenVertexArrays(1, &m_vao);
-    glBindVertexArray(m_vao);
 }
 
 static const GLfloat floor_uv[] =
@@ -48,6 +37,9 @@ static GLuint floor_buffer = 0;
 
 void Renderer3D::Init(const renderer3d_config& config)
 {
+    glGenVertexArrays(1, &m_vao);
+    glBindVertexArray(m_vao);
+
     GLContext::SetDebugMessageCallback(&GLErrorCallback);
     GLContext::EnableDepthTest(GL_LESS);
 
@@ -84,6 +76,8 @@ void Renderer3D::Init(const renderer3d_config& config)
 void Renderer3D::Shutdown()
 {
     glDeleteBuffers(1, &floor_buffer);
+    glBindVertexArray(0);
+    glDeleteVertexArrays(1, &m_vao);
 }
 
 void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const std::vector<Renderable>& scene)
