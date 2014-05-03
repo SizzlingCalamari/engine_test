@@ -1,5 +1,5 @@
 
-#include "ModelParser_OBJ.h"
+#include "ModelLoader_OBJ.h"
 #include <glm/glm.hpp>
 #include <vector>
 #include <fstream>

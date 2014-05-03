@@ -1,5 +1,5 @@
 
-#include "ModelParser_FBX.h"
+#include "ModelLoader_FBX.h"
 
 #include <glm/glm.hpp>
 #include <vector>

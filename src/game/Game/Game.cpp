@@ -7,8 +7,8 @@
 #include "../EntitySystem/PhysicalComponent.h"
 #include "../EntitySystem/GraphicalComponent.h"
 
-#include "../Renderer/3DRenderer/ModelParser_OBJ.h"
-#include "../Renderer/3DRenderer/ModelParser_FBX.h"
+#include "../Renderer/3DRenderer/ModelLoader_OBJ.h"
+#include "../Renderer/3DRenderer/ModelLoader_FBX.h"
 #include "../Renderer/3DRenderer/TextureLoader_JPG.h"
 #include "BulletCollision/CollisionShapes/btBoxShape.h"
 #include "mathutils.h"
