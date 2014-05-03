@@ -45,9 +45,6 @@ void PhysicsProxy::CheckEntChanges()
     auto &additions = m_dynamics_components->GetAdditions();
     for (uint ent : additions)
     {
-        assert(m_physical_components->HasComponent(ent));
-        assert(m_dynamics_components->HasComponent(ent));
-
         auto *physical = m_physical_components->PeekComponent(ent);
         auto *dynamics = m_dynamics_components->PeekComponent(ent);
 

@@ -10,8 +10,6 @@
 void CameraController_ThirdPerson::Update(uint32 dt)
 {
     assert(m_physical_components);
-    assert(m_physical_components->HasComponent(m_camera_ent));
-    assert(m_physical_components->HasComponent(m_target_ent));
     auto physical_camera = m_physical_components->GetComponent(m_camera_ent);
     auto *physical_target = m_physical_components->PeekComponent(m_target_ent);
 
