@@ -8,11 +8,6 @@
 template<typename T>
 class ComponentTable
 {
-    struct Entry
-    {
-        uint ent;
-        T component;
-    };
 public:
     // Components are attached right away.
     // The ent indices are added to an additions list
@@ -28,10 +23,7 @@ public:
             auto index = m_components.size();
 
             // add the component
-            Entry e;
-            e.ent = ent;
-            e.component = std::move(*component);
-            m_components.emplace_back(e);
+            m_components.emplace_back(std::move(*component));
 
             // map the ent to an array index
             m_ent_to_component.emplace(ent, index);
@@ -63,7 +55,7 @@ public:
     const T* PeekComponent(uint ent)
     {
         assert(HasComponent(ent));
-        return &m_components[m_ent_to_component[ent]].component;
+        return &m_components[m_ent_to_component[ent]];
     }
 
     // Returns a copy of the component
@@ -71,7 +63,7 @@ public:
     T GetComponent(uint ent)
     {
         assert(HasComponent(ent));
-        return m_components[m_ent_to_component[ent]].component;
+        return m_components[m_ent_to_component[ent]];
     }
 
     // Updates the component of the passed in entity
@@ -82,13 +74,13 @@ public:
         assert(component);
 
         // copy the updated component in
-        m_components[m_ent_to_component[ent]].component = std::move(*component);
+        m_components[m_ent_to_component[ent]] = std::move(*component);
 
         // add the ent to the edited list
         m_edits.emplace_back(ent);
     }
 
-    const std::vector<Entry>& GetComponentArray() const
+    const std::vector<T>& GetComponentArray() const
     {
         return m_components;
     }
@@ -164,15 +156,15 @@ public:
             {
                 auto removing_index = pair.first;
                 auto replacement_index = pair.second;
-                auto &entry = m_components[removing_index];
-                entry.component.FreeComponent();
+                auto &component = m_components[removing_index];
+                component.FreeComponent();
 
                 // if there is a valid replacement, replace
                 if (replacement_index > 0)
                 {
                     auto replacement_ent = m_component_to_ent[pair.second];
 
-                    entry = std::move(m_components[replacement_index]);
+                    component = std::move(m_components[replacement_index]);
                     m_ent_to_component[replacement_ent] = removing_index;
                     m_component_to_ent[removing_index] = replacement_ent;
                     m_component_to_ent.erase(replacement_index);
@@ -185,6 +177,7 @@ public:
                 }
             }
 
+            // TODO: change this loop into a range based vector::erase
             for (auto &pair : remove_pairs)
             {
                 m_components.pop_back();
@@ -194,15 +187,15 @@ public:
         // nothing to do for edits
 
         // clear the arrays
-        m_removals.clear();
         m_additions.clear();
+        m_removals.clear();
         m_edits.clear();
     }
 
 private:
     std::unordered_map<size_t, size_t> m_ent_to_component;
     std::unordered_map<size_t, size_t> m_component_to_ent;
-    std::vector<Entry> m_components;
+    std::vector<T> m_components;
 
     std::vector<uint> m_additions;
     std::vector<uint> m_removals;
