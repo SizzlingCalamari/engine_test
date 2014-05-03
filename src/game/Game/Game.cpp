@@ -107,6 +107,7 @@ void Game::Shutdown()
     m_entity_system.DestroyEntity(m_floor);
     m_entity_system.DestroyEntity(m_camera);
     m_physics->Cleanup();
+    m_renderer->Update();
     m_entity_system.CommitChanges();
 }
 
@@ -132,13 +133,13 @@ void Game::Simulate(uint64 tick, uint32 dt)
         physical_table->EditComponent(note, &note_physical);
     }
     m_physics->Simulate(dt);
+    m_renderer->Update();
 
     m_entity_system.CommitChanges();
 }
 
 void Game::Render()
 {
-    m_renderer->Update();
     m_renderer->RenderScene(nullptr, m_camera);
 }
 

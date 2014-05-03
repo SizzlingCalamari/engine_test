@@ -3,7 +3,7 @@
 
 #include "../Renderer/3DRenderer/Camera.h"
 #include "../Renderer/3DRenderer/Renderable.h"
-#include <vector>
+#include "DataTable.h"
 
 class Renderer3D;
 class Viewport;
@@ -27,7 +27,11 @@ public:
 private:
     void SetActiveCamera(uint camera);
 
-    void BuildScene();
+    void CheckEntChanges();
+
+    void LoadRenderable(Renderable *r, const PhysicalComponent* physical);
+
+    void LoadRenderable(Renderable *r, const GraphicalComponent* graphical);
 
 private:
     Renderer3D *m_renderer;
@@ -35,7 +39,7 @@ private:
     ComponentTable<GraphicalComponent> *m_graphical_components;
 
     Camera m_camera;
-    std::vector<Renderable> m_scene;
+    DataTable<Renderable> m_scene;
 };
 
 inline RenderProxy::RenderProxy(Renderer3D* renderer /*= nullptr*/):
