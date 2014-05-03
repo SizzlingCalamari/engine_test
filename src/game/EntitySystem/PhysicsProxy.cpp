@@ -37,7 +37,7 @@ void PhysicsProxy::CheckEntChanges()
     auto &removals = m_dynamics_components->GetRemovals();
     for (uint ent : removals)
     {
-        auto *component = m_dynamics_components->GetComponent(ent);
+        auto *component = m_dynamics_components->PeekComponent(ent);
         auto *collision_obj = static_cast<btCollisionObject*>(component->shape->getUserPointer());
         RemoveCollisionObject(collision_obj);
     }
@@ -48,8 +48,8 @@ void PhysicsProxy::CheckEntChanges()
         assert(m_physical_components->HasComponent(ent));
         assert(m_dynamics_components->HasComponent(ent));
 
-        auto *physical = m_physical_components->GetComponent(ent);
-        auto *dynamics = m_dynamics_components->GetComponent(ent);
+        auto *physical = m_physical_components->PeekComponent(ent);
+        auto *dynamics = m_dynamics_components->PeekComponent(ent);
 
         auto *motionState = new MotionState(&m_moved_objects, physical->position,
                                             physical->orientation, ent);
@@ -73,9 +73,11 @@ void PhysicsProxy::WriteBackSimulation()
 {
     for (auto &obj : m_moved_objects)
     {
-        auto *physical = m_physical_components->GetComponent(obj->GetEnt());
-        physical->position = obj->GetPosition();
-        physical->orientation = obj->GetOrientation();
+        const uint ent = obj->GetEnt();
+        auto physical = m_physical_components->GetComponent(ent);
+        physical.position = obj->GetPosition();
+        physical.orientation = obj->GetOrientation();
+        m_physical_components->EditComponent(ent, &physical);
     }
     m_moved_objects.clear();
 }

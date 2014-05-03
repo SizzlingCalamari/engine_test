@@ -117,15 +117,19 @@ void Game::Simulate(uint64 tick, uint32 dt)
     float angle = glm::radians(135.0f * ((float)dt / 1000.0f));
     float amount = glm::sin(tick / 200.0f) * 0.05f;
 
-    auto *camera_physical = physical_table->GetComponent(m_camera);
-    HandleCameraMovement(camera_physical, dt);
+    auto camera_physical = physical_table->GetComponent(m_camera);
+    if (HandleCameraMovement(&camera_physical, dt))
+    {
+        physical_table->EditComponent(m_camera, &camera_physical);
+    }
     //m_thirdperson_controller.Update(dt);
 
     for (uint note : m_notes)
     {
-        auto *note_physical = physical_table->GetComponent(note);
-        note_physical->orientation = math::rotate_local(note_physical->orientation, angle, glm::vec3(0.0f, 1.0f, 0.0f));
-        note_physical->position += glm::vec3(0.0f, amount, 0.0f);
+        auto note_physical = physical_table->GetComponent(note);
+        note_physical.orientation = math::rotate_local(note_physical.orientation, angle, glm::vec3(0.0f, 1.0f, 0.0f));
+        note_physical.position += glm::vec3(0.0f, amount, 0.0f);
+        physical_table->EditComponent(note, &note_physical);
     }
     m_physics->Simulate(dt);
 
@@ -138,15 +142,19 @@ void Game::Render()
     m_renderer->RenderScene(nullptr, m_camera);
 }
 
-void Game::HandleCameraMovement(PhysicalComponent *camera, uint32 dt)
+bool Game::HandleCameraMovement(PhysicalComponent *camera, uint32 dt)
 {
+    bool updated = false;
     // keyboard camera handling
     {
         float key_factor = float(dt * 0.5);
         auto *keys = SDL_GetKeyboardState(nullptr);
-            
-        if (!keys[SDL_SCANCODE_W] || !keys[SDL_SCANCODE_S])
+
+        // Using != for bools is like an xor.
+        // Only pass through if one of the keys is down and not both.
+        if (keys[SDL_SCANCODE_W] != keys[SDL_SCANCODE_S])
         {
+            updated = true;
             auto forward = math::forward(camera->orientation);
             if (keys[SDL_SCANCODE_W])
             {
@@ -157,8 +165,9 @@ void Game::HandleCameraMovement(PhysicalComponent *camera, uint32 dt)
                 camera->position -= (forward * key_factor);
             }
         }
-        if (!keys[SDL_SCANCODE_A] || !keys[SDL_SCANCODE_D])
+        if (keys[SDL_SCANCODE_A] != keys[SDL_SCANCODE_D])
         {
+            updated = true;
             auto right = math::right(camera->orientation);
             if (keys[SDL_SCANCODE_A])
             {
@@ -180,13 +189,13 @@ void Game::HandleCameraMovement(PhysicalComponent *camera, uint32 dt)
 
         if (mouse & SDL_BUTTON(SDL_BUTTON_RIGHT) && (x != 0 || y != 0))
         {
+            updated = true;
             if (x != 0)
             {
                 // left/right rotations. no angle clamping
                 const auto y_axis = glm::vec3(0.0f, 1.0f, 0.0f);
                 camera->orientation = math::rotate_world(camera->orientation, -x*mouse_factor, y_axis);
             }
-
             if (y != 0)
             {
                 // up/down rotations. clamp to +-90 degrees.
@@ -198,4 +207,5 @@ void Game::HandleCameraMovement(PhysicalComponent *camera, uint32 dt)
             }
         }
     }
+    return updated;
 }

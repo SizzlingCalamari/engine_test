@@ -25,7 +25,7 @@ public:
 
     void Render();
 
-    static void HandleCameraMovement(PhysicalComponent *camera, uint32 dt);
+    static bool HandleCameraMovement(PhysicalComponent *camera, uint32 dt);
 
 private:
     EntitySystem m_entity_system;

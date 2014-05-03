@@ -50,15 +50,42 @@ public:
             m_removals.emplace_back(ent);
         }
     }
-
-    bool HasComponent(uint ent)
+    
+    // Returns true if the passed in entity has a
+    // component of type T.
+    bool HasComponent(uint ent) const
     {
         return (m_ent_to_component.find(ent) != m_ent_to_component.end());
     }
 
-    T* GetComponent(uint ent)
+    // Returns a const pointer to the component
+    // belonging to the passed in entity.
+    const T* PeekComponent(uint ent)
     {
+        assert(HasComponent(ent));
         return &m_components[m_ent_to_component[ent]].component;
+    }
+
+    // Returns a copy of the component
+    // belonging to the passed in entity.
+    T GetComponent(uint ent)
+    {
+        assert(HasComponent(ent));
+        return m_components[m_ent_to_component[ent]].component;
+    }
+
+    // Updates the component of the passed in entity
+    // with the contents of the passed in component.
+    void EditComponent(uint ent, T* component)
+    {
+        assert(HasComponent(ent));
+        assert(component);
+
+        // copy the updated component in
+        m_components[m_ent_to_component[ent]].component = std::move(*component);
+
+        // add the ent to the edited list
+        m_edits.emplace_back(ent);
     }
 
     const std::vector<Entry>& GetComponentArray() const
@@ -66,16 +93,31 @@ public:
         return m_components;
     }
 
+    // Returns an array of the entity components
+    // added since the last call to CommitChanges.
     const std::vector<uint>& GetAdditions() const
     {
         return m_additions;
     }
 
+    // Returns an array of the entity components
+    // removed since the last call to CommitChanges.
     const std::vector<uint>& GetRemovals() const
     {
         return m_removals;
     }
 
+    // Returns an array of the entity components
+    // edited since the last call to CommitChanges.
+    const std::vector<uint>& GetEdits() const
+    {
+        return m_edits;
+    }
+
+    // Performs the entity removals and clears
+    // the lists of additions, removals, and edits.
+    // Makes a call to T::FreeComponent for each
+    // removed component.
     void CommitChanges()
     {
         auto less_compare = [](std::pair<size_t, size_t> a, std::pair<size_t, size_t> b)
@@ -148,8 +190,13 @@ public:
                 m_components.pop_back();
             }
         }
+
+        // nothing to do for edits
+
+        // clear the arrays
         m_removals.clear();
         m_additions.clear();
+        m_edits.clear();
     }
 
 private:
@@ -159,4 +206,5 @@ private:
 
     std::vector<uint> m_additions;
     std::vector<uint> m_removals;
+    std::vector<uint> m_edits;
 };

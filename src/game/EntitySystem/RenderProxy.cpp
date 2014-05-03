@@ -25,7 +25,7 @@ void RenderProxy::Update()
 
 void RenderProxy::SetActiveCamera(uint camera)
 {
-    auto *physical = m_physical_components->GetComponent(camera);
+    auto *physical = m_physical_components->PeekComponent(camera);
     assert(physical);
     m_camera.CalcView(physical->position, physical->orientation);
 }
@@ -37,7 +37,7 @@ void RenderProxy::BuildScene()
     auto &graphical = m_graphical_components->GetComponentArray();
     for (auto &entry : graphical)
     {
-        auto *physical = m_physical_components->GetComponent(entry.ent);
+        auto *physical = m_physical_components->PeekComponent(entry.ent);
         auto *graphical = &entry.component;
 
         // TODO: scale
