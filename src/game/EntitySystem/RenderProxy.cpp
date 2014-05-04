@@ -47,7 +47,7 @@ void RenderProxy::CheckEntChanges()
     auto &additions = m_graphical_components->GetAdditions();
     for (uint ent : additions)
     {
-        auto *physical = m_graphical_components->PeekComponent(ent);
+        auto *physical = m_physical_components->PeekComponent(ent);
         auto *graphical = m_graphical_components->PeekComponent(ent);
 
         Renderable r;
