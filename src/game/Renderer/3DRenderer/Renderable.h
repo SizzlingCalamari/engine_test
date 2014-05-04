@@ -1,13 +1,11 @@
 
 #pragma once
 
-#include "Mesh.h"
-#include "Texture.h"
-#include <glm/glm.hpp>
+#include <glm/mat4x4.hpp>
 
 struct Renderable
 {
     glm::mat4 transform;
-    Mesh mesh;
-    Texture texture;
+    uint mesh = 0;
+    uint texture = 0;
 };

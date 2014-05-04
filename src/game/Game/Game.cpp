@@ -7,9 +7,6 @@
 #include "../EntitySystem/PhysicalComponent.h"
 #include "../EntitySystem/GraphicalComponent.h"
 
-#include "../Renderer/3DRenderer/ModelLoader_OBJ.h"
-#include "../Renderer/3DRenderer/ModelLoader_FBX.h"
-#include "../Renderer/3DRenderer/TextureLoader_JPG.h"
 #include "BulletCollision/CollisionShapes/btBoxShape.h"
 #include "mathutils.h"
 
@@ -43,8 +40,8 @@ void Game::Initialize(const EngineContext& engine)
         m_entity_system.AttachComponent(m_floor, &physical);
 
         GraphicalComponent graphical;
-        graphical.mesh = LoadMeshFromOBJ("models/floor.obj");
-        graphical.texture = LoadTextureFromJPG("textures/jesusbond_feelingfresh.jpg");
+        graphical.mesh = "models/floor.obj";
+        graphical.texture = "textures/jesusbond_feelingfresh.jpg";
         m_entity_system.AttachComponent(m_floor, &graphical);
     }
 
@@ -54,7 +51,7 @@ void Game::Initialize(const EngineContext& engine)
         m_entity_system.AttachComponent(m_humanoid, &physical);
 
         GraphicalComponent graphical;
-        graphical.mesh = LoadMeshFromFBX("models/humanoid.fbx");
+        graphical.mesh = "models/humanoid.fbx";
         m_entity_system.AttachComponent(m_humanoid, &graphical);
     }
 
@@ -66,7 +63,7 @@ void Game::Initialize(const EngineContext& engine)
         m_entity_system.AttachComponent(m_jiggy, &physical);
 
         GraphicalComponent graphical;
-        graphical.mesh = LoadMeshFromOBJ("models/jiggy.obj");
+        graphical.mesh = "models/jiggy.obj";
         m_entity_system.AttachComponent(m_jiggy, &graphical);
 
         DynamicsComponent dynamics;
@@ -86,7 +83,7 @@ void Game::Initialize(const EngineContext& engine)
         m_entity_system.AttachComponent(note, &physical);
 
         GraphicalComponent graphical;
-        graphical.mesh = LoadMeshFromOBJ("models/note.obj");
+        graphical.mesh = "models/note.obj";
         m_entity_system.AttachComponent(note, &graphical);
         pos += 16;
     }

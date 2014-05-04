@@ -9,6 +9,7 @@
 
 class Camera;
 class ShaderManager;
+class ResourceLoader;
 
 struct renderer3d_config
 {
@@ -29,9 +30,13 @@ public:
 
     void RenderScene(const Viewport* viewport, const Camera* cam, const std::vector<Renderable>& scene);
 
+    ResourceLoader* GetResourceLoader() const;
+
 private:
     GLContext m_glcontext;
     uint m_vao;
+
+    ResourceLoader *m_resourceLoader;
 
     ShaderManager *m_shader_manager;
     ShaderProgram m_colour_shader;
@@ -42,3 +47,8 @@ private:
 
     Viewport m_fullview;
 };
+
+inline ResourceLoader* Renderer3D::GetResourceLoader() const
+{
+    return m_resourceLoader;
+}

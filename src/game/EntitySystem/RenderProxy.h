@@ -6,6 +6,7 @@
 #include "DataTable.h"
 
 class Renderer3D;
+class ResourceLoader;
 class Viewport;
 
 template<typename T> class ComponentTable;
@@ -15,7 +16,7 @@ struct GraphicalComponent;
 class RenderProxy
 {
 public:
-    RenderProxy(Renderer3D* renderer = nullptr);
+    RenderProxy(Renderer3D* renderer);
 
     void SetComponentTables(ComponentTable<PhysicalComponent>* physical,
                             ComponentTable<GraphicalComponent>* graphical);
@@ -35,19 +36,13 @@ private:
 
 private:
     Renderer3D *m_renderer;
+    ResourceLoader *m_resource_loader;
     ComponentTable<PhysicalComponent> *m_physical_components;
     ComponentTable<GraphicalComponent> *m_graphical_components;
 
     Camera m_camera;
     DataTable<Renderable> m_scene;
 };
-
-inline RenderProxy::RenderProxy(Renderer3D* renderer /*= nullptr*/):
-    m_renderer(renderer),
-    m_physical_components(nullptr),
-    m_graphical_components(nullptr)
-{
-}
 
 inline void RenderProxy::SetComponentTables(ComponentTable<PhysicalComponent>* physical,
                                             ComponentTable<GraphicalComponent>* graphical)

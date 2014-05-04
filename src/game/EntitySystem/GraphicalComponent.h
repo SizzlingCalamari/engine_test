@@ -1,17 +1,14 @@
 
 #pragma once
 
-#include "../Renderer/3DRenderer/Mesh.h"
-#include "../Renderer/3DRenderer/Texture.h"
+#include <string>
 
 struct GraphicalComponent
 {
-    Mesh mesh;
-    Texture texture;
+    std::string mesh;
+    std::string texture;
 
     void FreeComponent()
     {
-        mesh.FreeVerticies();
-        texture.FreeTexture();
     }
 };

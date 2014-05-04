@@ -10,6 +10,15 @@
 
 #include <glm/gtx/transform.hpp>
 
+RenderProxy::RenderProxy(Renderer3D* renderer):
+    m_renderer(renderer),
+    m_resource_loader(renderer->GetResourceLoader()),
+    m_physical_components(nullptr),
+    m_graphical_components(nullptr)
+{
+    assert(renderer);
+}
+
 void RenderProxy::RenderScene(const Viewport* viewport, uint camera)
 {
     SetActiveCamera(camera);
@@ -81,8 +90,14 @@ void RenderProxy::LoadRenderable(Renderable *r, const PhysicalComponent* physica
 void RenderProxy::LoadRenderable(Renderable *r, const GraphicalComponent* graphical)
 {
     // Load the mesh
-    r->mesh = graphical->mesh;
+    if (!graphical->mesh.empty())
+    {
+        r->mesh = m_resource_loader->LoadResource(graphical->mesh);
+    }
 
     // Load the texture
-    r->texture = graphical->texture;
+    if (!graphical->texture.empty())
+    {
+        r->texture = m_resource_loader->LoadResource(graphical->texture);
+    }
 }

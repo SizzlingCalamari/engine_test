@@ -2,6 +2,7 @@
 #include "3DRenderer.h"
 
 #include <iostream>
+#include "ResourceLoader.h"
 #include "ShaderManager.h"
 #include "Camera.h"
 #include "utils.h"
@@ -46,6 +47,8 @@ void Renderer3D::Init(const renderer3d_config& config)
     m_fullview.SetView(config.x, config.y, config.width, config.height);
     glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
+    m_resourceLoader = new ResourceLoader();
+
     m_shader_manager = m_glcontext.CreateShaderManager();
 
     std::vector<uint> vertexShaders;
@@ -75,6 +78,10 @@ void Renderer3D::Init(const renderer3d_config& config)
 
 void Renderer3D::Shutdown()
 {
+    m_resourceLoader->UnloadResources();
+    delete m_resourceLoader;
+    m_resourceLoader = nullptr;
+
     glDeleteBuffers(1, &floor_buffer);
     glBindVertexArray(0);
     glDeleteVertexArrays(1, &m_vao);
@@ -108,7 +115,7 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
     m_texture_shader_cache.clear();
     for (auto &obj : scene)
     {
-        if (obj.texture.GetGLId() > 0)
+        if (obj.texture > 0)
         {
             m_texture_shader_cache.emplace_back(&obj);
         }
@@ -125,10 +132,10 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
         auto mvp = pv * obj->transform;
         m_colour_shader.SetUniform("MVP", &mvp[0][0]);
 
-        GLuint buffer_id = obj->mesh.GetVertexBufferId();
-        GLsizei num_verticies = static_cast<GLsizei>(obj->mesh.GetNumVerticies());
+        auto *mesh = m_resourceLoader->GetMesh(obj->mesh);
+        GLsizei num_verticies = static_cast<GLsizei>(mesh->GetNumVerticies());
 
-        glBindBuffer(GL_ARRAY_BUFFER, buffer_id);
+        glBindBuffer(GL_ARRAY_BUFFER, mesh->GetVertexBufferId());
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
             glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
             glDrawArrays(GL_TRIANGLES, 0, num_verticies);
@@ -146,16 +153,19 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
         int texture_sampler = 0;
         m_texture_shader.SetUniform("myTextureSampler", &texture_sampler);
 
-        glBindBuffer(GL_ARRAY_BUFFER, obj->mesh.GetVertexBufferId());
+        auto *mesh = m_resourceLoader->GetMesh(obj->mesh);
+        auto *texture = m_resourceLoader->GetTexture(obj->texture);
+
+        glBindBuffer(GL_ARRAY_BUFFER, mesh->GetVertexBufferId());
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
         glBindBuffer(GL_ARRAY_BUFFER, floor_buffer);
             glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 
         glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, obj->texture.GetGLId());
+            glBindTexture(GL_TEXTURE_2D, texture->GetGLId());
             
-        auto num_verticies = static_cast<GLsizei>(obj->mesh.GetNumVerticies());
+            auto num_verticies = static_cast<GLsizei>(mesh->GetNumVerticies());
         glDrawArrays(GL_TRIANGLES, 0, num_verticies);
 
         glBindTexture(GL_TEXTURE_2D, 0);
