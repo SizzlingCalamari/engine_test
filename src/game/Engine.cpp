@@ -25,13 +25,13 @@ void Engine::Initialize()
     config.width = 640;
     config.height = 480;
     m_renderer->Init(config);
-    m_render_proxy = RenderProxy(m_renderer);
+    m_render_proxy = new RenderProxy(m_renderer);
 
     m_dynamics_world.Initialize();
     m_physics_proxy = PhysicsProxy(&m_dynamics_world);
 
     EngineContext engine;
-    engine.renderer = &m_render_proxy;
+    engine.renderer = m_render_proxy;
     engine.physics = &m_physics_proxy;
 
     m_game.Initialize(engine);
@@ -42,6 +42,9 @@ void Engine::Shutdown()
     m_game.Shutdown();
 
     m_dynamics_world.Shutdown();
+
+    delete m_render_proxy;
+    m_render_proxy = nullptr;
 
     m_renderer->Shutdown();
     Renderer::FreeRenderer(m_renderer);

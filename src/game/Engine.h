@@ -29,7 +29,7 @@ private:
     Window m_window;
     void *m_gl_context;
     Renderer3D *m_renderer;
-    RenderProxy m_render_proxy;
+    RenderProxy *m_render_proxy;
 
     DynamicsWorld m_dynamics_world;
     PhysicsProxy m_physics_proxy;
