@@ -1,28 +1,21 @@
 
 #pragma once
 
-class Mesh
+#include <glm/vec3.hpp>
+#include <glm/vec2.hpp>
+#include <vector>
+
+struct Mesh
 {
-public:
-    void LoadVerticies(const void* verticies, ptrdiff_t stride, size_t num_verticies);
+    std::vector<glm::vec3> verticies;
+    std::vector<glm::vec2> uvcoords;
+    std::vector<glm::vec3> normals;
 
-    void FreeVerticies();
-
-    size_t GetNumVerticies() const;
-
-    uint GetVertexBufferId() const;
-
-private:
-    uint m_vertex_buffer = 0;
-    size_t m_num_verticies = 0;
+    uint vertexBufferId = 0;
+    uint uvBufferId = 0;
+    uint normalBufferId = 0;
+    size_t numVerticies = 0;
 };
 
-inline size_t Mesh::GetNumVerticies() const
-{
-    return m_num_verticies;
-}
-
-inline uint Mesh::GetVertexBufferId() const
-{
-    return m_vertex_buffer;
-}
+uint LoadVerticies(const void* verticies, ptrdiff_t stride, size_t count);
+void FreeMesh(Mesh* mesh);

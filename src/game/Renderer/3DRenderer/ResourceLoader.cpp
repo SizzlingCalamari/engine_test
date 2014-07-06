@@ -16,7 +16,7 @@ uint ResourceLoader::LoadResource(const std::string& path)
     auto extension = GetPathExtension(path);
     uint id = ++m_resourceIdCounter;
     m_resourceIds.emplace(path, id);
-    if (extension == "jpg")
+    if (extension == "jpg" || extension == "png")
     {
         m_textures.emplace(id, LoadTextureFromJPG(path.c_str()));
     }
@@ -27,6 +27,10 @@ uint ResourceLoader::LoadResource(const std::string& path)
     else if (extension == "obj")
     {
         m_meshes.emplace(id, LoadMeshFromOBJ(path.c_str()));
+    }
+    else
+    {
+        assert(false && "unsupported extension");
     }
     return id;
 }

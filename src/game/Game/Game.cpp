@@ -51,7 +51,8 @@ void Game::Initialize(const EngineContext& engine)
         m_entity_system.AttachComponent(m_humanoid, &physical);
 
         GraphicalComponent graphical;
-        graphical.mesh = "models/humanoid.fbx";
+        graphical.mesh = "models/teapot/teapot.obj";
+        graphical.texture = "models/teapot/default.png";
         m_entity_system.AttachComponent(m_humanoid, &graphical);
     }
 
@@ -121,6 +122,22 @@ void Game::Simulate(uint64 tick, uint32 dt)
         physical_table->EditComponent(m_camera, &camera_physical);
     }
     //m_thirdperson_controller.Update(dt);
+
+    auto *keys = SDL_GetKeyboardState(nullptr);
+    if (keys[SDL_SCANCODE_J])
+    {
+        auto *graphical_table = m_entity_system.GetTable<GraphicalComponent>();
+        auto note_graphical = graphical_table->GetComponent(m_notes[3]);
+        note_graphical.mesh = "models/humanoid.fbx";
+        graphical_table->EditComponent(m_notes[3], &note_graphical);
+    }
+    else if (keys[SDL_SCANCODE_K])
+    {
+        auto *graphical_table = m_entity_system.GetTable<GraphicalComponent>();
+        auto note_graphical = graphical_table->GetComponent(m_notes[3]);
+        note_graphical.mesh = "models/untitled.obj";
+        graphical_table->EditComponent(m_notes[3], &note_graphical);
+    }
 
     for (uint note : m_notes)
     {

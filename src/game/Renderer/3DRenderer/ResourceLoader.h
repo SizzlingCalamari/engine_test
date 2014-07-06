@@ -45,7 +45,7 @@ inline void ResourceLoader::UnloadResources()
     for (auto it : m_meshes)
     {
         auto &mesh = it.second;
-        mesh.FreeVerticies();
+        FreeMesh(&mesh);
     }
     for (auto it : m_textures)
     {
