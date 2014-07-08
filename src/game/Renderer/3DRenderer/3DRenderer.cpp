@@ -150,14 +150,23 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
         auto mvp = pv * obj->transform;
         m_texture_shader.SetUniform("MVP", &mvp[0][0]);
 
+        auto m = obj->transform;
+        m_texture_shader.SetUniform("modelToWorld", &m[0][0]);
+
         int texture_sampler = 0;
         m_texture_shader.SetUniform("myTextureSampler", &texture_sampler);
 
         glm::vec3 ambientColour(1.0f);
-        m_texture_shader.SetUniform("ambientLight.colour", &ambientColour);
+        m_texture_shader.SetUniform("directionalLight.colour", &ambientColour);
 
-        float ambientIntensity = 0.5f;
-        m_texture_shader.SetUniform("ambientLight.intensity", &ambientIntensity);
+        float ambientIntensity = 0.2f;
+        m_texture_shader.SetUniform("directionalLight.ambientIntensity", &ambientIntensity);
+
+        glm::vec3 direction(-1.0f);
+        m_texture_shader.SetUniform("directionalLight.direction", &direction);
+
+        float diffuseIntensity = 0.5f;
+        m_texture_shader.SetUniform("directionalLight.diffuseIntensity", &diffuseIntensity);
 
         auto *mesh = m_resourceLoader->GetMesh(obj->mesh);
         auto *texture = m_resourceLoader->GetTexture(obj->texture);
@@ -168,10 +177,13 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
         glBindBuffer(GL_ARRAY_BUFFER, mesh->uvBufferId);
             glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 
+        glBindBuffer(GL_ARRAY_BUFFER, mesh->normalBufferId);
+            glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+
         glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, texture->GetGLId());
             
-            auto num_verticies = static_cast<GLsizei>(mesh->numVerticies);
+        auto num_verticies = static_cast<GLsizei>(mesh->numVerticies);
         glDrawArrays(GL_TRIANGLES, 0, num_verticies);
 
         glBindTexture(GL_TEXTURE_2D, 0);
