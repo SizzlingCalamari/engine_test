@@ -86,6 +86,18 @@ bool ShaderProgram::SetUniform(const char* name, void* data)
             glUniform1i(info.index, *data_int);
         }
         break;
+    case GL_FLOAT_VEC3_ARB:
+        {
+            float* float3 = static_cast<float*>(data);
+            glUniform3f(info.index, *float3, *(float3 + 1), *(float3 + 2));
+        }
+        break;
+    case GL_FLOAT:
+        {
+            float value = *static_cast<float*>(data);
+            glUniform1f(info.index, value);
+        }
+        break;
     default:
         return false;
     }

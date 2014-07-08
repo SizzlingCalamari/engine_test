@@ -153,6 +153,12 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
         int texture_sampler = 0;
         m_texture_shader.SetUniform("myTextureSampler", &texture_sampler);
 
+        glm::vec3 ambientColour(1.0f);
+        m_texture_shader.SetUniform("ambientLight.colour", &ambientColour);
+
+        float ambientIntensity = 0.5f;
+        m_texture_shader.SetUniform("ambientLight.intensity", &ambientIntensity);
+
         auto *mesh = m_resourceLoader->GetMesh(obj->mesh);
         auto *texture = m_resourceLoader->GetTexture(obj->texture);
 
