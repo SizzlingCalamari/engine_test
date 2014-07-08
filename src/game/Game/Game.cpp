@@ -129,6 +129,7 @@ void Game::Simulate(uint64 tick, uint32 dt)
         auto *graphical_table = m_entity_system.GetTable<GraphicalComponent>();
         auto note_graphical = graphical_table->GetComponent(m_notes[3]);
         note_graphical.mesh = "models/humanoid.fbx";
+        note_graphical.texture = "";
         graphical_table->EditComponent(m_notes[3], &note_graphical);
     }
     else if (keys[SDL_SCANCODE_K])
@@ -136,6 +137,7 @@ void Game::Simulate(uint64 tick, uint32 dt)
         auto *graphical_table = m_entity_system.GetTable<GraphicalComponent>();
         auto note_graphical = graphical_table->GetComponent(m_notes[3]);
         note_graphical.mesh = "models/teapot/teapot.obj";
+        note_graphical.texture = "models/teapot/default.png";
         graphical_table->EditComponent(m_notes[3], &note_graphical);
     }
 

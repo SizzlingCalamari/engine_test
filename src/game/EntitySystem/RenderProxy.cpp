@@ -89,6 +89,10 @@ void RenderProxy::LoadRenderable(Renderable *r, const PhysicalComponent* physica
 
 void RenderProxy::LoadRenderable(Renderable *r, const GraphicalComponent* graphical)
 {
+    // clear the renderable ids
+    r->mesh = 0;
+    r->texture = 0;
+
     // Load the mesh
     if (!graphical->mesh.empty())
     {
