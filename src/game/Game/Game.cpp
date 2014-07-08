@@ -135,7 +135,7 @@ void Game::Simulate(uint64 tick, uint32 dt)
     {
         auto *graphical_table = m_entity_system.GetTable<GraphicalComponent>();
         auto note_graphical = graphical_table->GetComponent(m_notes[3]);
-        note_graphical.mesh = "models/untitled.obj";
+        note_graphical.mesh = "models/teapot/teapot.obj";
         graphical_table->EditComponent(m_notes[3], &note_graphical);
     }
 
