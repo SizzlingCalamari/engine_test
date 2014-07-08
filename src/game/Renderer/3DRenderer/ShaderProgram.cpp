@@ -56,7 +56,7 @@ void ShaderProgram::Unbind()
 {
     for (GLint i = 0; i < m_num_attributes; ++i)
     {
-        glEnableVertexAttribArray(i);
+        glDisableVertexAttribArray(i);
     }
     glUseProgram(0);
 }
