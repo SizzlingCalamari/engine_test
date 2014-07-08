@@ -1,8 +1,9 @@
 
 #pragma once
 
-#include <string>
 #include "GL/glew.h"
+#include <string>
+#include <iostream>
 
 namespace
 {
@@ -18,6 +19,14 @@ namespace
         {
             auto res = GL_FALSE;
             glGetShaderiv(shader_id, GL_COMPILE_STATUS, &res);
+            if (res != GL_FALSE)
+            {
+                GLint length;
+                glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &length);
+                std::string log(length, '\0');
+                glGetShaderInfoLog(shader_id, length, nullptr, &log[0]);
+                std::cout << log << std::endl;
+            }
             return (GL_TRUE == res);
         }
         return true;
