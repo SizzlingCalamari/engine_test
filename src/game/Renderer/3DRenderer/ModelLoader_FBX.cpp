@@ -108,7 +108,8 @@ vector<glm::vec3> ParseFBX(const char *filename)
 Mesh LoadMeshFromFBX(const char *filename)
 {
     Mesh mesh;
-    auto verts = ParseFBX(filename);
-    mesh.LoadVerticies(verts.data(), sizeof(glm::vec3), verts.size());
+    mesh.verticies = ParseFBX(filename);
+    mesh.numVerticies = mesh.verticies.size();
+    mesh.vertexBufferId = LoadVerticies(mesh.verticies.data(), sizeof(glm::vec3), mesh.numVerticies);
     return mesh;
 }
