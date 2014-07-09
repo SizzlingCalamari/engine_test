@@ -19,7 +19,7 @@ namespace
         {
             auto res = GL_FALSE;
             glGetShaderiv(shader_id, GL_COMPILE_STATUS, &res);
-            if (res != GL_FALSE)
+            if (res == GL_FALSE)
             {
                 GLint length;
                 glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &length);
