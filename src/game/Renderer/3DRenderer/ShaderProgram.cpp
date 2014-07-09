@@ -61,7 +61,7 @@ void ShaderProgram::Unbind()
     glUseProgram(0);
 }
 
-bool ShaderProgram::SetUniform(const char* name, void* data)
+bool ShaderProgram::SetUniform(const char* name, const void* data)
 {
     // check if the uniform name exists in the program
     auto it = m_uniforms.find(name);
@@ -76,25 +76,25 @@ bool ShaderProgram::SetUniform(const char* name, void* data)
     {
     case GL_FLOAT_MAT4:
         {
-            float* data_float = static_cast<float*>(data);
-            glUniformMatrix4fv(info.index, 1, GL_FALSE, data_float);
+            auto mat4 = static_cast<const float*>(data);
+            glUniformMatrix4fv(info.index, 1, GL_FALSE, mat4);
         }
         break;
     case GL_SAMPLER_2D:
         {
-            int* data_int = static_cast<int*>(data);
-            glUniform1i(info.index, *data_int);
+            int value = *static_cast<const int*>(data);
+            glUniform1i(info.index, value);
         }
         break;
     case GL_FLOAT_VEC3_ARB:
         {
-            float* float3 = static_cast<float*>(data);
+            auto float3 = static_cast<const float*>(data);
             glUniform3f(info.index, *float3, *(float3 + 1), *(float3 + 2));
         }
         break;
     case GL_FLOAT:
         {
-            float value = *static_cast<float*>(data);
+            float value = *static_cast<const float*>(data);
             glUniform1f(info.index, value);
         }
         break;

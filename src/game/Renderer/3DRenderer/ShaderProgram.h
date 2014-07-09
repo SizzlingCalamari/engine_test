@@ -17,7 +17,7 @@ public:
     void Bind();
     void Unbind();
 
-    bool SetUniform(const char* name, void* data);
+    bool SetUniform(const char* name, const void* data);
 
 private:
     void QueryUniformInformation();
