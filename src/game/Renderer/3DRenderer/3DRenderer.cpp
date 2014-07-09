@@ -150,8 +150,7 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
         auto mvp = pv * obj->transform;
         m_texture_shader.SetUniform("MVP", &mvp[0][0]);
 
-        auto m = obj->transform;
-        m_texture_shader.SetUniform("modelToWorld", &m[0][0]);
+        m_texture_shader.SetUniform("modelToWorld", &obj->transform);
 
         int texture_sampler = 0;
         m_texture_shader.SetUniform("myTextureSampler", &texture_sampler);
@@ -167,6 +166,14 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
 
         float diffuseIntensity = 0.5f;
         m_texture_shader.SetUniform("directionalLight.diffuseIntensity", &diffuseIntensity);
+
+        m_texture_shader.SetUniform("eyePosition_worldspace", &cam->GetPosition());
+
+        float specularIntensity = 1.0f;
+        m_texture_shader.SetUniform("specularIntensity", &specularIntensity);
+
+        float specularPower = 32.0f;
+        m_texture_shader.SetUniform("specularPower", &specularPower);
 
         auto *mesh = m_resourceLoader->GetMesh(obj->mesh);
         auto *texture = m_resourceLoader->GetTexture(obj->texture);

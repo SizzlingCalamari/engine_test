@@ -8,6 +8,7 @@ layout(location = 2) in vec3 vertexNormal_modelspace;
 // Output data ; will be interpolated for each fragment.
 out vec2 UV;
 out vec3 normal;
+out vec3 worldPosition;
 
 // Values that stay constant for the whole mesh.
 uniform mat4 MVP;
@@ -23,4 +24,6 @@ void main()
 
     // convert the normal to world space
     normal = (modelToWorld * vec4(vertexNormal_modelspace, 0.0f)).xyz;
+
+    worldPosition = (modelToWorld * vec4(vertexPosition_modelspace, 1.0f)).xyz;
 }
