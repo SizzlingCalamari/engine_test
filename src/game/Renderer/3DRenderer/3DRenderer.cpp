@@ -24,18 +24,6 @@ Renderer3D::Renderer3D(void *GLContext):
 {
 }
 
-static const GLfloat floor_uv[] =
-{
-    1.0f, 0.0f,
-    0.0f, 0.0f,
-    0.0f, 1.0f,
-    1.0f, 1.0f,
-    1.0f, 0.0f,
-    0.0f, 1.0f
-};
-
-static GLuint floor_buffer = 0;
-
 void Renderer3D::Init(const renderer3d_config& config)
 {
     glGenVertexArrays(1, &m_vao);
@@ -70,10 +58,6 @@ void Renderer3D::Init(const renderer3d_config& config)
     m_texture_shader.AttachShader(fragmentShaders[1]);
     linked = m_texture_shader.Link();
     assert(linked);
-
-    glGenBuffers(1, &floor_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, floor_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(floor_uv), floor_uv, GL_STATIC_DRAW);
 }
 
 void Renderer3D::Shutdown()
@@ -82,7 +66,6 @@ void Renderer3D::Shutdown()
     delete m_resourceLoader;
     m_resourceLoader = nullptr;
 
-    glDeleteBuffers(1, &floor_buffer);
     glBindVertexArray(0);
     glDeleteVertexArrays(1, &m_vao);
 }
