@@ -11,6 +11,7 @@
 #include <glm/gtx/transform.hpp>
 
 #include "EntitySystem/EntitySystem.h"
+#include <chrono>
 
 void Engine::Initialize()
 {
@@ -61,6 +62,11 @@ void Engine::Run()
     uint32 currentTime = SDL_GetTicks();
     uint32 accumulator = 0;
 
+    uint32 fpsMax = 121;
+    std::chrono::nanoseconds renderPeriod(1000000000 / fpsMax);
+    auto currentRenderTime = std::chrono::high_resolution_clock::now();
+    auto renderAccumulator = std::chrono::high_resolution_clock::duration();
+
     while (ApplicationService::FlushAndRefreshEvents(),
             !ApplicationService::QuitRequested())
     {
@@ -81,7 +87,16 @@ void Engine::Run()
             accumulator -= dt;
         }
 
-        Render();
+        auto now = std::chrono::high_resolution_clock::now();
+        auto deltaTime = (now - currentRenderTime);
+        currentRenderTime = now;
+        renderAccumulator += deltaTime;
+
+        if (renderAccumulator >= renderPeriod)
+        {
+            Render();
+            renderAccumulator %= std::chrono::duration_cast<decltype(renderAccumulator)>(renderPeriod);
+        }
     }
 }
 
