@@ -4,7 +4,7 @@
 class Texture
 {
 public:
-    void LoadTexture2D(const uint8* pixels, ptrdiff_t stride, uint width, uint height);
+    void LoadTexture2D(const uint8* pixels, std::ptrdiff_t stride, uint width, uint height);
 
     void FreeTexture();
 

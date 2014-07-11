@@ -96,18 +96,6 @@ namespace math
         twist = glm::normalize(glm::conjugate(swing) * q);
     }
 
-    template <typename T, glm::precision P>
-    static inline glm::detail::tquat<T, P> limit_rotation_xaxis(glm::detail::tquat<T, P> const & q,
-                                                                T max_degrees)
-    {
-        const auto x_axis = glm::vec3(1.0f, 0.0f, 0.0f);
-        glm::detail::tquat<T, P> swing;
-        glm::detail::tquat<T, P> twist;
-        math::decompose_swing_twist(q, x_axis, swing, twist);
-        twist = math::closest_x(twist, -max_degrees, max_degrees);
-        return swing * twist;
-    }
-
     // Based on code from David Eberly's "Constrained Quaternions Using Euler Angles"
     template <typename T, glm::precision P>
     static inline glm::detail::tquat<T, P> closest_x(glm::detail::tquat<T, P> const & q,
@@ -166,5 +154,17 @@ namespace math
         ret.x = (dot_max >= dot_min) ? sin_max : sin_min;
 
         return glm::normalize(ret);
+    }
+    
+    template <typename T, glm::precision P>
+    static inline glm::detail::tquat<T, P> limit_rotation_xaxis(glm::detail::tquat<T, P> const & q,
+                                                                T max_degrees)
+    {
+        const auto x_axis = glm::vec3(1.0f, 0.0f, 0.0f);
+        glm::detail::tquat<T, P> swing;
+        glm::detail::tquat<T, P> twist;
+        math::decompose_swing_twist(q, x_axis, swing, twist);
+        twist = math::closest_x(twist, -max_degrees, max_degrees);
+        return swing * twist;
     }
 }

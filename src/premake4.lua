@@ -1,7 +1,12 @@
 
 -- Xrandr dependency
-if (os.get == "linux" and os.findlib("libXrandr") == nil) then
+if (os.get() == "linux" and os.findlib("libXrandr") == nil) then
     os.execute("sudo apt-get install libxrandr-dev")
+end
+
+-- Xi dependency
+if (os.get() == "linux" and os.findlib("libxi") == nil) then
+    os.execute("sudo apt-get install libxi-dev")
 end
 
 -- visual studio intellisense doesn't work with relative include paths
@@ -9,7 +14,7 @@ vs_include_prefix = ""
 if string.find(_ACTION, "vs20") then
     vs_include_prefix = "$(SolutionDir)../"
 else
-    vs_include_prefix = os.getcwd()
+    vs_include_prefix = os.getcwd() .. "/"
 end
 
 src_dir = vs_include_prefix .. "game/"
@@ -80,13 +85,14 @@ solution "engine_test"
         targetdir "../bin"
         language "C++"
 
-        forceincludes "platform.h"
+        forceincludes "game/public/platform.h"
 
         defines { "GLEW_STATIC", "SDL_MAIN_HANDLED", "GLM_FORCE_RADIANS" }
         files { "game/**.h", "game/**.cpp", "game/**.vert", "game/**.frag" }
         includedirs {
             src_dir .. "public/"
         }
+        print (src_dir.."public/")
         
         -- GLM linking
         dofile "external/glm/include_config.lua"
@@ -112,6 +118,13 @@ solution "engine_test"
         
         local shader_src = path.translate(os.getcwd() .. "/game/shaders/*")
         local shader_dest = path.translate(os.getcwd() .. "/../shaders/")
-        postbuildcommands {
-            "copy /Y \"" .. shader_src .. "\" " .. shader_dest .. "\""
-        }
+        configuration { "windows" }
+            postbuildcommands {
+                "copy /Y \"" .. shader_src .. "\" " .. shader_dest .. "\""
+            }
+        configuration { "linux" }
+            postbuildcommands {
+                "cp \"" .. shader_src .. "\" " .. shader_dest .. "\""
+            }
+        configuration {}
+

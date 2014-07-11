@@ -12,7 +12,15 @@ function clone()
     end
 end
 
-function build()
+function buildLinux()
+    if (not os.isfile("SDL/Makefile")) then
+        os.execute("cd SDL; ./autogen.sh; ./configure; make -j4")
+    else
+        os.execute("cd SDL; make -j4")
+    end
+end
+
+function buildWindows()
     local build_dir = getdir() .. "/VisualC/SDL/"
     local msbuild = '"' .. os.getenv("VS120COMNTOOLS") .. '../../../MSBuild/12.0/Bin/MSBuild"'
     local build_command = msbuild .. " " .. build_dir

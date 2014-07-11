@@ -15,10 +15,21 @@ function clone()
     os.execute("git reset --hard")
     os.execute("git fetch origin master")
     os.execute("git checkout " .. current_rev)
-    os.execute("git apply ../bullet_build.patch")
+    os.execute("git apply --ignore-whitespace ../bullet_build.patch")
 end
 
-function build()
+function buildLinux()
+    local build_dir = getdir() .. "/build/"
+    os.execute(_PREMAKE_COMMAND .. " gmake --without-demos --file=" .. build_dir .. "premake4.lua")
+
+    local build_command = "cd bullet3/build/gmake; make -j4 "
+    os.execute(build_command .. "config=debug_x32")
+    os.execute(build_command .. "config=debug_x64")
+    os.execute(build_command .. "config=release_x32")
+    os.execute(build_command .. "config=release_x64")
+end
+
+function buildWindows()
     local build_dir = getdir() .. "/build/"
     os.execute(_PREMAKE_COMMAND .. " vs2013 --without-demos --file=" .. build_dir .. "premake4.lua")
     
@@ -50,3 +61,4 @@ function build()
     os.execute(build_command .. "LinearMath.vcxproj " .. debug_x64)
     os.execute(build_command .. "LinearMath.vcxproj " .. release_x64)
 end
+

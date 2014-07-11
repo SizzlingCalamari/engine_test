@@ -12,5 +12,9 @@ function clone()
     end
 end
 
-function build()
+function buildLinux()
 end
+
+function buildWindows()
+end
+

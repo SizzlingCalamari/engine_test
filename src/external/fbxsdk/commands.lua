@@ -8,5 +8,9 @@ end
 function clone()
 end
 
-function build()
+function buildLinux()
 end
+
+function buildWindows()
+end
+
