@@ -12,9 +12,9 @@ end
 includedirs (g_externals_dir .. "sdl/SDL/include")
 
 configuration { "windows", "x32", "Debug" }
-    libdirs (lib_dir .. "x86/debug")
+    libdirs (lib_dir .. "Win32/debug")
 configuration { "windows", "x32", "Release" }
-    libdirs (lib_dir .. "x86/release")
+    libdirs (lib_dir .. "Win32/release")
 configuration { "windows", "x64", "Debug" }
     libdirs (lib_dir .. "x64/debug")
 configuration { "windows", "x64", "Release" }
@@ -26,10 +26,10 @@ configuration {}
 links "SDL2"
 
 configuration { "windows", "x32", "Debug" }
-    local fullLibPath = (lib_dir .. "x86/debug/" .. lib_name)
+    local fullLibPath = (lib_dir .. "Win32/debug/" .. lib_name)
     postbuildcommands { path.translate("copy " .. fullLibPath .. " " .. g_output_dir) }
 configuration { "windows", "x32", "Release" }
-    local fullLibPath = (lib_dir .. "x86/release/" .. lib_name)
+    local fullLibPath = (lib_dir .. "Win32/release/" .. lib_name)
     postbuildcommands { path.translate("copy " .. fullLibPath .. " " .. g_output_dir) }
 configuration { "windows", "x64", "Debug" }
     local fullLibPath = (lib_dir .. "x64/debug/" .. lib_name)
