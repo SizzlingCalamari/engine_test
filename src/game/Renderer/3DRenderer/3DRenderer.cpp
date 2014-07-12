@@ -6,6 +6,8 @@
 #include "ShaderManager.h"
 #include "Camera.h"
 #include "utils.h"
+#include "Light.h"
+#include "Material.h"
 
 static void STDCALL GLErrorCallback(
     GLenum source, GLenum type,
@@ -128,35 +130,51 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
 
     // render using the texture shader
     m_texture_shader.Bind();
+
+    DirectionalLight directionalLight;
+    directionalLight.colour = glm::vec3(1.0f);
+    directionalLight.ambientIntensity = 0.1f;
+    directionalLight.diffuseIntensity = 0.2f;
+    directionalLight.direction = glm::vec3(-1.0f);
+
+    m_texture_shader.SetUniform("g_directionalLight.base.colour", &directionalLight.colour);
+    m_texture_shader.SetUniform("g_directionalLight.base.ambientIntensity", &directionalLight.ambientIntensity);
+    m_texture_shader.SetUniform("g_directionalLight.base.diffuseIntensity", &directionalLight.diffuseIntensity);
+    m_texture_shader.SetUniform("g_directionalLight.direction", &directionalLight.direction);
+
+    int numPointLights = 1;
+    m_texture_shader.SetUniform("g_numPointLights", &numPointLights);
+
+    PointLight light;
+    light.colour = glm::vec3(1.0f);
+    light.ambientIntensity = 0.0f;
+    light.diffuseIntensity = 0.3f;
+    light.position = glm::vec3(-50.0f, 0.0f, -50.0f);
+
+    m_texture_shader.SetUniform("g_pointLights[0].base.colour", &light.colour);
+    m_texture_shader.SetUniform("g_pointLights[0].base.ambientIntensity", &light.ambientIntensity);
+    m_texture_shader.SetUniform("g_pointLights[0].base.diffuseIntensity", &light.diffuseIntensity);
+    m_texture_shader.SetUniform("g_pointLights[0].position", &light.position);
+    m_texture_shader.SetUniform("g_pointLights[0].attenuation.constant", &light.attenuation.constant);
+    m_texture_shader.SetUniform("g_pointLights[0].attenuation.linear", &light.attenuation.linear);
+    m_texture_shader.SetUniform("g_pointLights[0].attenuation.exponential", &light.attenuation.exp);
+
+    Material material;
+    material.specularIntensity = 1.0f;
+    material.specularPower = 32.0f;
+
+    m_texture_shader.SetUniform("g_materialProps.specularIntensity", &material.specularIntensity);
+    m_texture_shader.SetUniform("g_materialProps.specularPower", &material.specularPower);
+
     for (auto &obj : m_texture_shader_cache)
     {
         auto mvp = pv * obj->transform;
         m_texture_shader.SetUniform("MVP", &mvp[0][0]);
-
         m_texture_shader.SetUniform("modelToWorld", &obj->transform);
+        m_texture_shader.SetUniform("eyePosition_worldspace", &cam->GetPosition());
 
         int texture_sampler = 0;
         m_texture_shader.SetUniform("myTextureSampler", &texture_sampler);
-
-        glm::vec3 ambientColour(1.0f);
-        m_texture_shader.SetUniform("directionalLight.colour", &ambientColour);
-
-        float ambientIntensity = 0.2f;
-        m_texture_shader.SetUniform("directionalLight.ambientIntensity", &ambientIntensity);
-
-        glm::vec3 direction(-1.0f);
-        m_texture_shader.SetUniform("directionalLight.direction", &direction);
-
-        float diffuseIntensity = 0.5f;
-        m_texture_shader.SetUniform("directionalLight.diffuseIntensity", &diffuseIntensity);
-
-        m_texture_shader.SetUniform("eyePosition_worldspace", &cam->GetPosition());
-
-        float specularIntensity = 1.0f;
-        m_texture_shader.SetUniform("specularIntensity", &specularIntensity);
-
-        float specularPower = 32.0f;
-        m_texture_shader.SetUniform("specularPower", &specularPower);
 
         auto *mesh = m_resourceLoader->GetMesh(obj->mesh);
         auto *texture = m_resourceLoader->GetTexture(obj->texture);

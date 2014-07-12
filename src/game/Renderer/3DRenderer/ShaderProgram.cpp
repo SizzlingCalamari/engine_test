@@ -85,6 +85,12 @@ bool ShaderProgram::SetUniform(const char* name, const void* data)
             glUniform1f(info.index, value);
         }
         break;
+    case GL_INT:
+        {
+            int value = *static_cast<const int*>(data);
+            glUniform1i(info.index, value);
+        }
+        break;
     default:
         return false;
     }
