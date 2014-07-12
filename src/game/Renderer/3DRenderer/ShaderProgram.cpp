@@ -1,5 +1,6 @@
 
 #include "ShaderProgram.h"
+#include "glutils.h"
 
 ShaderProgram::ShaderProgram(GLuint id):
     m_id(id)
@@ -13,15 +14,10 @@ void ShaderProgram::AttachShader(GLuint shader)
 
 bool ShaderProgram::Link(std::string* error_out /*= nullptr*/)
 {
-    // link the program
-    glLinkProgram(m_id);
-
-    // check if the link was successful
-    GLint status = GL_FALSE;
-    glGetProgramiv(m_id, GL_LINK_STATUS, &status);
+    bool success = LinkProgram(m_id);
 
     // if it linked, find and cache the uniform names and ids
-    if (GL_TRUE == status)
+    if (success)
     {
         // lookup and store uniform information
         QueryUniformInformation();
@@ -30,17 +26,8 @@ bool ShaderProgram::Link(std::string* error_out /*= nullptr*/)
         // for activating before using the shader
         glGetProgramiv(m_id, GL_ACTIVE_ATTRIBUTES, &m_num_attributes);
     }
-    else if (error_out && (GL_FALSE == status))
-    {
-        // write out the error to the output string
-        GLint log_length = 0;
-        glGetProgramiv(m_id, GL_INFO_LOG_LENGTH, &log_length);
 
-        error_out->resize(log_length);
-        glGetProgramInfoLog(m_id, log_length, nullptr, &error_out->front());
-    }
-
-    return (GL_TRUE == status);
+    return success;
 }
 
 void ShaderProgram::Bind()
