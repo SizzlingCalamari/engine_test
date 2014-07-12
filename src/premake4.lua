@@ -85,7 +85,11 @@ solution "engine_test"
         targetdir "../bin"
         language "C++"
 
-        forceincludes "game/public/platform.h"
+        configuration { "windows" }
+            forceincludes "platform.h"
+        configuration { "linux" }
+            forceincludes "game/public/platform.h"
+        configuration {}
 
         defines { "GLEW_STATIC", "SDL_MAIN_HANDLED", "GLM_FORCE_RADIANS" }
         files { "game/**.h", "game/**.cpp", "game/**.vert", "game/**.frag" }

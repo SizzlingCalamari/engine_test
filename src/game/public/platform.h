@@ -6,6 +6,7 @@
 #endif
 
 #include <cstdint>
+#include <cstddef>
 #include <cassert>
 
 // STDCALL define

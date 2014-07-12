@@ -1,35 +1,43 @@
 
-local copy_cmd = "copy " .. g_externals_dir .. "sdl/SDL/VisualC/SDL/"
-local copy_dest = g_output_dir .. "SDL2.dll"
-local full_cmd = ""
+local lib_dir = ""
+local lib_name = ""
+if (os.get() == "windows") then
+    lib_dir = (g_externals_dir .. "sdl/SDL/VisualC/SDL/")
+    lib_name = "SDL2.dll"
+elseif (os.get() == "linux") then
+    lib_dir = (g_externals_dir .. "sdl/SDL/build/")
+    lib_name = "libSDL2.so"
+end
 
 includedirs (g_externals_dir .. "sdl/SDL/include")
 
-configuration { "windows" }
-    libdirs ("SDL/VisualC/SDL")
-configuration { "linux" }
-    libdirs { "SDL/build/", "SDL/build/.libs" }
-
-local lib_name = ""
 configuration { "windows", "x32", "Debug" }
-    lib_name = "/Win32/Debug/SDL2"
-    full_cmd = path.translate(copy_cmd .. "Win32/Debug/SDL2.dll " .. copy_dest)
-    postbuildcommands { full_cmd }
+    libdirs (lib_dir .. "x86/debug")
 configuration { "windows", "x32", "Release" }
-    lib_name = "/Win32/Release/SDL2"
-    full_cmd = path.translate(copy_cmd .. "Win32/Release/SDL2.dll " .. copy_dest)
-    postbuildcommands { full_cmd }
+    libdirs (lib_dir .. "x86/release")
 configuration { "windows", "x64", "Debug" }
-    lib_name = "/x64/Debug/SDL2"
-    full_cmd = path.translate(copy_cmd .. "x64/Debug/SDL2.dll " .. copy_dest)
-    postbuildcommands { full_cmd }
+    libdirs (lib_dir .. "x64/debug")
 configuration { "windows", "x64", "Release" }
-    lib_name = "/x64/Release/SDL2"
-configuration { "windows" }
-    links { lib_name }
-    full_cmd = path.translate(copy_cmd .. lib_name .. ".dll " .. copy_dest)
-    postbuildcommands { full_cmd }
+    libdirs (lib_dir .. "x64/release")
 configuration { "linux" }
-    links { "SDL2" }
--- TODO: osx sdl linking
+    libdirs { lib_dir, (lib_dir .. ".libs/") }
+configuration {}
+
+links "SDL2"
+
+configuration { "windows", "x32", "Debug" }
+    local fullLibPath = (lib_dir .. "x86/debug/" .. lib_name)
+    postbuildcommands { path.translate("copy " .. fullLibPath .. " " .. g_output_dir) }
+configuration { "windows", "x32", "Release" }
+    local fullLibPath = (lib_dir .. "x86/release/" .. lib_name)
+    postbuildcommands { path.translate("copy " .. fullLibPath .. " " .. g_output_dir) }
+configuration { "windows", "x64", "Debug" }
+    local fullLibPath = (lib_dir .. "x64/debug/" .. lib_name)
+    postbuildcommands { path.translate("copy " .. fullLibPath .. " " .. g_output_dir) }
+configuration { "windows", "x64", "Release" }
+    local fullLibPath = (lib_dir .. "x64/release/" .. lib_name)
+    postbuildcommands { path.translate("copy " .. fullLibPath .. " " .. g_output_dir) }
+configuration { "linux" }
+    local fullLibPath = (lib_dir .. ".libs/" .. lib_name)
+    postbuildcommands { path.translate("cp " .. fullLibPath .. " " .. g_output_dir) }
 configuration {}
