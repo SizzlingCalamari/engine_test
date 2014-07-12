@@ -27,6 +27,13 @@ struct PointLight
     Attenuation attenuation;
 };
 
+struct SpotLight
+{
+    PointLight base;
+    vec3 coneDirection;
+    float cosineConeAngle;
+};
+
 struct MaterialLightProps
 {
     float specularIntensity;
@@ -37,6 +44,7 @@ vec4 CalcLightInternal(BaseLight light, vec3 lightDirection,
                        vec3 vertexNormal, vec3 vertexToEye,
                        MaterialLightProps materialProps)
 {
+    lightDirection = normalize(lightDirection);
     vertexToEye = normalize(vertexToEye);
 
     vec4 ambientColour = vec4(light.colour, 1.0f) * light.ambientIntensity;
@@ -75,7 +83,7 @@ vec4 CalcPointLight(PointLight light, vec3 lightToVertex,
                     vec3 vertexNormal, vec3 vertexToEye,
                     MaterialLightProps materialProps)
 {
-    vec4 colour = CalcLightInternal(light.base, normalize(lightToVertex),
+    vec4 colour = CalcLightInternal(light.base, lightToVertex,
                                     vertexNormal, vertexToEye, materialProps);
     float distToVertex = length(lightToVertex);
     float attenuation = light.attenuation.constant
@@ -84,7 +92,23 @@ vec4 CalcPointLight(PointLight light, vec3 lightToVertex,
     return colour / attenuation;
 }
 
+vec4 CalcSpotLight(SpotLight light, vec3 lightToVertex,
+                   vec3 vertexNormal, vec3 vertexToEye,
+                   MaterialLightProps materialProps)
+{
+    float spotFactor = dot(normalize(lightToVertex), normalize(light.coneDirection));
+    vec4 spotColour = vec4(0.0f);
+    if (spotFactor > light.cosineConeAngle)
+    {
+        vec4 colour = CalcPointLight(light.base, lightToVertex,
+                                     vertexNormal, vertexToEye, materialProps);
+        spotColour = colour * (1.0f - (1.0f - spotFactor) * 1.0f / (1.0f - light.cosineConeAngle));
+    }
+    return spotColour;
+}
+
 const int MAX_POINT_LIGHTS = 4;
+const int MAX_SPOT_LIGHTS = 4;
 
 // Interpolated values from the vertex shaders
 in vec2 UV;
@@ -99,13 +123,13 @@ uniform sampler2D myTextureSampler;
 uniform DirectionalLight g_directionalLight;
 uniform int g_numPointLights;
 uniform PointLight g_pointLights[MAX_POINT_LIGHTS];
+uniform int g_numSpotLights;
+uniform SpotLight g_spotLights[MAX_SPOT_LIGHTS];
 uniform vec3 eyePosition_worldspace;
 uniform MaterialLightProps g_materialProps;
 
 void main()
 {
-
-
     vec3 vertexNormal = normalize(normal);
     vec3 vertexToEye = normalize(eyePosition_worldspace - worldPosition);
 
@@ -114,6 +138,11 @@ void main()
     {
         vec3 lightToVertex = (worldPosition - g_pointLights[i].position);
         totalLight += CalcPointLight(g_pointLights[i], lightToVertex, vertexNormal, vertexToEye, g_materialProps);
+    }
+    for (int i = 0; i < g_numSpotLights; ++i)
+    {
+        vec3 lightToVertex = (worldPosition - g_spotLights[i].base.position);
+        totalLight += CalcSpotLight(g_spotLights[i], lightToVertex, vertexNormal, vertexToEye, g_materialProps);
     }
 
     fragColour = texture(myTextureSampler, UV) * totalLight;

@@ -146,7 +146,7 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
     m_texture_shader.SetUniform("g_numPointLights", &numPointLights);
 
     PointLight light;
-    light.colour = glm::vec3(1.0f);
+    light.colour = glm::vec3(0.0f, 0.0f, 1.0f);
     light.ambientIntensity = 0.0f;
     light.diffuseIntensity = 0.3f;
     light.position = glm::vec3(-50.0f, 0.0f, -50.0f);
@@ -158,6 +158,27 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
     m_texture_shader.SetUniform("g_pointLights[0].attenuation.constant", &light.attenuation.constant);
     m_texture_shader.SetUniform("g_pointLights[0].attenuation.linear", &light.attenuation.linear);
     m_texture_shader.SetUniform("g_pointLights[0].attenuation.exponential", &light.attenuation.exp);
+
+    int numSpotLights = 1;
+    m_texture_shader.SetUniform("g_numSpotLights", &numSpotLights);
+
+    SpotLight spotLight;
+    spotLight.colour = glm::vec3(0.0f, 1.0f, 0.0f);
+    spotLight.ambientIntensity = 0.0f;
+    spotLight.diffuseIntensity = 0.3f;
+    spotLight.position = glm::vec3(50.0f, 0.0f, -50.0f);
+    spotLight.coneDirection = (glm::vec3(0.0f) - spotLight.position);
+    spotLight.cosineConeAngle = glm::cos(20.0f);
+
+    m_texture_shader.SetUniform("g_spotLights[0].base.base.colour", &spotLight.colour);
+    m_texture_shader.SetUniform("g_spotLights[0].base.base.ambientIntensity", &spotLight.ambientIntensity);
+    m_texture_shader.SetUniform("g_spotLights[0].base.base.diffuseIntensity", &spotLight.diffuseIntensity);
+    m_texture_shader.SetUniform("g_spotLights[0].base.position", &spotLight.position);
+    m_texture_shader.SetUniform("g_spotLights[0].base.attenuation.constant", &spotLight.attenuation.constant);
+    m_texture_shader.SetUniform("g_spotLights[0].base.attenuation.linear", &spotLight.attenuation.linear);
+    m_texture_shader.SetUniform("g_spotLights[0].base.attenuation.exponential", &spotLight.attenuation.exp);
+    m_texture_shader.SetUniform("g_spotLights[0].coneDirection", &spotLight.coneDirection);
+    m_texture_shader.SetUniform("g_spotLights[0].cosineConeAngle", &spotLight.cosineConeAngle);
 
     Material material;
     material.specularIntensity = 1.0f;

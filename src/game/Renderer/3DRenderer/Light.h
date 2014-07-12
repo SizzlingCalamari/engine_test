@@ -5,29 +5,53 @@
 
 struct BaseLight
 {
-    glm::vec3 colour = glm::vec3(0.0f);
-    float ambientIntensity = 0.0f;
-    float diffuseIntensity = 0.0f;
+    BaseLight():
+        colour(1.0f),
+        ambientIntensity(0.0f),
+        diffuseIntensity(0.0f)
+    {
+    }
+
+    glm::vec3 colour;
+    float ambientIntensity;
+    float diffuseIntensity;
 };
 
 struct DirectionalLight: public BaseLight
 {
-    glm::vec3 direction = glm::vec3(0.0f);
+    DirectionalLight(): BaseLight(),
+        direction(0.0f)
+    {
+    }
+
+    glm::vec3 direction;
 };
 
 struct PointLight: public BaseLight
 {
-    PointLight():
-        position(glm::vec3(0.0f)),
+    PointLight(): BaseLight(),
+        position(0.0f),
         attenuation({ 1.0f, 0.0f, 0.0f })
     {
     }
 
-    glm::vec3 position = glm::vec3(0.0f);
+    glm::vec3 position;
     struct
     {
         float constant;
         float linear;
         float exp;
     } attenuation;
+};
+
+struct SpotLight: public PointLight
+{
+    SpotLight(): PointLight(),
+        coneDirection(0.0f),
+        cosineConeAngle(glm::one_over_root_two<float>()) // 45.0f degrees
+    {
+    }
+
+    glm::vec3 coneDirection;
+    float cosineConeAngle;
 };
