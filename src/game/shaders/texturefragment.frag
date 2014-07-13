@@ -42,7 +42,8 @@ struct MaterialLightProps
 
 vec4 CalcLightInternal(BaseLight light, vec3 lightDirection,
                        vec3 vertexNormal, vec3 vertexToEye,
-                       MaterialLightProps materialProps)
+                       MaterialLightProps materialProps,
+                       float shadowFactor)
 {
     lightDirection = normalize(lightDirection);
     vertexToEye = normalize(vertexToEye);
@@ -68,23 +69,25 @@ vec4 CalcLightInternal(BaseLight light, vec3 lightDirection,
         }
     }
 
-    return (ambientColour + diffuseColour + specularColour);
+    return (ambientColour + shadowFactor*(diffuseColour + specularColour));
 }
 
 vec4 CalcDirectionalLight(DirectionalLight light,
                           vec3 vertexNormal, vec3 vertexToEye,
-                          MaterialLightProps materialProps)
+                          MaterialLightProps materialProps,
+                          float shadowFactor)
 {
     return CalcLightInternal(light.base, light.direction,
-                             vertexNormal, vertexToEye, materialProps);
+                             vertexNormal, vertexToEye, materialProps, shadowFactor);
 }
 
 vec4 CalcPointLight(PointLight light, vec3 lightToVertex,
                     vec3 vertexNormal, vec3 vertexToEye,
-                    MaterialLightProps materialProps)
+                    MaterialLightProps materialProps,
+                    float shadowFactor)
 {
     vec4 colour = CalcLightInternal(light.base, lightToVertex,
-                                    vertexNormal, vertexToEye, materialProps);
+                                    vertexNormal, vertexToEye, materialProps, shadowFactor);
     float distToVertex = length(lightToVertex);
     float attenuation = light.attenuation.constant
                         + light.attenuation.linear * distToVertex
@@ -94,14 +97,15 @@ vec4 CalcPointLight(PointLight light, vec3 lightToVertex,
 
 vec4 CalcSpotLight(SpotLight light, vec3 lightToVertex,
                    vec3 vertexNormal, vec3 vertexToEye,
-                   MaterialLightProps materialProps)
+                   MaterialLightProps materialProps,
+                   float shadowFactor)
 {
     float spotFactor = dot(normalize(lightToVertex), normalize(light.coneDirection));
     vec4 spotColour = vec4(0.0f);
     if (spotFactor > light.cosineConeAngle)
     {
         vec4 colour = CalcPointLight(light.base, lightToVertex,
-                                     vertexNormal, vertexToEye, materialProps);
+                                     vertexNormal, vertexToEye, materialProps, shadowFactor);
         spotColour = colour * (1.0f - (1.0f - spotFactor) * 1.0f / (1.0f - light.cosineConeAngle));
     }
     return spotColour;
@@ -114,12 +118,14 @@ const int MAX_SPOT_LIGHTS = 4;
 in vec2 UV;
 in vec3 normal;
 in vec3 worldPosition;
+in vec4 directionalLightSpacePosition;
 
 // Ouput data
 out vec4 fragColour;
 
 // Values that stay constant for the whole mesh.
 uniform sampler2D myTextureSampler;
+uniform sampler2D g_shadowMapSampler;
 uniform DirectionalLight g_directionalLight;
 uniform int g_numPointLights;
 uniform PointLight g_pointLights[MAX_POINT_LIGHTS];
@@ -133,16 +139,23 @@ void main()
     vec3 vertexNormal = normalize(normal);
     vec3 vertexToEye = normalize(eyePosition_worldspace - worldPosition);
 
-    vec4 totalLight = CalcDirectionalLight(g_directionalLight, vertexNormal, vertexToEye, g_materialProps);
+    float shadowFactor = 1.0f;
+    float depth = texture(g_shadowMapSampler, directionalLightSpacePosition.xy).x;
+    if (depth < directionalLightSpacePosition.z)
+    {
+        shadowFactor = 0.0f;
+    }
+
+    vec4 totalLight = CalcDirectionalLight(g_directionalLight, vertexNormal, vertexToEye, g_materialProps, shadowFactor);
     for (int i = 0; i < g_numPointLights; ++i)
     {
         vec3 lightToVertex = (worldPosition - g_pointLights[i].position);
-        totalLight += CalcPointLight(g_pointLights[i], lightToVertex, vertexNormal, vertexToEye, g_materialProps);
+        totalLight += CalcPointLight(g_pointLights[i], lightToVertex, vertexNormal, vertexToEye, g_materialProps, 1.0f);
     }
     for (int i = 0; i < g_numSpotLights; ++i)
     {
         vec3 lightToVertex = (worldPosition - g_spotLights[i].base.position);
-        totalLight += CalcSpotLight(g_spotLights[i], lightToVertex, vertexNormal, vertexToEye, g_materialProps);
+        totalLight += CalcSpotLight(g_spotLights[i], lightToVertex, vertexNormal, vertexToEye, g_materialProps, 1.0f);
     }
 
     fragColour = texture(myTextureSampler, UV) * totalLight;

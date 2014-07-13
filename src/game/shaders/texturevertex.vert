@@ -9,15 +9,20 @@ layout(location = 2) in vec3 vertexNormal_modelspace;
 out vec2 UV;
 out vec3 normal;
 out vec3 worldPosition;
+out vec4 directionalLightSpacePosition;
 
 // Values that stay constant for the whole mesh.
 uniform mat4 MVP;
+uniform mat4 g_depthMVP;
 uniform mat4 modelToWorld;
 
 void main()
 {
 	// Output position of the vertex, in clip space : MVP * position
 	gl_Position =  MVP * vec4(vertexPosition_modelspace, 1.0f);
+
+    // output coordinates in directional light shadow depth coordinates
+    directionalLightSpacePosition = g_depthMVP * vec4(vertexPosition_modelspace, 1.0f);
 
 	// UV of the vertex. No special space for this one.
 	UV = vertexUV;

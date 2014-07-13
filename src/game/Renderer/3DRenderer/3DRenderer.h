@@ -5,6 +5,7 @@
 #include "Viewport.h"
 #include "ShaderProgram.h"
 #include "Renderable.h"
+#include "ShadowMap.h"
 #include <vector>
 
 class Camera;
@@ -46,6 +47,8 @@ private:
     std::vector<const Renderable*> m_texture_shader_cache;
 
     Viewport m_fullview;
+
+    ShadowMapDirectional m_shadowMapping;
 };
 
 inline ResourceLoader* Renderer3D::GetResourceLoader() const

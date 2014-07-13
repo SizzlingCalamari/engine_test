@@ -8,6 +8,7 @@
 #include "utils.h"
 #include "Light.h"
 #include "Material.h"
+#include "Scene.h"
 
 static void STDCALL GLErrorCallback(
     GLenum source, GLenum type,
@@ -45,8 +46,8 @@ void Renderer3D::Init(const renderer3d_config& config)
     std::vector<uint> fragmentShaders;
 
     m_shader_manager->CompileShaders(
-        {"shaders/simplevertex.vert", "shaders/texturevertex.vert"},
-        {"shaders/simplefragment.frag", "shaders/texturefragment.frag"},
+        {"shaders/simplevertex.vert", "shaders/texturevertex.vert", "shaders/shadowmap.vert"},
+        {"shaders/simplefragment.frag", "shaders/texturefragment.frag", "shaders/shadowmap.frag"},
     vertexShaders, fragmentShaders);
 
     m_colour_shader = m_shader_manager->CreateProgram();
@@ -60,6 +61,14 @@ void Renderer3D::Init(const renderer3d_config& config)
     m_texture_shader.AttachShader(fragmentShaders[1]);
     linked = m_texture_shader.Link();
     assert(linked);
+
+    auto shadowMapShader = m_shader_manager->CreateProgram();
+    shadowMapShader.AttachShader(vertexShaders[2]);
+    shadowMapShader.AttachShader(fragmentShaders[2]);
+    linked = shadowMapShader.Link();
+    assert(linked);
+    m_shadowMapping.Init(std::move(shadowMapShader),
+                         config.width, config.height, 4096, 4096);
 }
 
 void Renderer3D::Shutdown()
@@ -74,6 +83,33 @@ void Renderer3D::Shutdown()
 
 void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const std::vector<Renderable>& scene)
 {
+    DirectionalLight directionalLight;
+    directionalLight.colour = glm::vec3(1.0f);
+    directionalLight.ambientIntensity = 0.1f;
+    directionalLight.diffuseIntensity = 0.2f;
+    directionalLight.direction = glm::vec3(-1.0f);
+
+    // shadow mapping depth render
+    {
+        std::vector<SceneNode> sceneNodes;
+        sceneNodes.reserve(scene.size());
+        for (auto &obj : scene)
+        {
+            const Mesh *mesh = nullptr;
+            if (obj.mesh > 0)
+            {
+                mesh = m_resourceLoader->GetMesh(obj.mesh);
+            }
+            const Texture *texture = nullptr;
+            if (obj.texture > 0)
+            {
+                texture = m_resourceLoader->GetTexture(obj.texture);
+            }
+            sceneNodes.emplace_back(SceneNode{ obj.transform, mesh, texture });
+        }
+        m_shadowMapping.RenderShadowMap(directionalLight.direction, sceneNodes);
+    }
+
     bool do_scissor = false;
     if (viewport)
     {
@@ -131,12 +167,6 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
     // render using the texture shader
     m_texture_shader.Bind();
 
-    DirectionalLight directionalLight;
-    directionalLight.colour = glm::vec3(1.0f);
-    directionalLight.ambientIntensity = 0.1f;
-    directionalLight.diffuseIntensity = 0.2f;
-    directionalLight.direction = glm::vec3(-1.0f);
-
     m_texture_shader.SetUniform("g_directionalLight.base.colour", &directionalLight.colour);
     m_texture_shader.SetUniform("g_directionalLight.base.ambientIntensity", &directionalLight.ambientIntensity);
     m_texture_shader.SetUniform("g_directionalLight.base.diffuseIntensity", &directionalLight.diffuseIntensity);
@@ -187,15 +217,20 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
     m_texture_shader.SetUniform("g_materialProps.specularIntensity", &material.specularIntensity);
     m_texture_shader.SetUniform("g_materialProps.specularPower", &material.specularPower);
 
+    int texture_sampler = 0;
+    m_texture_shader.SetUniform("myTextureSampler", &texture_sampler);
+
+    int depthSampler = 1;
+    m_texture_shader.SetUniform("g_shadowMapSampler", &depthSampler);
+
     for (auto &obj : m_texture_shader_cache)
     {
         auto mvp = pv * obj->transform;
+        auto depthMVP = m_shadowMapping.GetBiasDepthPV() * obj->transform;
         m_texture_shader.SetUniform("MVP", &mvp[0][0]);
+        m_texture_shader.SetUniform("g_depthMVP", &depthMVP[0][0]);
         m_texture_shader.SetUniform("modelToWorld", &obj->transform);
         m_texture_shader.SetUniform("eyePosition_worldspace", &cam->GetPosition());
-
-        int texture_sampler = 0;
-        m_texture_shader.SetUniform("myTextureSampler", &texture_sampler);
 
         auto *mesh = m_resourceLoader->GetMesh(obj->mesh);
         auto *texture = m_resourceLoader->GetTexture(obj->texture);
@@ -211,6 +246,9 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
 
         glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, texture->GetGLId());
+
+        glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, m_shadowMapping.GetShadowMapId());
             
         auto num_verticies = static_cast<GLsizei>(mesh->numVerticies);
         glDrawArrays(GL_TRIANGLES, 0, num_verticies);
