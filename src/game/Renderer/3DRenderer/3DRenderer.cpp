@@ -73,6 +73,8 @@ void Renderer3D::Init(const renderer3d_config& config)
 
 void Renderer3D::Shutdown()
 {
+    m_shadowMapping.Free();
+
     m_resourceLoader->UnloadResources();
     delete m_resourceLoader;
     m_resourceLoader = nullptr;
