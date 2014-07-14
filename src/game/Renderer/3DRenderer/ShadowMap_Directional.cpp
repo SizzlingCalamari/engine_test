@@ -125,6 +125,4 @@ void ShadowMapDirectional::RenderShadowMap(const glm::vec3& lightDirection,
 
     m_shadowMapShader.Unbind();
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-
-    glDisable(GL_CULL_FACE);
 }
