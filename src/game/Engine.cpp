@@ -36,6 +36,10 @@ void Engine::Initialize()
     engine.physics = &m_physics_proxy;
 
     m_game.Initialize(engine);
+
+    // Allows the game to have simulate run
+    // at least once before it shuts down
+    m_game.Simulate(0, 0);
 }
 
 void Engine::Shutdown()
