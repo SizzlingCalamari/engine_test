@@ -1,6 +1,6 @@
 
 #ifdef PLATFORM_PCH
-#  error this is force included already. don't include it...
+#  error "This header is force included already. Don't include it manually..."
 #else
 #  define PLATFORM_PCH
 #endif

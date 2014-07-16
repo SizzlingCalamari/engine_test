@@ -21,7 +21,11 @@ configuration { "x64", "Release" }
     libdirs (lib_dir .. "x64/release")
 configuration {}
 
-links { "libfbxsdk" }
+configuration { "windows" }
+    links { "libfbxsdk" }
+configuration { "linux" }
+    links { "fbxsdk" }
+configuration {}
 
 configuration { "x32", "Debug" }
     local fullLibPath = (lib_dir .. "x86/debug/" .. lib_name)

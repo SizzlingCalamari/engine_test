@@ -1,9 +1,4 @@
 
--- Xrandr dependency
-if (os.get() == "linux" and os.findlib("libXrandr") == nil) then
-    os.execute("sudo apt-get install libxrandr-dev")
-end
-
 -- Xi dependency
 if (os.get() == "linux" and os.findlib("libxi") == nil) then
     os.execute("sudo apt-get install libxi-dev")
@@ -91,7 +86,7 @@ solution "engine_test"
             forceincludes "game/public/platform.h"
         configuration {}
 
-        defines { "GLEW_STATIC", "SDL_MAIN_HANDLED", "GLM_FORCE_RADIANS" }
+        defines { "GLEW_STATIC", "GLEW_NO_GLU", "SDL_MAIN_HANDLED", "GLM_FORCE_RADIANS" }
         files { "game/**.h", "game/**.cpp", "game/**.vert", "game/**.frag" }
         includedirs {
             src_dir .. "public/"
@@ -114,7 +109,7 @@ solution "engine_test"
         dofile "external/fbxsdk/include_config.lua"
         
         configuration "linux"
-            links { "GL", "rt", "m", "pthread", "X11", "Xrandr", "Xi", "Xxf86vm" }
+            links { "GL", "rt", "m", "pthread", "X11", "Xi" }
             buildoptions { "-std=c++11" }
         configuration "windows"
             links "opengl32"
