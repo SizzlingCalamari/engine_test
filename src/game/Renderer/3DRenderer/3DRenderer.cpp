@@ -134,7 +134,7 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     auto aspect = viewport->GetAspectRatio();
-    auto pv = glm::perspective(glm::quarter_pi<float>(), aspect, 0.1f, 1000.0f) * cam->GetView();
+    auto pv = glm::perspective(glm::quarter_pi<float>(), aspect, 0.1f, 10000.0f) * cam->GetView();
 
     // categorize the renderables by shader
     m_colour_shader_cache.clear();
