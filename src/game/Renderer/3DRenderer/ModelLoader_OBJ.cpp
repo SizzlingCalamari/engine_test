@@ -64,8 +64,17 @@ void ParseOBJ(const char *filename,
     char firstOnLine, secondOnLine;
     FaceType faceType = Unclassified;
 
-    while ((firstOnLine = fgetc(file)) != EOF && (secondOnLine = fgetc(file)) != EOF)
+    while ((firstOnLine = fgetc(file)) != EOF)
     {
+        if (firstOnLine == '\n')
+        {
+            continue;
+        }
+        if ((secondOnLine = fgetc(file)) == EOF)
+        {
+            break;
+        }
+
         if (firstOnLine == 'v' && secondOnLine == ' ')
         {
             glm::vec3 vertex;
