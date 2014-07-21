@@ -16,7 +16,7 @@ void CameraController_InterpolatedPath::Update(uint32 dt)
 
     auto numPoints = m_positions.size();
 
-    uint timePerControlPoint = m_period / numPoints;
+    uint timePerControlPoint = static_cast<uint>(m_period / numPoints);
     float interpValue = (float)(m_curTime % timePerControlPoint) / timePerControlPoint;
 
     uint point1 = (m_curTime / timePerControlPoint) % numPoints;
