@@ -57,6 +57,10 @@ public:
     void Update(uint32 dt);
 
 private:
+    glm::vec3 InterpPosition(uint index1, uint index2, const float t);
+    glm::quat InterpOrientation(uint index1, uint index2, const float t);
+
+private:
     ComponentTable<PhysicalComponent> *m_physical_components;
     uint m_cameraEnt;
     uint m_startTime;

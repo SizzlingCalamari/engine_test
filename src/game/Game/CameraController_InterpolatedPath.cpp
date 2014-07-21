@@ -19,19 +19,30 @@ void CameraController_InterpolatedPath::Update(uint32 dt)
     uint timePerControlPoint = m_period / numPoints;
     float interpValue = (float)(m_curTime % timePerControlPoint) / timePerControlPoint;
 
-    uint point2 = (m_curTime / timePerControlPoint) % numPoints;
-    uint point1 = (point2 - 1) % numPoints;
-    uint point3 = (point2 + 1) % numPoints;
-    uint point4 = (point2 + 2) % numPoints;
+    uint point1 = (m_curTime / timePerControlPoint) % numPoints;
+    uint point2 = (point1 + 1) % numPoints;
 
     auto camera = m_physical_components->GetComponent(m_cameraEnt);
-    camera.position = glm::catmullRom(m_positions[point1], m_positions[point2],
-                                      m_positions[point3], m_positions[point4],
-                                      interpValue);
+    camera.position = InterpPosition(point1, point2, interpValue);
+    camera.orientation = InterpOrientation(point1, point2, interpValue);
     
     // Set the updated component.
     m_physical_components->EditComponent(m_cameraEnt, &camera);
 
     // update the current time
     m_curTime = (m_curTime + dt) % m_period;
+}
+
+glm::vec3 CameraController_InterpolatedPath::InterpPosition(uint index1, uint index2, const float t)
+{
+    auto numPoints = m_positions.size();
+    uint index0 = (index1 - 1) % numPoints;
+    uint index3 = (index2 + 1) % numPoints;
+    return glm::catmullRom(m_positions[index0], m_positions[index1],
+                           m_positions[index2], m_positions[index3], t);
+}
+
+glm::quat CameraController_InterpolatedPath::InterpOrientation(uint index1, uint index2, const float t)
+{
+    return glm::slerp(m_orientations[index1], m_orientations[index2], t);
 }

@@ -100,14 +100,14 @@ void Game::Initialize(const EngineContext& engine)
     m_cameraPathController.SetStartTime(0);
 
     float mid = 75.0f * glm::root_two<float>();
-    m_cameraPathController.AddControlPoint(glm::vec3{ 0.0f, 20.0f, -150.0f }, glm::quat());
-    m_cameraPathController.AddControlPoint(glm::vec3{ mid, 30.0f, -mid }, glm::quat());
-    m_cameraPathController.AddControlPoint(glm::vec3{ 150.0f, 40.0f, 0.0f }, glm::quat());
-    m_cameraPathController.AddControlPoint(glm::vec3{ mid, 50.0f, mid }, glm::quat());
-    m_cameraPathController.AddControlPoint(glm::vec3{ 0.0f, 40.0f, 150.0f }, glm::quat());
-    m_cameraPathController.AddControlPoint(glm::vec3{ -mid, 30.0f, mid }, glm::quat());
-    m_cameraPathController.AddControlPoint(glm::vec3{ -150.0f, 20.0f, 0.0f }, glm::quat());
-    m_cameraPathController.AddControlPoint(glm::vec3{ -mid, 30.0f, -mid }, glm::quat());
+    m_cameraPathController.AddControlPoint(glm::vec3{ 0.0f, 20.0f, -150.0f }, glm::quat(glm::vec3{ 0.0f, 0.0f, 0.0f }));
+    //m_cameraPathController.AddControlPoint(glm::vec3{ mid, 30.0f, -mid }, glm::quat(glm::vec3{ 0.0f, 0.0f, 0.0f }));
+    m_cameraPathController.AddControlPoint(glm::vec3{ 150.0f, 40.0f, 0.0f }, glm::quat(glm::vec3{ 0.0f, -glm::half_pi<float>(), 0.0f }));
+    //m_cameraPathController.AddControlPoint(glm::vec3{ mid, 50.0f, mid }, glm::quat(glm::vec3{ 0.0f, 0.0f, 0.0f }));
+    m_cameraPathController.AddControlPoint(glm::vec3{ 0.0f, 40.0f, 150.0f }, glm::quat(glm::vec3{ 0.0f, glm::pi<float>(), 0.0f }));
+    //m_cameraPathController.AddControlPoint(glm::vec3{ -mid, 30.0f, mid }, glm::quat(glm::vec3{ 0.0f, 0.0f, 0.0f }));
+    m_cameraPathController.AddControlPoint(glm::vec3{ -150.0f, 20.0f, 0.0f }, glm::quat(glm::vec3{ 0.0f, glm::half_pi<float>(), 0.0f }));
+    //m_cameraPathController.AddControlPoint(glm::vec3{ -mid, 30.0f, -mid }, glm::quat(glm::vec3{ 0.0f, 0.0f, 0.0f }));
 }
 
 void Game::Shutdown()
