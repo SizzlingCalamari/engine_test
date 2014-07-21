@@ -87,7 +87,7 @@ solution "engine_test"
         configuration {}
 
         defines { "GLEW_STATIC", "GLEW_NO_GLU", "SDL_MAIN_HANDLED", "GLM_FORCE_RADIANS" }
-        files { "game/**.h", "game/**.cpp", "game/**.vert", "game/**.frag" }
+        files { "game/**.h", "game/**.cpp", "game/**.vert", "game/**.frag", "game/**.glsl" }
         includedirs {
             src_dir .. "public/"
         }

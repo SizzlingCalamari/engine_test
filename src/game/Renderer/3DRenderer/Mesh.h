@@ -10,6 +10,8 @@ struct Mesh
     std::vector<glm::vec3> verticies;
     std::vector<glm::vec2> uvcoords;
     std::vector<glm::vec3> normals;
+    glm::vec3 minAABB;
+    glm::vec3 maxAABB;
 
     uint vertexBufferId = 0;
     uint uvBufferId = 0;

@@ -1,5 +1,6 @@
 
 #include "ModelLoader_OBJ.h"
+#include "utils.h"
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <vector>
@@ -46,11 +47,28 @@ inline void SkipToNextLine(FILE* file)
     while ((c = fgetc(file)) != EOF && c != '\n');
 }
 
+inline void UpdateAABB(const glm::vec3& vertex,
+                       glm::vec3& minAABB, glm::vec3& maxAABB)
+{
+    minAABB.x = utils::min(vertex.x, minAABB.x);
+    minAABB.y = utils::min(vertex.y, minAABB.y);
+    minAABB.z = utils::min(vertex.z, minAABB.z);
+
+    maxAABB.x = utils::max(vertex.x, maxAABB.x);
+    maxAABB.y = utils::max(vertex.y, maxAABB.y);
+    maxAABB.z = utils::max(vertex.z, maxAABB.z);
+}
+
 void ParseOBJ(const char *filename,
               std::vector<glm::vec3>& verticies,
               std::vector<glm::vec2>& uvcoords,
-              std::vector<glm::vec3>& normals)
+              std::vector<glm::vec3>& normals,
+              glm::vec3& minAABB,
+              glm::vec3& maxAABB)
 {
+    minAABB = glm::vec3();
+    maxAABB = glm::vec3();
+
     std::deque<glm::vec3> verticies_temp;
     std::deque<glm::vec2> uvs_temp;
     std::deque<glm::vec3> normals_temp;
@@ -79,6 +97,7 @@ void ParseOBJ(const char *filename,
         {
             glm::vec3 vertex;
             fscanf(file, "%f %f %f", &vertex.x, &vertex.y, &vertex.z);
+            UpdateAABB(vertex, minAABB, maxAABB);
             verticies_temp.emplace_back(vertex);
         }
         else if (firstOnLine == 'v' && secondOnLine == 't')
@@ -167,7 +186,7 @@ void ParseOBJ(const char *filename,
 Mesh LoadMeshFromOBJ(const char *filename)
 {
     Mesh mesh;
-    ParseOBJ(filename, mesh.verticies, mesh.uvcoords, mesh.normals);
+    ParseOBJ(filename, mesh.verticies, mesh.uvcoords, mesh.normals, mesh.minAABB, mesh.maxAABB);
     mesh.numVerticies = mesh.verticies.size();
     if (mesh.numVerticies > 0)
     {

@@ -44,15 +44,18 @@ void Renderer3D::Init(const renderer3d_config& config)
 
     std::vector<uint> vertexShaders;
     std::vector<uint> fragmentShaders;
+    std::vector<uint> utilShaders;
 
     m_shader_manager->CompileShaders(
         {"shaders/simplevertex.vert", "shaders/texturevertex.vert", "shaders/shadowmap.vert"},
         {"shaders/simplefragment.frag", "shaders/texturefragment.frag", "shaders/shadowmap.frag"},
-    vertexShaders, fragmentShaders);
+        {"shaders/noise3D.glsl"},
+        vertexShaders, fragmentShaders, utilShaders);
 
     m_colour_shader = m_shader_manager->CreateProgram();
     m_colour_shader.AttachShader(vertexShaders[0]);
     m_colour_shader.AttachShader(fragmentShaders[0]);
+    m_colour_shader.AttachShader(utilShaders[0]);
     bool linked = m_colour_shader.Link();
     assert(linked);
 
@@ -156,14 +159,15 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
     for (auto obj : m_colour_shader_cache)
     {
         auto mvp = pv * obj->transform;
-        m_colour_shader.SetUniform("MVP", &mvp[0][0]);
+        m_colour_shader.SetUniform("MVP", &mvp);
 
         auto *mesh = m_resourceLoader->GetMesh(obj->mesh);
         GLsizei num_verticies = static_cast<GLsizei>(mesh->numVerticies);
 
+        m_colour_shader.SetUniform("minAABB", &mesh->minAABB);
+
         glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBufferId);
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
             glDrawArrays(GL_TRIANGLES, 0, num_verticies);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }

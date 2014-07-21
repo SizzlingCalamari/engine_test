@@ -23,11 +23,14 @@ ShaderManager::~ShaderManager()
 void ShaderManager::CompileShaders(
     const vector<string> &vshader_files,
     const vector<string> &fshader_files,
+    const vector<string> &ushader_files,
     vector<GLuint> &vertex_out,
-    vector<GLuint> &fragment_out)
+    vector<GLuint> &fragment_out,
+    vector<GLuint> &util_out)
 {
     vertex_out = CompileShaders(vshader_files, GL_VERTEX_SHADER);
     fragment_out = CompileShaders(fshader_files, GL_FRAGMENT_SHADER);
+    util_out = CompileShaders(ushader_files, GL_FRAGMENT_SHADER);
 }
 
 ShaderProgram ShaderManager::CreateProgram()
