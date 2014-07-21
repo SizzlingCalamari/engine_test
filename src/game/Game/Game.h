@@ -26,6 +26,7 @@ public:
 
     void Render();
 
+private:
     static bool HandleCameraMovement(PhysicalComponent *camera, uint32 dt);
 
 private:

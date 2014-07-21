@@ -92,7 +92,7 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
     directionalLight.colour = glm::vec3(1.0f);
     directionalLight.ambientIntensity = 0.1f;
     directionalLight.diffuseIntensity = 0.2f;
-    directionalLight.direction = glm::vec3(-1.0f);
+    directionalLight.direction = glm::normalize(glm::vec3(-1.0f));
 
     // shadow mapping depth render
     {
