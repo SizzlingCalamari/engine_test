@@ -3,6 +3,7 @@
 
 #include "../EntitySystem/EntitySystem.h"
 #include "CameraController_ThirdPerson.h"
+#include "CameraController_InterpolatedPath.h"
 
 class RenderProxy;
 class PhysicsProxy;
@@ -40,4 +41,5 @@ private:
     uint m_notes[4];
 
     CameraController_ThirdPerson m_thirdperson_controller;
+    CameraController_InterpolatedPath m_cameraPathController;
 };

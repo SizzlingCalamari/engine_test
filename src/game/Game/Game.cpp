@@ -92,6 +92,22 @@ void Game::Initialize(const EngineContext& engine)
     m_thirdperson_controller.SetCameraEnt(m_camera);
     m_thirdperson_controller.SetTargetEnt(m_notes[1]);
     m_thirdperson_controller.SetRadiusFromTarget(75.0f);
+
+    m_cameraPathController.SetComponentTables(m_entity_system.GetTable<PhysicalComponent>());
+    m_cameraPathController.SetCameraEnt(m_camera);
+    m_cameraPathController.SetPeriod(15000);
+    m_cameraPathController.SetShouldLoop(false);
+    m_cameraPathController.SetStartTime(0);
+
+    float mid = 75.0f * glm::root_two<float>();
+    m_cameraPathController.AddControlPoint(glm::vec3{ 0.0f, 20.0f, -150.0f }, glm::quat());
+    m_cameraPathController.AddControlPoint(glm::vec3{ mid, 30.0f, -mid }, glm::quat());
+    m_cameraPathController.AddControlPoint(glm::vec3{ 150.0f, 40.0f, 0.0f }, glm::quat());
+    m_cameraPathController.AddControlPoint(glm::vec3{ mid, 50.0f, mid }, glm::quat());
+    m_cameraPathController.AddControlPoint(glm::vec3{ 0.0f, 40.0f, 150.0f }, glm::quat());
+    m_cameraPathController.AddControlPoint(glm::vec3{ -mid, 30.0f, mid }, glm::quat());
+    m_cameraPathController.AddControlPoint(glm::vec3{ -150.0f, 20.0f, 0.0f }, glm::quat());
+    m_cameraPathController.AddControlPoint(glm::vec3{ -mid, 30.0f, -mid }, glm::quat());
 }
 
 void Game::Shutdown()
@@ -122,7 +138,7 @@ void Game::Simulate(uint64 tick, uint32 dt)
         physical_table->EditComponent(m_camera, &camera_physical);
     }
     //m_thirdperson_controller.Update(dt);
-
+    m_cameraPathController.Update(dt);
     auto *keys = SDL_GetKeyboardState(nullptr);
     if (keys[SDL_SCANCODE_J])
     {
