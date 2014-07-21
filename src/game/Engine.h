@@ -6,6 +6,7 @@
 #include "EntitySystem/RenderProxy.h"
 #include "Physics/DynamicsWorld.h"
 #include "EntitySystem/PhysicsProxy.h"
+#include "Input/InputMapper.h"
 
 class Renderer3D;
 
@@ -33,4 +34,6 @@ private:
 
     DynamicsWorld m_dynamics_world;
     PhysicsProxy m_physics_proxy;
+
+    InputMapper m_inputMapper;
 };

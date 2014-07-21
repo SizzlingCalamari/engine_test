@@ -34,6 +34,7 @@ void Engine::Initialize()
     EngineContext engine;
     engine.renderer = m_render_proxy;
     engine.physics = &m_physics_proxy;
+    engine.input = &m_inputMapper;
 
     m_game.Initialize(engine);
 
@@ -84,6 +85,7 @@ void Engine::Run()
 
         accumulator += frameTime;
 
+        m_inputMapper.DispatchCallbacks();
         while (accumulator >= dt)
         {
             Simulate(cur_tick, dt);
@@ -106,7 +108,6 @@ void Engine::Run()
 
 void Engine::Simulate(uint64 tick, uint32 dt)
 {
-    //input.DispatchCallbacks();
     m_game.Simulate(tick, dt);
 }
 

@@ -7,14 +7,37 @@
 #include "../EntitySystem/PhysicalComponent.h"
 #include "../EntitySystem/GraphicalComponent.h"
 
+#include "../Input/InputMapper.h"
+
 #include "BulletCollision/CollisionShapes/btBoxShape.h"
 #include "mathutils.h"
 
 #include "SDL_keyboard.h"
 #include "SDL_mouse.h"
 
+Game::Game():
+    m_renderer(nullptr),
+    m_physics(nullptr),
+    m_camera(0),
+    m_floor(0),
+    m_humanoid(0),
+    m_jiggy(0),
+    m_notes(),
+    m_inputIdZ(0),
+    m_activeCameraType(Camera_InterpolatedPath)
+{
+}
+
 void Game::Initialize(const EngineContext& engine)
 {
+    using namespace std::placeholders;
+    KeyboardContext keyboardContext;
+    {
+        KeyCombination temp = { SDL_SCANCODE_Z };
+        keyboardContext.AddMapping(temp, std::bind(&Game::InputEventCallback, this, _1));
+    }
+    engine.input->LoadContext(std::move(keyboardContext));
+
     m_renderer = engine.renderer;
     m_physics = engine.physics;
 
@@ -129,16 +152,11 @@ void Game::Simulate(uint64 tick, uint32 dt)
 {
     auto *physical_table = m_entity_system.GetTable<PhysicalComponent>();
 
+    CameraSimulation(dt);
+
     float angle = glm::radians(135.0f * ((float)dt / 1000.0f));
     float amount = glm::sin(tick / 200.0f) * 0.05f;
 
-    auto camera_physical = physical_table->GetComponent(m_camera);
-    if (HandleCameraMovement(&camera_physical, dt))
-    {
-        physical_table->EditComponent(m_camera, &camera_physical);
-    }
-    //m_thirdperson_controller.Update(dt);
-    m_cameraPathController.Update(dt);
     auto *keys = SDL_GetKeyboardState(nullptr);
     if (keys[SDL_SCANCODE_J])
     {
@@ -173,6 +191,46 @@ void Game::Simulate(uint64 tick, uint32 dt)
 void Game::Render()
 {
     m_renderer->RenderScene(nullptr, m_camera);
+}
+
+void Game::InputEventCallback(const KeyboardEventInfo& info)
+{
+    if (info.mappingId == m_inputIdZ && info.pressed)
+    {
+        if (m_activeCameraType != Camera_InterpolatedPath)
+        {
+            m_activeCameraType = Camera_InterpolatedPath;
+        }
+        else
+        {
+            m_activeCameraType = Camera_FirstPerson;
+        }
+    }
+}
+
+void Game::CameraSimulation(uint32 dt)
+{
+    auto *physical_table = m_entity_system.GetTable<PhysicalComponent>();
+    switch (m_activeCameraType)
+    {
+    case Camera_FirstPerson:
+        {
+            auto camera_physical = physical_table->GetComponent(m_camera);
+            if (HandleCameraMovement(&camera_physical, dt))
+            {
+                physical_table->EditComponent(m_camera, &camera_physical);
+            }
+        }
+        break;
+    case Camera_ThirdPerson:
+        m_thirdperson_controller.Update(dt);
+        break;
+    case Camera_InterpolatedPath:
+        m_cameraPathController.Update(dt);
+        break;
+    default:
+        break;
+    }
 }
 
 bool Game::HandleCameraMovement(PhysicalComponent *camera, uint32 dt)

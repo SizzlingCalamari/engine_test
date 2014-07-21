@@ -18,7 +18,7 @@ struct ButtonCombination
         uint16 m_buttons[MAX_BUTTON_COMBINATION];
     };
 
-    static bool has_button(ButtonCombination buttons, SDL_Scancode button)
+    static inline bool has_button(ButtonCombination buttons, SDL_Scancode button)
     {
         bool ret = false;
         ret |= (buttons.m_buttons[0] == button);
@@ -29,7 +29,7 @@ struct ButtonCombination
     }
 };
 
-bool operator==(ButtonCombination a, ButtonCombination b)
+inline bool operator==(ButtonCombination a, ButtonCombination b)
 {
     return a.m_allbuttons == b.m_allbuttons;
 }
