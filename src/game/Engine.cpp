@@ -15,16 +15,18 @@
 
 void Engine::Initialize()
 {
-    m_window = ApplicationService::CreateWindow(
-        "JORDAN", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_OPENGL);
-    m_gl_context = ApplicationService::CreateGLContext(m_window);
-    m_renderer = Renderer::CreateRenderer3D(m_gl_context);
-
     renderer3d_config config;
     config.x = 0;
     config.y = 0;
-    config.width = 640;
-    config.height = 480;
+    config.width = 1280;
+    config.height = 720;
+
+    m_window = ApplicationService::CreateWindow(
+        "JORDAN", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+        config.width, config.height, SDL_WINDOW_OPENGL);
+    m_gl_context = ApplicationService::CreateGLContext(m_window);
+    m_renderer = Renderer::CreateRenderer3D(m_gl_context);
+
     m_renderer->Init(config);
     m_render_proxy = new RenderProxy(m_renderer);
 

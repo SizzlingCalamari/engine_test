@@ -39,7 +39,7 @@ void Renderer3D::Init(const renderer3d_config& config)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     m_fullview.SetView(config.x, config.y, config.width, config.height);
-    glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
     m_resourceLoader = new ResourceLoader();
 
@@ -131,7 +131,7 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     auto aspect = viewport->GetAspectRatio();
-    auto pv = glm::perspective(glm::quarter_pi<float>(), aspect, 0.1f, 10000.0f) * cam->GetView();
+    auto pv = glm::perspective(glm::radians(70.0f), aspect, 0.1f, 10000.0f) * cam->GetView();
 
     // categorize the renderables by shader
     m_colour_shader_cache.clear();
