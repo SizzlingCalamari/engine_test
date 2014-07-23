@@ -15,15 +15,14 @@ ShadowMapDirectional::ShadowMapDirectional():
 
 bool ShadowMapDirectional::Init(ResourceLoader* resourceLoader,
                                 ShaderProgram shadowMapShader,
-                                uint windowWidth, uint windowHeight,
+                                const glm::vec3& frustumDimensions,
                                 uint shadowMapWidth, uint shadowMapHeight)
 {
     m_resourceLoader = resourceLoader;
     m_shadowMapShader = std::move(shadowMapShader);
     m_shadowMapWidth = shadowMapWidth;
     m_shadowMapHeight = shadowMapHeight;
-    m_windowWidth = windowWidth;
-    m_windowHeight = windowHeight;
+    m_frustumDimensions = frustumDimensions;
 
     if (m_fbo == 0)
     {
@@ -92,9 +91,12 @@ void ShadowMapDirectional::RenderShadowMap(const glm::vec3& lightDirection,
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    float halfWidth = m_windowWidth / 2.0f;
-    float halfHeight = m_windowHeight / 2.0f;
-    auto projMatrix = glm::ortho(-halfWidth, halfWidth, -halfHeight, halfHeight, -5000.0f, 5000.0f);
+    float halfWidth = m_frustumDimensions.x / 2.0f;
+    float halfHeight = m_frustumDimensions.y / 2.0f;
+    float halfDepth = m_frustumDimensions.z / 2.0f;
+    auto projMatrix = glm::ortho(-halfWidth, halfWidth,
+                                 -halfHeight, halfHeight,
+                                 -halfDepth, halfDepth);
 
     auto right = glm::cross(lightDirection, glm::vec3(0.0f, 1.0f, 0.0f));
     auto up = glm::cross(right, lightDirection);

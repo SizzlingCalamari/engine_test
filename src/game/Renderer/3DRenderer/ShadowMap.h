@@ -17,7 +17,7 @@ public:
 
     bool Init(ResourceLoader* resourceLoader,
               ShaderProgram shadowMapShader,
-              uint windowWidth, uint windowHeight,
+              const glm::vec3& frustumDimensions,
               uint shadowMapWidth, uint shadowMapHeight);
 
     void Free();
@@ -45,8 +45,7 @@ private:
     uint m_shadowMapWidth;
     uint m_shadowMapHeight;
 
-    uint m_windowWidth;
-    uint m_windowHeight;
+    glm::vec3 m_frustumDimensions;
 
     glm::mat4x4 m_biasPV;
 };

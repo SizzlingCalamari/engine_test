@@ -79,7 +79,8 @@ void Renderer3D::Init(const renderer3d_config& config)
     assert(linked);
     m_shadowMapping.Init(m_resourceLoader,
                          std::move(shadowMapShader),
-                         config.width, config.height, 4096, 4096);
+                         glm::vec3{5000.0f, 5000.0f, 10000.0f},
+                         4096, 4096);
 }
 
 void Renderer3D::Shutdown()
