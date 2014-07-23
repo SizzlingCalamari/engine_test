@@ -293,6 +293,7 @@ void RenderProxy::ParseMaterial(Material &mat, const RenderObject& obj)
     {
         mat.diffuseMap = m_resource_loader->LoadResource(temp);
     }
+    FindAndLoad(props, "diffuseSolidColour", mat.diffuseSolidColour);
     FindAndLoad(props, "specularIntensity", mat.specularIntensity);
     FindAndLoad(props, "specularPower", mat.specularPower);
     FindAndLoad(props, "noiseDiffuseMap", mat.noiseDiffuseMap);
