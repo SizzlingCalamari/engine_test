@@ -38,17 +38,33 @@ private:
     void CameraSimulation(uint32 dt);
     static bool HandleCameraMovement(PhysicalComponent *camera, uint32 dt);
 
+    void LoadResources();
+    void LoadEnts();
+
 private:
     EntitySystem m_entity_system;
 
     RenderProxy *m_renderer;
     PhysicsProxy *m_physics;
 
+    uint m_floorMesh;
+    uint m_jesusMaterial;
+    uint m_teapotDefaultMaterial;
+    uint m_teapotMarbleMaterial;
+    uint m_teapotBumpMaterial;
+    uint m_teapotCelMaterial;
+    uint m_moonLightDirectional;
+    uint m_teapotMesh;
+    uint m_pedestalMesh;
+    uint m_wallBumpMaterial;
+    uint m_pedestalBumpMaterial;
+
     uint m_camera;
-    uint m_floor;
-    uint m_humanoid;
-    uint m_jiggy;
-    uint m_notes[4];
+    uint m_floorEnt;
+    uint m_teapotTextured;
+    uint m_teapotBumped;
+    uint m_pedestal;
+    uint m_moonLightEnt;
 
     CameraController_ThirdPerson m_thirdperson_controller;
     CameraController_InterpolatedPath m_cameraPathController;

@@ -25,6 +25,14 @@ public:
         m_data_to_id.emplace(index, id);
     }
 
+    // Version of AddData that does
+    // not modify data
+    void AddData(uint id, const T* data)
+    {
+        T temp(*data);
+        AddData(id, &temp);
+    }
+
     // Remove the mapping of id to data.
     void RemoveData(uint id)
     {
@@ -68,6 +76,35 @@ public:
     {
         assert(HasData(id));
         return &m_data[m_id_to_data[id]];
+    }
+
+    const T* PeekData(uint id)
+    {
+        assert(HasData(id));
+        return &m_data[m_id_to_data[id]];
+    }
+
+    // If id data exists, updates the internal data,
+    // otherwise, adds the new data with the id
+    void UpdateOrAddData(uint id, T* data)
+    {
+        auto it = m_id_to_data.find(id);
+        if (it != m_id_to_data.end())
+        {
+            m_data[it->second] = std::move(*data);
+        }
+        else
+        {
+            AddData(id, data);
+        }
+    }
+
+    // Version of UpdateOrAddData that does not
+    // modify data
+    void UpdateOrAddData(uint id, const T* data)
+    {
+        T temp(*data);
+        UpdateOrAddData(id, &temp);
     }
 
     const std::vector<T>& GetDataArray() const

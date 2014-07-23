@@ -53,6 +53,8 @@ vec4 CalcLightInternal(BaseLight light, vec3 lightDirection,
     float diffuseFactor = dot(vertexNormal, -lightDirection);
     vec4 diffuseColour = vec4(0.0f);
     vec4 specularColour = vec4(0.0f);
+    diffuseFactor = 0.5f * step(0.3f, diffuseFactor)
+                    + 1.0f * step(0.6f, diffuseFactor);
     if (diffuseFactor > 0.0f)
     {
         diffuseColour = vec4(light.colour, 1.0f)
@@ -134,9 +136,14 @@ uniform SpotLight g_spotLights[MAX_SPOT_LIGHTS];
 uniform vec3 eyePosition_worldspace;
 uniform MaterialLightProps g_materialProps;
 
+float snoise(vec3 v);
+
 void main()
 {
-    vec3 vertexNormal = normalize(normal);
+    vec3 vertexNormal = vec3(normal.x*(snoise(1.5f*worldPosition) * 0.5f + 1.0f),
+                             normal.y*(snoise(3.2f*worldPosition) * 0.5f + 1.0f),
+                             normal.z*(snoise(2.3f*worldPosition) * 0.5f + 1.0f));
+    vertexNormal = normalize(vertexNormal);
     vec3 vertexToEye = normalize(eyePosition_worldspace - worldPosition);
 
     float shadowFactor = 1.0f;

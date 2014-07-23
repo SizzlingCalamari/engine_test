@@ -35,6 +35,13 @@ uint ResourceLoader::LoadResource(const std::string& path)
     return id;
 }
 
+uint ResourceLoader::AddMaterial(const Material& mat)
+{
+    uint id = ++m_resourceIdCounter;
+    m_materials.emplace(id, mat);
+    return id;
+}
+
 std::string ResourceLoader::GetPathExtension(const std::string& path)
 {
     auto index = path.find_last_of('.');

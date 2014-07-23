@@ -11,6 +11,9 @@
 class Camera;
 class ShaderManager;
 class ResourceLoader;
+class MaterialCache;
+struct Scene;
+struct SceneNode;
 
 struct renderer3d_config
 {
@@ -29,9 +32,11 @@ public:
 
     void Shutdown();
 
-    void RenderScene(const Viewport* viewport, const Camera* cam, const std::vector<Renderable>& scene);
+    void RenderScene(const Viewport* viewport, const Camera* cam, const Scene* scene);
 
     ResourceLoader* GetResourceLoader() const;
+
+    MaterialCache* GetMaterialCache() const;
 
 private:
     GLContext m_glcontext;
@@ -43,8 +48,8 @@ private:
     ShaderProgram m_colour_shader;
     ShaderProgram m_texture_shader;
 
-    std::vector<const Renderable*> m_colour_shader_cache;
-    std::vector<const Renderable*> m_texture_shader_cache;
+    std::vector<const SceneNode*> m_colour_shader_cache;
+    std::vector<const SceneNode*> m_texture_shader_cache;
 
     Viewport m_fullview;
 

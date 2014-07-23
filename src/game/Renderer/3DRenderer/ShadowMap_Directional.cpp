@@ -6,16 +6,19 @@
 #include "ResourceLoader.h"
 
 ShadowMapDirectional::ShadowMapDirectional():
+    m_resourceLoader(nullptr),
     m_shadowMapShader(0),
     m_fbo(0),
     m_shadowMap(0)
 {
 }
 
-bool ShadowMapDirectional::Init(ShaderProgram shadowMapShader,
+bool ShadowMapDirectional::Init(ResourceLoader* resourceLoader,
+                                ShaderProgram shadowMapShader,
                                 uint windowWidth, uint windowHeight,
                                 uint shadowMapWidth, uint shadowMapHeight)
 {
+    m_resourceLoader = resourceLoader;
     m_shadowMapShader = std::move(shadowMapShader);
     m_shadowMapWidth = shadowMapWidth;
     m_shadowMapHeight = shadowMapHeight;
@@ -79,7 +82,7 @@ void ShadowMapDirectional::Free()
 }
 
 void ShadowMapDirectional::RenderShadowMap(const glm::vec3& lightDirection,
-                                           const std::vector<SceneNode>& scene)
+                                           const Scene* scene)
 {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
     glViewport(0, 0, m_shadowMapWidth, m_shadowMapHeight);
@@ -110,14 +113,15 @@ void ShadowMapDirectional::RenderShadowMap(const glm::vec3& lightDirection,
 
     m_shadowMapShader.Bind();
 
-    for (auto &obj : scene)
+    for (auto &obj : scene->m_objects.GetDataArray())
     {
+        auto *mesh = m_resourceLoader->GetMesh(obj.meshId);
         auto mvp = pv * obj.transform;
         m_shadowMapShader.SetUniform("g_depthMVP", &mvp[0][0]);
 
-        GLsizei numVerticies = static_cast<GLsizei>(obj.mesh->numVerticies);
+        GLsizei numVerticies = static_cast<GLsizei>(mesh->numVerticies);
 
-        glBindBuffer(GL_ARRAY_BUFFER, obj.mesh->vertexBufferId);
+        glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBufferId);
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
             glDrawArrays(GL_TRIANGLES, 0, numVerticies);
         glBindBuffer(GL_ARRAY_BUFFER, 0);

@@ -15,10 +15,12 @@ public:
     void CompileShaders(
         const std::vector<std::string> &vshader_files,
         const std::vector<std::string> &fshader_files,
-        const std::vector<std::string> &ushader_files,
+        const std::vector<std::string> &uvert_shader_files,
+        const std::vector<std::string> &ufrag_shader_files,
         std::vector<uint> &vertex_out,
         std::vector<uint> &fragment_out,
-        std::vector<uint> &util_out);
+        std::vector<uint> &util_vert_out,
+        std::vector<uint> &util_frag_out);
 
     ShaderProgram CreateProgram();
 

@@ -1,13 +1,21 @@
 
 #pragma once
 
-#include "Mesh.h"
-#include "Texture.h"
+#include "Light.h"
 #include <glm/mat4x4.hpp>
+#include "DataTable.h"
 
 struct SceneNode
 {
     glm::mat4 transform;
-    const Mesh *mesh;
-    const Texture *texture;
+    uint meshId;
+    uint materialId;
+};
+
+struct Scene
+{
+    DataTable<SceneNode> m_objects;
+    DataTable<DirectionalLight> m_directionalLights;
+    DataTable<PointLight> m_pointLights;
+    DataTable<SpotLight> m_spotLights;
 };

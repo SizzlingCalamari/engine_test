@@ -18,11 +18,23 @@
 Game::Game():
     m_renderer(nullptr),
     m_physics(nullptr),
+    m_floorMesh(0),
+    m_jesusMaterial(0),
+    m_teapotDefaultMaterial(0),
+    m_teapotMarbleMaterial(0),
+    m_teapotBumpMaterial(0),
+    m_teapotCelMaterial(0),
+    m_moonLightDirectional(0),
+    m_teapotMesh(0),
+    m_pedestalMesh(0),
+    m_wallBumpMaterial(0),
+    m_pedestalBumpMaterial(0),
     m_camera(0),
-    m_floor(0),
-    m_humanoid(0),
-    m_jiggy(0),
-    m_notes(),
+    m_floorEnt(0),
+    m_teapotTextured(0),
+    m_teapotBumped(0),
+    m_pedestal(0),
+    m_moonLightEnt(0),
     m_inputIdZ(0),
     m_activeCameraType(Camera_InterpolatedPath)
 {
@@ -49,71 +61,11 @@ void Game::Initialize(const EngineContext& engine)
 
     m_thirdperson_controller.SetComponentTables(m_entity_system.GetTable<PhysicalComponent>());
 
-    m_camera = m_entity_system.CreateEntity();
-    {
-        PhysicalComponent physical;
-        physical.position = glm::vec3(0.0f, 20.0f, -150.0f);
-        physical.orientation = glm::quat();
-        m_entity_system.AttachComponent(m_camera, &physical);
-    }
-
-    m_floor = m_entity_system.CreateEntity();
-    {
-        PhysicalComponent physical;
-        m_entity_system.AttachComponent(m_floor, &physical);
-
-        GraphicalComponent graphical;
-        graphical.mesh = "models/floor.obj";
-        graphical.texture = "textures/jesusbond_feelingfresh.jpg";
-        m_entity_system.AttachComponent(m_floor, &graphical);
-    }
-
-    m_humanoid = m_entity_system.CreateEntity();
-    {
-        PhysicalComponent physical;
-        m_entity_system.AttachComponent(m_humanoid, &physical);
-
-        GraphicalComponent graphical;
-        graphical.mesh = "models/teapot/teapot.obj";
-        graphical.texture = "models/teapot/default.png";
-        m_entity_system.AttachComponent(m_humanoid, &graphical);
-    }
-
-    m_jiggy = m_entity_system.CreateEntity();
-    {
-        PhysicalComponent physical;
-        physical.position = glm::vec3(0.0f, -20.0f, 150.0f);
-        physical.orientation = glm::quat();
-        m_entity_system.AttachComponent(m_jiggy, &physical);
-
-        GraphicalComponent graphical;
-        graphical.mesh = "models/jiggy.obj";
-        m_entity_system.AttachComponent(m_jiggy, &graphical);
-
-        DynamicsComponent dynamics;
-        dynamics.mass = 1.0f;
-        dynamics.inertia = glm::vec3(0.0f);
-        dynamics.shape = new btBoxShape(btVector3{ 3.0f, 3.0f, 1.0f });
-        m_entity_system.AttachComponent(m_jiggy, &dynamics);
-    }
-
-    int pos = -24;
-    for (uint &note : m_notes)
-    {
-        note = m_entity_system.CreateEntity();
-
-        PhysicalComponent physical;
-        physical.position = glm::vec3((float)pos, 10.0f, 50.0f);
-        m_entity_system.AttachComponent(note, &physical);
-
-        GraphicalComponent graphical;
-        graphical.mesh = "models/note.obj";
-        m_entity_system.AttachComponent(note, &graphical);
-        pos += 16;
-    }
+    LoadResources();
+    LoadEnts();
 
     m_thirdperson_controller.SetCameraEnt(m_camera);
-    m_thirdperson_controller.SetTargetEnt(m_notes[1]);
+    m_thirdperson_controller.SetTargetEnt(m_teapotTextured);
     m_thirdperson_controller.SetRadiusFromTarget(75.0f);
 
     m_cameraPathController.SetComponentTables(m_entity_system.GetTable<PhysicalComponent>());
@@ -135,14 +87,12 @@ void Game::Initialize(const EngineContext& engine)
 
 void Game::Shutdown()
 {
-    for (uint note : m_notes)
-    {
-        m_entity_system.DestroyEntity(note);
-    }
-    m_entity_system.DestroyEntity(m_jiggy);
-    m_entity_system.DestroyEntity(m_humanoid);
-    m_entity_system.DestroyEntity(m_floor);
     m_entity_system.DestroyEntity(m_camera);
+    m_entity_system.DestroyEntity(m_floorEnt);
+    m_entity_system.DestroyEntity(m_teapotTextured);
+    m_entity_system.DestroyEntity(m_teapotBumped);
+    m_entity_system.DestroyEntity(m_pedestal);
+
     m_physics->Cleanup();
     m_renderer->Update();
     m_entity_system.CommitChanges();
@@ -150,38 +100,8 @@ void Game::Shutdown()
 
 void Game::Simulate(uint64 tick, uint32 dt)
 {
-    auto *physical_table = m_entity_system.GetTable<PhysicalComponent>();
-
     CameraSimulation(dt);
 
-    float angle = glm::radians(135.0f * ((float)dt / 1000.0f));
-    float amount = glm::sin(tick / 200.0f) * 0.05f;
-
-    auto *keys = SDL_GetKeyboardState(nullptr);
-    if (keys[SDL_SCANCODE_J])
-    {
-        auto *graphical_table = m_entity_system.GetTable<GraphicalComponent>();
-        auto note_graphical = graphical_table->GetComponent(m_notes[3]);
-        note_graphical.mesh = "models/humanoid.fbx";
-        note_graphical.texture = "";
-        graphical_table->EditComponent(m_notes[3], &note_graphical);
-    }
-    else if (keys[SDL_SCANCODE_K])
-    {
-        auto *graphical_table = m_entity_system.GetTable<GraphicalComponent>();
-        auto note_graphical = graphical_table->GetComponent(m_notes[3]);
-        note_graphical.mesh = "models/teapot/teapot.obj";
-        note_graphical.texture = "models/teapot/default.png";
-        graphical_table->EditComponent(m_notes[3], &note_graphical);
-    }
-
-    for (uint note : m_notes)
-    {
-        auto note_physical = physical_table->GetComponent(note);
-        note_physical.orientation = math::rotate_local(note_physical.orientation, angle, glm::vec3(0.0f, 1.0f, 0.0f));
-        note_physical.position += glm::vec3(0.0f, amount, 0.0f);
-        physical_table->EditComponent(note, &note_physical);
-    }
     m_physics->Simulate(dt);
     m_renderer->Update();
 
@@ -299,4 +219,184 @@ bool Game::HandleCameraMovement(PhysicalComponent *camera, uint32 dt)
         }
     }
     return updated;
+}
+
+void Game::LoadResources()
+{
+    m_floorMesh = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::MeshObject;
+        obj.properties.emplace("meshFile", "models/floor.obj");
+        m_floorMesh = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_jesusMaterial = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::Material;
+        obj.properties.emplace("diffuseMapFile", "textures/jesusbond_feelingfresh.jpg");
+        obj.properties.emplace("specularIntensity", "1.0");
+        obj.properties.emplace("specularPower", "32.0");
+        m_jesusMaterial = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_teapotDefaultMaterial = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::Material;
+        obj.properties.emplace("diffuseMapFile", "models/teapot/default.png");
+        obj.properties.emplace("specularIntensity", "1.0");
+        obj.properties.emplace("specularPower", "32.0");
+        m_teapotDefaultMaterial = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_teapotMarbleMaterial = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::Material;
+        obj.properties.emplace("diffuseMapFile", "models/teapot/default.png");
+        obj.properties.emplace("specularIntensity", "1.0");
+        obj.properties.emplace("specularPower", "32.0");
+        obj.properties.emplace("noiseDiffuseMap", "1");
+        m_teapotMarbleMaterial = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_teapotBumpMaterial = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::Material;
+        obj.properties.emplace("diffuseMapFile", "models/teapot/default.png");
+        obj.properties.emplace("specularIntensity", "1.0");
+        obj.properties.emplace("specularPower", "32.0");
+        obj.properties.emplace("noiseBumpMap", "1");
+        m_teapotBumpMaterial = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_teapotCelMaterial = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::Material;
+        obj.properties.emplace("diffuseMapFile", "models/teapot/default.png");
+        obj.properties.emplace("specularIntensity", "1.0");
+        obj.properties.emplace("specularPower", "32.0");
+        obj.properties.emplace("celShaded", "1");
+        m_teapotCelMaterial = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_moonLightDirectional = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::DirectionalLight;
+        obj.properties.emplace("colour", "1.0 1.0 1.0");
+        obj.properties.emplace("ambientIntensity", "0.1");
+        obj.properties.emplace("diffuseIntensity", "0.2");
+        obj.properties.emplace("direction", "-1.0 -1.0 -1.0");
+        m_moonLightDirectional = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_teapotMesh = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::MeshObject;
+        obj.properties.emplace("meshFile", "models/teapot/teapot.obj");
+        m_teapotMesh = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_pedestalMesh = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::MeshObject;
+        obj.properties.emplace("meshFile", "models/pedestal.obj");
+        m_pedestalMesh = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_wallBumpMaterial = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::Material;
+        obj.properties.emplace("diffuseSolidColour", "0.5 0.5 0.5");
+        obj.properties.emplace("specularIntensity", "1.0");
+        obj.properties.emplace("specularPower", "32.0");
+        obj.properties.emplace("noiseBumpMap", "1");
+        m_wallBumpMaterial = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_pedestalBumpMaterial = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::Material;
+        obj.properties.emplace("diffuseSolidColour", "0.6 0.6 0.6");
+        obj.properties.emplace("specularIntensity", "1.0");
+        obj.properties.emplace("specularPower", "32.0");
+        obj.properties.emplace("noiseBumpMap", "1");
+        m_pedestalBumpMaterial = m_renderer->CreateRenderObject(obj);
+    }
+}
+
+void Game::LoadEnts()
+{
+    m_camera = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        physical.position = glm::vec3(0.0f, 20.0f, -150.0f);
+        physical.orientation = glm::quat();
+        m_entity_system.AttachComponent(m_camera, &physical);
+    }
+
+    m_floorEnt = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        physical.position = glm::vec3(0.0f, -100.0f, 0.0f);
+        m_entity_system.AttachComponent(m_floorEnt, &physical);
+
+        GraphicalComponent graphical;
+        graphical.mesh = m_floorMesh;
+        graphical.material = m_jesusMaterial;
+        m_entity_system.AttachComponent(m_floorEnt, &graphical);
+    }
+
+    m_teapotTextured = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        m_entity_system.AttachComponent(m_teapotTextured, &physical);
+
+        GraphicalComponent graphical;
+        graphical.mesh = m_teapotMesh;
+        graphical.material = m_teapotDefaultMaterial;
+        m_entity_system.AttachComponent(m_teapotTextured, &graphical);
+    }
+
+    m_teapotBumped = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        physical.position = glm::vec3(100.0f, 0.0f, 0.0f);
+        m_entity_system.AttachComponent(m_teapotBumped, &physical);
+
+        GraphicalComponent graphical;
+        graphical.mesh = m_teapotMesh;
+        graphical.material = m_teapotDefaultMaterial;
+        m_entity_system.AttachComponent(m_teapotBumped, &graphical);
+    }
+
+    m_pedestal = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        m_entity_system.AttachComponent(m_pedestal, &physical);
+
+        GraphicalComponent graphical;
+        graphical.mesh = m_pedestalMesh;
+        graphical.material = m_pedestalBumpMaterial;
+        m_entity_system.AttachComponent(m_pedestal, &graphical);
+    }
+
+    m_moonLightEnt = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        m_entity_system.AttachComponent(m_moonLightEnt, &physical);
+
+        GraphicalComponent graphical;
+        graphical.directionalLight = m_moonLightDirectional;
+        m_entity_system.AttachComponent(m_moonLightEnt, &graphical);
+    }
 }

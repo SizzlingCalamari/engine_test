@@ -44,24 +44,28 @@ void Renderer3D::Init(const renderer3d_config& config)
 
     std::vector<uint> vertexShaders;
     std::vector<uint> fragmentShaders;
-    std::vector<uint> utilShaders;
+    std::vector<uint> utilVertexShaders;
+    std::vector<uint> utilFragmentShaders;
 
     m_shader_manager->CompileShaders(
         {"shaders/simplevertex.vert", "shaders/texturevertex.vert", "shaders/shadowmap.vert"},
         {"shaders/simplefragment.frag", "shaders/texturefragment.frag", "shaders/shadowmap.frag"},
         {"shaders/noise3D.glsl"},
-        vertexShaders, fragmentShaders, utilShaders);
+        {"shaders/noise3D.glsl"},
+        vertexShaders, fragmentShaders,
+        utilVertexShaders, utilFragmentShaders);
 
     m_colour_shader = m_shader_manager->CreateProgram();
     m_colour_shader.AttachShader(vertexShaders[0]);
     m_colour_shader.AttachShader(fragmentShaders[0]);
-    m_colour_shader.AttachShader(utilShaders[0]);
+    m_colour_shader.AttachShader(utilFragmentShaders[0]);
     bool linked = m_colour_shader.Link();
     assert(linked);
 
     m_texture_shader = m_shader_manager->CreateProgram();
     m_texture_shader.AttachShader(vertexShaders[1]);
     m_texture_shader.AttachShader(fragmentShaders[1]);
+    m_texture_shader.AttachShader(utilFragmentShaders[0]);
     linked = m_texture_shader.Link();
     assert(linked);
 
@@ -70,7 +74,8 @@ void Renderer3D::Init(const renderer3d_config& config)
     shadowMapShader.AttachShader(fragmentShaders[2]);
     linked = shadowMapShader.Link();
     assert(linked);
-    m_shadowMapping.Init(std::move(shadowMapShader),
+    m_shadowMapping.Init(m_resourceLoader,
+                         std::move(shadowMapShader),
                          config.width, config.height, 4096, 4096);
 }
 
@@ -86,33 +91,18 @@ void Renderer3D::Shutdown()
     glDeleteVertexArrays(1, &m_vao);
 }
 
-void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const std::vector<Renderable>& scene)
+void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const Scene* scene)
 {
-    DirectionalLight directionalLight;
-    directionalLight.colour = glm::vec3(1.0f);
-    directionalLight.ambientIntensity = 0.1f;
-    directionalLight.diffuseIntensity = 0.2f;
-    directionalLight.direction = glm::normalize(glm::vec3(-1.0f));
-
-    // shadow mapping depth render
+    const DirectionalLight* directionalLight = nullptr;
     {
-        std::vector<SceneNode> sceneNodes;
-        sceneNodes.reserve(scene.size());
-        for (auto &obj : scene)
+        // shadow mapping depth render
+        auto& directionalLights = scene->m_directionalLights.GetDataArray();
+        if (directionalLights.size() > 0)
         {
-            const Mesh *mesh = nullptr;
-            if (obj.mesh > 0)
-            {
-                mesh = m_resourceLoader->GetMesh(obj.mesh);
-            }
-            const Texture *texture = nullptr;
-            if (obj.texture > 0)
-            {
-                texture = m_resourceLoader->GetTexture(obj.texture);
-            }
-            sceneNodes.emplace_back(SceneNode{ obj.transform, mesh, texture });
+            directionalLight = &directionalLights[0];
+            // shaders only supports 1 directional light currently
+            m_shadowMapping.RenderShadowMap(directionalLight->direction, scene);
         }
-        m_shadowMapping.RenderShadowMap(directionalLight.direction, sceneNodes);
     }
 
     bool do_scissor = false;
@@ -142,11 +132,19 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
     // categorize the renderables by shader
     m_colour_shader_cache.clear();
     m_texture_shader_cache.clear();
-    for (auto &obj : scene)
+    for (auto &obj : scene->m_objects.GetDataArray())
     {
-        if (obj.texture > 0)
+        if (obj.materialId > 0)
         {
-            m_texture_shader_cache.emplace_back(&obj);
+            auto *material = m_resourceLoader->GetMaterial(obj.materialId);
+            if (material->diffuseMap > 0)
+            {
+                m_texture_shader_cache.emplace_back(&obj);
+            }
+            else
+            {
+                m_colour_shader_cache.emplace_back(&obj);
+            }
         }
         else
         {
@@ -161,7 +159,7 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
         auto mvp = pv * obj->transform;
         m_colour_shader.SetUniform("MVP", &mvp);
 
-        auto *mesh = m_resourceLoader->GetMesh(obj->mesh);
+        auto *mesh = m_resourceLoader->GetMesh(obj->meshId);
         GLsizei num_verticies = static_cast<GLsizei>(mesh->numVerticies);
 
         m_colour_shader.SetUniform("minAABB", &mesh->minAABB);
@@ -176,10 +174,10 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
     // render using the texture shader
     m_texture_shader.Bind();
 
-    m_texture_shader.SetUniform("g_directionalLight.base.colour", &directionalLight.colour);
-    m_texture_shader.SetUniform("g_directionalLight.base.ambientIntensity", &directionalLight.ambientIntensity);
-    m_texture_shader.SetUniform("g_directionalLight.base.diffuseIntensity", &directionalLight.diffuseIntensity);
-    m_texture_shader.SetUniform("g_directionalLight.direction", &directionalLight.direction);
+    m_texture_shader.SetUniform("g_directionalLight.base.colour", &directionalLight->colour);
+    m_texture_shader.SetUniform("g_directionalLight.base.ambientIntensity", &directionalLight->ambientIntensity);
+    m_texture_shader.SetUniform("g_directionalLight.base.diffuseIntensity", &directionalLight->diffuseIntensity);
+    m_texture_shader.SetUniform("g_directionalLight.direction", &directionalLight->direction);
 
     int numPointLights = 1;
     m_texture_shader.SetUniform("g_numPointLights", &numPointLights);
@@ -241,8 +239,9 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
         m_texture_shader.SetUniform("modelToWorld", &obj->transform);
         m_texture_shader.SetUniform("eyePosition_worldspace", &cam->GetPosition());
 
-        auto *mesh = m_resourceLoader->GetMesh(obj->mesh);
-        auto *texture = m_resourceLoader->GetTexture(obj->texture);
+        auto *mesh = m_resourceLoader->GetMesh(obj->meshId);
+        auto *material = m_resourceLoader->GetMaterial(obj->materialId);
+        auto *texture = m_resourceLoader->GetTexture(material->diffuseMap);
 
         glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBufferId);
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);

@@ -7,21 +7,23 @@
 #include <vector>
 
 class ShaderProgram;
-struct SceneNode;
+class ResourceLoader;
+struct Scene;
 
 class ShadowMapDirectional
 {
 public:
     ShadowMapDirectional();
 
-    bool Init(ShaderProgram shadowMapShader,
+    bool Init(ResourceLoader* resourceLoader,
+              ShaderProgram shadowMapShader,
               uint windowWidth, uint windowHeight,
               uint shadowMapWidth, uint shadowMapHeight);
 
     void Free();
 
     void RenderShadowMap(const glm::vec3& lightDirection,
-                         const std::vector<SceneNode>& scene);
+                         const Scene* scene);
 
     const glm::mat4& GetBiasDepthPV() const
     {
@@ -34,6 +36,7 @@ public:
     }
 
 private:
+    ResourceLoader* m_resourceLoader;
     ShaderProgram m_shadowMapShader;
 
     uint m_fbo;
