@@ -5,11 +5,46 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/projection.hpp>
+#include <glm/gtx/vector_angle.hpp>
 
 namespace math
 {
+    // Input vectors are assumed to be normalized.
+    // Performs an slerp on two vectors v1 and v2 with parameter t[0,1]
     template <typename T, glm::precision P>
-    static inline glm::detail::tvec3<T, P> forward(glm::detail::tquat<T, P> const & q)
+    inline glm::detail::tvec3<T, P> slerp(glm::detail::tvec3<T, P> const & v1,
+                                          glm::detail::tvec3<T, P> const & v2,
+                                          T angleBetween, T t)
+    {
+        T const subtendedAngle = glm::pi<T>()*T(2.0)*(T(1.0) - glm::cos(angleBetween / T(2.0)));
+        T const sinAngle = glm::sin(subtendedAngle);
+        T const sinOneMinusTAngle = glm::sin((T(1.0) - t)*subtendedAngle);
+        T const sinTAngle = glm::sin(t*subtendedAngle);
+        return (sinOneMinusTAngle / sinAngle)*v1 + (sinTAngle / sinAngle)*v2;
+    }
+
+    // Returns either v2 if angle(v1,v2) <= angle,
+    // Otherwise, returns the closest vector constrained
+    // to v1 at a max angle of angleLimit.
+    template <typename T, glm::precision P>
+    inline glm::detail::tvec3<T, P> limit_angle(glm::detail::tvec3<T, P> const & v1,
+                                                glm::detail::tvec3<T, P> const & v2,
+                                                T angleLimit)
+    {
+        auto nv1 = glm::normalize(v1);
+        auto nv2 = glm::normalize(v2);
+        T angle = glm::angle(nv1, nv2);
+        if (angle <= angleLimit)
+        {
+            return v2;
+        }
+
+        T t = angleLimit / angle;
+        return math::slerp(nv1, nv2, angle, t);
+    }
+
+    template <typename T, glm::precision P>
+    inline glm::detail::tvec3<T, P> forward(glm::detail::tquat<T, P> const & q)
     {
         // equivalent to
         // return q * vec3(0.0, 0.0, 1.0) * conjugate(q);
@@ -21,7 +56,7 @@ namespace math
     }
 
     template <typename T, glm::precision P>
-    static inline glm::detail::tvec3<T, P> up(glm::detail::tquat<T, P> const & q)
+    inline glm::detail::tvec3<T, P> up(glm::detail::tquat<T, P> const & q)
     {
         // equivalent to
         // return q * vec3(0.0, 1.0, 0.0) * conjugate(q);
@@ -33,7 +68,7 @@ namespace math
     }
 
     template <typename T, glm::precision P>
-    static inline glm::detail::tvec3<T, P> right(glm::detail::tquat<T, P> const & q)
+    inline glm::detail::tvec3<T, P> right(glm::detail::tquat<T, P> const & q)
     {
         // equivalent to
         // return q * vec3(1.0, 0.0, 0.0) * conjugate(q);
@@ -45,7 +80,7 @@ namespace math
     }
 
     template <typename T, glm::precision P>
-    static inline glm::detail::tquat<T, P> rotate_local(glm::detail::tquat<T, P> const & q,
+    inline glm::detail::tquat<T, P> rotate_local(glm::detail::tquat<T, P> const & q,
                                                         T angle_degrees,
                                                         glm::detail::tvec3<T, P> const & v)
     {
@@ -54,7 +89,7 @@ namespace math
     }
 
     template <typename T, glm::precision P>
-    static inline glm::detail::tquat<T, P> rotate_world(glm::detail::tquat<T, P> const & q,
+    inline glm::detail::tquat<T, P> rotate_world(glm::detail::tquat<T, P> const & q,
                                                         T angle_degrees,
                                                         glm::detail::tvec3<T, P> const & v)
     {
@@ -69,7 +104,7 @@ namespace math
     // q, q_swing represents the rotation about the axis perpendicular to
     // V1 and V2 (see Quaternion::Align), and q_twist is a rotation about V1.
     template <typename T, glm::precision P>
-    static inline void decompose_twist_swing(glm::detail::tquat<T, P> const & q,
+    inline void decompose_twist_swing(glm::detail::tquat<T, P> const & q,
                                              glm::detail::tvec3<T, P> const & twist_axis,
                                              glm::detail::tquat<T, P> & swing,
                                              glm::detail::tquat<T, P> & twist)
@@ -86,7 +121,7 @@ namespace math
     // q, q_swing represents the rotation about the axis perpendicular to
     // V1 and V2 (see Quaternion::Align), and q_twist is a rotation about V1.
     template <typename T, glm::precision P>
-    static inline void decompose_swing_twist(glm::detail::tquat<T, P> const & q,
+    inline void decompose_swing_twist(glm::detail::tquat<T, P> const & q,
                                              glm::detail::tvec3<T, P> const & twist_axis,
                                              glm::detail::tquat<T, P> & swing,
                                              glm::detail::tquat<T, P> & twist)
@@ -98,7 +133,7 @@ namespace math
 
     // Based on code from David Eberly's "Constrained Quaternions Using Euler Angles"
     template <typename T, glm::precision P>
-    static inline glm::detail::tquat<T, P> closest_x(glm::detail::tquat<T, P> const & q,
+    inline glm::detail::tquat<T, P> closest_x(glm::detail::tquat<T, P> const & q,
                                                      T min_angle, T max_angle)
     {
         min_angle = min_angle * T(0.5);
@@ -157,7 +192,7 @@ namespace math
     }
     
     template <typename T, glm::precision P>
-    static inline glm::detail::tquat<T, P> limit_rotation_xaxis(glm::detail::tquat<T, P> const & q,
+    inline glm::detail::tquat<T, P> limit_rotation_xaxis(glm::detail::tquat<T, P> const & q,
                                                                 T max_degrees)
     {
         const auto x_axis = glm::vec3(1.0f, 0.0f, 0.0f);

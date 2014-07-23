@@ -5,7 +5,6 @@
 #include "../EntitySystem/PhysicalComponent.h"
 
 #include "mathutils.h"
-#include <glm/gtx/quaternion.hpp>
 
 void BillboardController::Update()
 {
@@ -42,7 +41,11 @@ void BillboardController::OrientBillboard(const PhysicalComponent* camera,
                                           const CylindricalBillboard* constraints,
                                           PhysicalComponent* billboard)
 {
-    auto forward = glm::normalize(camera->position - billboard->position);
+    auto forward = math::limit_angle(constraints->initialDirection,
+                                     camera->position - billboard->position,
+                                     constraints->maxAngleFromForward);
+    forward = glm::normalize(forward);
+
     auto right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), forward));
     auto up = glm::normalize(glm::cross(forward, right));
 
