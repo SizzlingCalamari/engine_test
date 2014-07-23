@@ -150,7 +150,10 @@ void RenderProxy::CheckEntChanges()
         SceneNode node;
         LoadRenderable(&node, physical);
         LoadRenderable(&node, graphical);
-        m_scene.m_objects.AddData(ent, &node);
+        if (node.meshId > 0)
+        {
+            m_scene.m_objects.AddData(ent, &node);
+        }
     }
 
     auto &physical_edits = m_physical_components->GetEdits();
