@@ -35,6 +35,8 @@ Game::Game():
     m_teapotBumped(0),
     m_pedestal(0),
     m_moonLightEnt(0),
+    m_billboardTextMaterials(),
+    m_billboardTextEnts(),
     m_inputIdZ(0),
     m_activeCameraType(Camera_InterpolatedPath)
 {
@@ -60,6 +62,8 @@ void Game::Initialize(const EngineContext& engine)
                                   m_entity_system.GetTable<DynamicsComponent>());
 
     m_thirdperson_controller.SetComponentTables(m_entity_system.GetTable<PhysicalComponent>());
+    m_cameraPathController.SetComponentTables(m_entity_system.GetTable<PhysicalComponent>());
+    m_billboardController.SetComponentTables(m_entity_system.GetTable<PhysicalComponent>());
 
     LoadResources();
     LoadEnts();
@@ -67,8 +71,7 @@ void Game::Initialize(const EngineContext& engine)
     m_thirdperson_controller.SetCameraEnt(m_camera);
     m_thirdperson_controller.SetTargetEnt(m_teapotTextured);
     m_thirdperson_controller.SetRadiusFromTarget(75.0f);
-
-    m_cameraPathController.SetComponentTables(m_entity_system.GetTable<PhysicalComponent>());
+    
     m_cameraPathController.SetCameraEnt(m_camera);
     m_cameraPathController.SetPeriod(15000);
     m_cameraPathController.SetShouldLoop(false);
@@ -83,6 +86,15 @@ void Game::Initialize(const EngineContext& engine)
     //m_cameraPathController.AddControlPoint(glm::vec3{ -mid, 30.0f, mid }, glm::quat(glm::vec3{ 0.0f, 0.0f, 0.0f }));
     m_cameraPathController.AddControlPoint(glm::vec3{ -150.0f, 20.0f, 0.0f }, glm::quat(glm::vec3{ 0.0f, glm::half_pi<float>(), 0.0f }));
     //m_cameraPathController.AddControlPoint(glm::vec3{ -mid, 30.0f, -mid }, glm::quat(glm::vec3{ 0.0f, 0.0f, 0.0f }));
+
+    m_billboardController.SetCameraEnt(m_camera);
+    {
+        CylindricalBillboard billboard;
+        billboard.initialDirection = glm::vec3(0.0f, 0.0f, 1.0f);
+        // 30 degrees
+        billboard.maxAngleFromForward = glm::half_pi<float>() / 3.0f;
+        m_billboardController.AddBillboard(m_billboardTextEnts[0], billboard);
+    }
 }
 
 void Game::Shutdown()
@@ -101,6 +113,7 @@ void Game::Shutdown()
 void Game::Simulate(uint64 tick, uint32 dt)
 {
     CameraSimulation(dt);
+    m_billboardController.Update();
 
     m_physics->Simulate(dt);
     m_renderer->Update();
@@ -332,6 +345,24 @@ void Game::LoadResources()
         obj.properties.emplace("noiseBumpMap", "1");
         m_pedestalBumpMaterial = m_renderer->CreateRenderObject(obj);
     }
+
+    m_billboardMesh = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::MeshObject;
+        obj.properties.emplace("meshFile", "models/billboard.obj");
+        m_billboardMesh = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_billboardTextMaterials[0] = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::Material;
+        obj.properties.emplace("diffuseMapFile", "textures/celshading.png");
+        obj.properties.emplace("specularIntensity", "1.0");
+        obj.properties.emplace("specularPower", "32.0");
+        m_billboardTextMaterials[0] = m_renderer->CreateRenderObject(obj);
+    }
 }
 
 void Game::LoadEnts()
@@ -398,5 +429,17 @@ void Game::LoadEnts()
         GraphicalComponent graphical;
         graphical.directionalLight = m_moonLightDirectional;
         m_entity_system.AttachComponent(m_moonLightEnt, &graphical);
+    }
+
+    m_billboardTextEnts[0] = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        physical.position = glm::vec3(200.0f, 0.0f, 0.0f);
+        m_entity_system.AttachComponent(m_billboardTextEnts[0], &physical);
+
+        GraphicalComponent graphical;
+        graphical.mesh = m_billboardMesh;
+        graphical.material = m_billboardTextMaterials[0];
+        m_entity_system.AttachComponent(m_billboardTextEnts[0], &graphical);
     }
 }

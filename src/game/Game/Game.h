@@ -5,6 +5,7 @@
 #include "CameraController_ThirdPerson.h"
 #include "CameraController_InterpolatedPath.h"
 #include "../Input/InputContext.h"
+#include "BillboardController.h"
 
 class RenderProxy;
 class PhysicsProxy;
@@ -66,8 +67,13 @@ private:
     uint m_pedestal;
     uint m_moonLightEnt;
 
+    uint m_billboardMesh;
+    uint m_billboardTextMaterials[4];
+    uint m_billboardTextEnts[4];
+
     CameraController_ThirdPerson m_thirdperson_controller;
     CameraController_InterpolatedPath m_cameraPathController;
+    BillboardController m_billboardController;
 
     uint m_inputIdZ;
 
