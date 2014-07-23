@@ -2,7 +2,6 @@
 #pragma once
 
 #include "../Renderer/3DRenderer/Camera.h"
-#include "../Renderer/3DRenderer/Renderable.h"
 #include "../Renderer/3DRenderer/Scene.h"
 
 class Renderer3D;

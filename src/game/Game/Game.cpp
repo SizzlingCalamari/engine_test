@@ -15,6 +15,8 @@
 #include "SDL_keyboard.h"
 #include "SDL_mouse.h"
 
+#include <iostream>
+
 Game::Game():
     m_renderer(nullptr),
     m_physics(nullptr),
@@ -31,9 +33,6 @@ Game::Game():
     m_pedestalBumpMaterial(0),
     m_camera(0),
     m_floorEnt(0),
-    m_teapotTextured(0),
-    m_teapotBumped(0),
-    m_pedestal(0),
     m_moonLightEnt(0),
     m_billboardTextMaterials(),
     m_billboardTextEnts(),
@@ -47,8 +46,14 @@ void Game::Initialize(const EngineContext& engine)
     using namespace std::placeholders;
     KeyboardContext keyboardContext;
     {
-        KeyCombination temp = { SDL_SCANCODE_Z };
-        keyboardContext.AddMapping(temp, std::bind(&Game::InputEventCallback, this, _1));
+        KeyCombination temp = {};
+        temp[0] = SDL_SCANCODE_Z;
+        m_inputIdZ = keyboardContext.AddMapping(temp, std::bind(&Game::InputEventCallback, this, _1));
+        temp[0] = SDL_SCANCODE_P;
+        m_inputIdP = keyboardContext.AddMapping(temp, std::bind(&Game::InputEventCallback, this, _1));
+    }
+    {
+
     }
     engine.input->LoadContext(std::move(keyboardContext));
 
@@ -69,23 +74,55 @@ void Game::Initialize(const EngineContext& engine)
     LoadEnts();
 
     m_thirdperson_controller.SetCameraEnt(m_camera);
-    m_thirdperson_controller.SetTargetEnt(m_teapotTextured);
+    m_thirdperson_controller.SetTargetEnt(m_teapotMarbleEnt);
     m_thirdperson_controller.SetRadiusFromTarget(75.0f);
     
     m_cameraPathController.SetCameraEnt(m_camera);
-    m_cameraPathController.SetPeriod(15000);
+    m_cameraPathController.SetTimePerControlPoint(5000);
     m_cameraPathController.SetShouldLoop(false);
     m_cameraPathController.SetStartTime(0);
 
     float mid = 75.0f * glm::root_two<float>();
-    m_cameraPathController.AddControlPoint(glm::vec3{ 0.0f, 20.0f, -150.0f }, glm::quat(glm::vec3{ 0.0f, 0.0f, 0.0f }));
-    //m_cameraPathController.AddControlPoint(glm::vec3{ mid, 30.0f, -mid }, glm::quat(glm::vec3{ 0.0f, 0.0f, 0.0f }));
-    m_cameraPathController.AddControlPoint(glm::vec3{ 150.0f, 40.0f, 0.0f }, glm::quat(glm::vec3{ 0.0f, -glm::half_pi<float>(), 0.0f }));
-    //m_cameraPathController.AddControlPoint(glm::vec3{ mid, 50.0f, mid }, glm::quat(glm::vec3{ 0.0f, 0.0f, 0.0f }));
-    m_cameraPathController.AddControlPoint(glm::vec3{ 0.0f, 40.0f, 150.0f }, glm::quat(glm::vec3{ 0.0f, glm::pi<float>(), 0.0f }));
-    //m_cameraPathController.AddControlPoint(glm::vec3{ -mid, 30.0f, mid }, glm::quat(glm::vec3{ 0.0f, 0.0f, 0.0f }));
-    m_cameraPathController.AddControlPoint(glm::vec3{ -150.0f, 20.0f, 0.0f }, glm::quat(glm::vec3{ 0.0f, glm::half_pi<float>(), 0.0f }));
-    //m_cameraPathController.AddControlPoint(glm::vec3{ -mid, 30.0f, -mid }, glm::quat(glm::vec3{ 0.0f, 0.0f, 0.0f }));
+
+    m_cameraPathController.AddControlPoint(glm::vec3{ -700.0f, 600.0f, 0.0f }, glm::quat(glm::vec3{ 0.0f, glm::pi<float>(), 0.0f }));
+
+    // teapots
+    m_cameraPathController.AddControlPoint(glm::vec3{ -400.0f, 400.0f, -270.0f }, glm::quat(glm::vec3{ 0.0f, glm::pi<float>(), 0.0f }));
+    m_cameraPathController.AddControlPoint(glm::vec3{ 0.0f, 400.0f, -270.0f }, glm::quat(glm::vec3{ 0.0f, glm::pi<float>(), 0.0f }));
+    m_cameraPathController.AddControlPoint(glm::vec3{ 400.0f, 400.0f, -270.0f }, glm::quat(glm::vec3{ 0.0f, glm::pi<float>(), 0.0f }));
+
+    // top corner shadows
+    m_cameraPathController.AddControlPoint(glm::vec3{ 940.0f, 425.0f, 442.0f }, glm::quat(glm::vec3{ 0.0f, -3.0f*glm::quarter_pi<float>(), 0.0f }));
+
+    // bert
+    m_cameraPathController.AddControlPoint(glm::vec3{ 570.0f, 430.0f, 570.0f }, glm::quat(glm::vec3{ 0.0f, -1.25f*glm::half_pi<float>(), 0.0f }));
+
+    // more teapots
+    m_cameraPathController.AddControlPoint(glm::vec3{ 150.0f, 440.0f, 0.0f }, glm::quat(glm::vec3{ 0.0f, glm::pi<float>(), 0.0f }));
+
+    // teapot view
+    m_cameraPathController.AddControlPoint(glm::vec3{ -680.0f, 770.0f, 320.0f }, glm::quat(glm::vec3{ 0.5f*glm::quarter_pi<float>(), -1.25f*glm::pi<float>(), 0.0f }));
+
+    // room view
+    m_cameraPathController.AddControlPoint(glm::vec3{ -1440.0f, 1065.0f, -180.0f }, glm::quat(glm::vec3{ 0.5f*glm::quarter_pi<float>(), 1.10f*glm::half_pi<float>(), 0.0f }));
+
+    // next corner room view
+    m_cameraPathController.AddControlPoint(glm::vec3{ -1333.0f, 1033.0f, -1500.0f }, glm::quat(glm::vec3{ 0.5f*glm::quarter_pi<float>(), glm::quarter_pi<float>(), 0.0f }));
+
+    // painting close
+    m_cameraPathController.AddControlPoint(glm::vec3{ -700.0f, 575.0f, -1400.0f }, glm::quat(glm::vec3{ 0.5f*glm::quarter_pi<float>(), glm::quarter_pi<float>(), 0.0f }));
+
+    // gg painting
+    m_cameraPathController.AddControlPoint(glm::vec3{ -470.0f, 430.0f, -1276.0f }, glm::quat(glm::vec3{ 0.0f, 0.0f, 0.0f }));
+
+    // next corner overview
+    m_cameraPathController.AddControlPoint(glm::vec3{ 500.0f, 1024.0f, -1900.0f }, glm::quat(glm::vec3{ 0.5f*glm::quarter_pi<float>(), -0.5f*glm::quarter_pi<float>(), 0.0f }));
+
+    // bob omb view
+    m_cameraPathController.AddControlPoint(glm::vec3{ 1550.0f, 455.0f, -956.0f }, glm::quat(glm::vec3{ 0.0f, -glm::quarter_pi<float>(), 0.0f }));
+
+    // teapots view again
+    m_cameraPathController.AddControlPoint(glm::vec3{ 907.0f, 624.0f, 192.0f }, glm::quat(glm::vec3{ 0.5f*glm::quarter_pi<float>(), -1.5f*glm::half_pi<float>(), 0.0f }));
 
     m_billboardController.SetCameraEnt(m_camera);
     {
@@ -94,6 +131,8 @@ void Game::Initialize(const EngineContext& engine)
         // 30 degrees
         billboard.maxAngleFromForward = glm::half_pi<float>() / 3.0f;
         m_billboardController.AddBillboard(m_billboardTextEnts[0], billboard);
+        m_billboardController.AddBillboard(m_billboardTextEnts[1], billboard);
+        m_billboardController.AddBillboard(m_billboardTextEnts[2], billboard);
     }
 }
 
@@ -101,9 +140,6 @@ void Game::Shutdown()
 {
     m_entity_system.DestroyEntity(m_camera);
     m_entity_system.DestroyEntity(m_floorEnt);
-    m_entity_system.DestroyEntity(m_teapotTextured);
-    m_entity_system.DestroyEntity(m_teapotBumped);
-    m_entity_system.DestroyEntity(m_pedestal);
 
     m_physics->Cleanup();
     m_renderer->Update();
@@ -139,6 +175,17 @@ void Game::InputEventCallback(const KeyboardEventInfo& info)
             m_activeCameraType = Camera_FirstPerson;
         }
     }
+    else if (info.mappingId == m_inputIdP && info.pressed)
+    {
+        auto* physical_table = m_entity_system.GetTable<PhysicalComponent>();
+        auto* physical = physical_table->PeekComponent(m_camera);
+        
+        std::cout << physical->position.x
+            << " " << physical->position.y
+            << " " << physical->position.z << std::endl;
+        auto forward = math::forward(physical->orientation);
+        std::cout << forward.x << " " << forward.y << " " << forward.z << std::endl;
+    }
 }
 
 void Game::CameraSimulation(uint32 dt)
@@ -171,7 +218,7 @@ bool Game::HandleCameraMovement(PhysicalComponent *camera, uint32 dt)
     bool updated = false;
     // keyboard camera handling
     {
-        float key_factor = float(dt * 0.5);
+        float key_factor = float(dt * 2.5);
         auto *keys = SDL_GetKeyboardState(nullptr);
 
         // Using != for bools is like an xor.
@@ -236,12 +283,54 @@ bool Game::HandleCameraMovement(PhysicalComponent *camera, uint32 dt)
 
 void Game::LoadResources()
 {
+    m_roomMesh = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::MeshObject;
+        obj.properties.emplace("meshFile", "models/room.obj");
+        m_roomMesh = m_renderer->CreateRenderObject(obj);
+    }
+
     m_floorMesh = 0;
     {
         RenderObject obj;
         obj.type = RenderObject::MeshObject;
         obj.properties.emplace("meshFile", "models/floor.obj");
         m_floorMesh = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_teapotMesh = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::MeshObject;
+        obj.properties.emplace("meshFile", "models/teapot/teapot.obj");
+        m_teapotMesh = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_pedestalMesh = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::MeshObject;
+        obj.properties.emplace("meshFile", "models/pedestal.obj");
+        m_pedestalMesh = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_billboardMesh = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::MeshObject;
+        obj.properties.emplace("meshFile", "models/billboard.obj");
+        m_billboardMesh = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_woodFloorMaterial = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::Material;
+        obj.properties.emplace("diffuseMapFile", "textures/hardwood.jpg");
+        obj.properties.emplace("specularIntensity", "1.0");
+        obj.properties.emplace("specularPower", "32.0");
+        m_woodFloorMaterial = m_renderer->CreateRenderObject(obj);
     }
 
     m_jesusMaterial = 0;
@@ -268,7 +357,6 @@ void Game::LoadResources()
     {
         RenderObject obj;
         obj.type = RenderObject::Material;
-        obj.properties.emplace("diffuseMapFile", "models/teapot/default.png");
         obj.properties.emplace("specularIntensity", "1.0");
         obj.properties.emplace("specularPower", "32.0");
         obj.properties.emplace("noiseDiffuseMap", "1");
@@ -279,7 +367,7 @@ void Game::LoadResources()
     {
         RenderObject obj;
         obj.type = RenderObject::Material;
-        obj.properties.emplace("diffuseMapFile", "models/teapot/default.png");
+        obj.properties.emplace("diffuseSolidColour", "0.5 0.5 0.5");
         obj.properties.emplace("specularIntensity", "1.0");
         obj.properties.emplace("specularPower", "32.0");
         obj.properties.emplace("noiseBumpMap", "1");
@@ -290,7 +378,7 @@ void Game::LoadResources()
     {
         RenderObject obj;
         obj.type = RenderObject::Material;
-        obj.properties.emplace("diffuseMapFile", "models/teapot/default.png");
+        obj.properties.emplace("diffuseSolidColour", "0.1 0.7 0.1");
         obj.properties.emplace("specularIntensity", "1.0");
         obj.properties.emplace("specularPower", "32.0");
         obj.properties.emplace("celShaded", "1");
@@ -302,26 +390,10 @@ void Game::LoadResources()
         RenderObject obj;
         obj.type = RenderObject::DirectionalLight;
         obj.properties.emplace("colour", "1.0 1.0 1.0");
-        obj.properties.emplace("ambientIntensity", "0.1");
-        obj.properties.emplace("diffuseIntensity", "0.2");
-        obj.properties.emplace("direction", "-1.0 -1.0 -1.0");
+        obj.properties.emplace("ambientIntensity", "0.03");
+        obj.properties.emplace("diffuseIntensity", "0.3");
+        obj.properties.emplace("direction", "-0.5 -1.0 -1.0");
         m_moonLightDirectional = m_renderer->CreateRenderObject(obj);
-    }
-
-    m_teapotMesh = 0;
-    {
-        RenderObject obj;
-        obj.type = RenderObject::MeshObject;
-        obj.properties.emplace("meshFile", "models/teapot/teapot.obj");
-        m_teapotMesh = m_renderer->CreateRenderObject(obj);
-    }
-
-    m_pedestalMesh = 0;
-    {
-        RenderObject obj;
-        obj.type = RenderObject::MeshObject;
-        obj.properties.emplace("meshFile", "models/pedestal.obj");
-        m_pedestalMesh = m_renderer->CreateRenderObject(obj);
     }
 
     m_wallBumpMaterial = 0;
@@ -346,27 +418,220 @@ void Game::LoadResources()
         m_pedestalBumpMaterial = m_renderer->CreateRenderObject(obj);
     }
 
-    m_billboardMesh = 0;
+    // Billboard materials
+    m_billboardTextMaterials[0] = 0;
     {
         RenderObject obj;
-        obj.type = RenderObject::MeshObject;
-        obj.properties.emplace("meshFile", "models/billboard.obj");
-        m_billboardMesh = m_renderer->CreateRenderObject(obj);
+        obj.type = RenderObject::Material;
+        obj.properties.emplace("diffuseMapFile", "textures/bumpmapping.png");
+        obj.properties.emplace("specularIntensity", "1.0");
+        obj.properties.emplace("specularPower", "32.0");
+        m_billboardTextMaterials[0] = m_renderer->CreateRenderObject(obj);
     }
 
-    m_billboardTextMaterials[0] = 0;
+    m_billboardTextMaterials[1] = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::Material;
+        obj.properties.emplace("diffuseMapFile", "textures/fractalnoise.png");
+        obj.properties.emplace("specularIntensity", "1.0");
+        obj.properties.emplace("specularPower", "32.0");
+        m_billboardTextMaterials[1] = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_billboardTextMaterials[2] = 0;
     {
         RenderObject obj;
         obj.type = RenderObject::Material;
         obj.properties.emplace("diffuseMapFile", "textures/celshading.png");
         obj.properties.emplace("specularIntensity", "1.0");
         obj.properties.emplace("specularPower", "32.0");
-        m_billboardTextMaterials[0] = m_renderer->CreateRenderObject(obj);
+        m_billboardTextMaterials[2] = m_renderer->CreateRenderObject(obj);
+    }
+
+    // Painting mesh with aspect ratio 1.73
+    m_painting173 = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::MeshObject;
+        obj.properties.emplace("meshFile", "models/painting173.obj");
+        m_painting173 = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_painting100 = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::MeshObject;
+        obj.properties.emplace("meshFile", "models/painting100.obj");
+        m_painting100 = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_paintint133 = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::MeshObject;
+        obj.properties.emplace("meshFile", "models/painting133.obj");
+        m_paintint133 = m_renderer->CreateRenderObject(obj);
+    }
+
+    // Painting Descriptions
+    m_paintingMaterials[0] = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::Material;
+        obj.properties.emplace("diffuseMapFile", "textures/mos98-02.png");
+        obj.properties.emplace("specularIntensity", "1.0");
+        obj.properties.emplace("specularPower", "32.0");
+        m_paintingMaterials[0] = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_paintingMaterials[1] = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::Material;
+        obj.properties.emplace("diffuseMapFile", "textures/utah_teapot.jpg");
+        obj.properties.emplace("specularIntensity", "1.0");
+        obj.properties.emplace("specularPower", "32.0");
+        m_paintingMaterials[1] = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_paintingMaterials[2] = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::Material;
+        obj.properties.emplace("diffuseMapFile", "textures/bob.jpg");
+        obj.properties.emplace("specularIntensity", "1.0");
+        obj.properties.emplace("specularPower", "32.0");
+        m_paintingMaterials[2] = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_paintingMaterials[3] = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::Material;
+        obj.properties.emplace("diffuseMapFile", "textures/bertstare.jpg");
+        obj.properties.emplace("specularIntensity", "1.0");
+        obj.properties.emplace("specularPower", "32.0");
+        m_paintingMaterials[3] = m_renderer->CreateRenderObject(obj);
+    }
+
+    // Spot Light Descriptions
+    m_spotLights[0] = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::SpotLight;
+        obj.properties.emplace("colour", "1.0 1.0 1.0");
+        obj.properties.emplace("ambientIntensity", "0.1");
+        obj.properties.emplace("diffuseIntensity", "0.6");
+        obj.properties.emplace("position", "-400.0 650.0 -450.0");
+        obj.properties.emplace("attenuation.constant", "1.0");
+        obj.properties.emplace("attenuation.linear", "0.0");
+        obj.properties.emplace("attenuation.exp", "0.0");
+        obj.properties.emplace("coneDirection", "0.0 -1.0 -1.0");
+        obj.properties.emplace("cosineConeAngle", "0.86"); // ~cos(30 degrees)
+        m_spotLights[0] = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_spotLights[1] = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::SpotLight;
+        obj.properties.emplace("colour", "1.0 1.0 1.0");
+        obj.properties.emplace("ambientIntensity", "0.1");
+        obj.properties.emplace("diffuseIntensity", "0.6");
+        obj.properties.emplace("position", "0.0 650.0 -450.0");
+        obj.properties.emplace("attenuation.constant", "1.0");
+        obj.properties.emplace("attenuation.linear", "0.0");
+        obj.properties.emplace("attenuation.exp", "0.0");
+        obj.properties.emplace("coneDirection", "0.0 -1.0 -1.0");
+        obj.properties.emplace("cosineConeAngle", "0.86"); // ~cos(30 degrees)
+        m_spotLights[1] = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_spotLights[2] = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::SpotLight;
+        obj.properties.emplace("colour", "1.0 1.0 1.0");
+        obj.properties.emplace("ambientIntensity", "0.1");
+        obj.properties.emplace("diffuseIntensity", "0.6");
+        obj.properties.emplace("position", "400.0 650.0 -450.0");
+        obj.properties.emplace("attenuation.constant", "1.0");
+        obj.properties.emplace("attenuation.linear", "0.0");
+        obj.properties.emplace("attenuation.exp", "0.0");
+        obj.properties.emplace("coneDirection", "0.0 -1.0 -1.0");
+        obj.properties.emplace("cosineConeAngle", "0.86"); // ~cos(30 degrees)
+        m_spotLights[2] = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_spotLights[3] = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::SpotLight;
+        obj.properties.emplace("colour", "1.0 1.0 1.0");
+        obj.properties.emplace("ambientIntensity", "0.1");
+        obj.properties.emplace("diffuseIntensity", "0.6");
+        obj.properties.emplace("position", "1293.0 886.0 -1634.0");
+        obj.properties.emplace("attenuation.constant", "2.0");
+        obj.properties.emplace("attenuation.linear", "0.0");
+        obj.properties.emplace("attenuation.exp", "0.0");
+        obj.properties.emplace("coneDirection", "-0.37 -0.49 0.78");
+        obj.properties.emplace("cosineConeAngle", "0.86"); // ~cos(30 degrees)
+        m_spotLights[3] = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_spotLights[4] = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::SpotLight;
+        obj.properties.emplace("colour", "1.0 1.0 1.0");
+        obj.properties.emplace("ambientIntensity", "0.1");
+        obj.properties.emplace("diffuseIntensity", "0.6");
+        obj.properties.emplace("position", "400.0 590.0 550.0");
+        obj.properties.emplace("attenuation.constant", "2.0");
+        obj.properties.emplace("attenuation.linear", "0.0");
+        obj.properties.emplace("attenuation.exp", "0.0");
+        obj.properties.emplace("coneDirection", "-1.5 -1.0 0.0");
+        obj.properties.emplace("cosineConeAngle", "0.86"); // ~cos(30 degrees)
+        m_spotLights[4] = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_spotLights[5] = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::SpotLight;
+        obj.properties.emplace("colour", "1.0 1.0 1.0");
+        obj.properties.emplace("ambientIntensity", "0.1");
+        obj.properties.emplace("diffuseIntensity", "0.6");
+        obj.properties.emplace("position", "-400.0 590.0 550.0");
+        obj.properties.emplace("attenuation.constant", "2.0");
+        obj.properties.emplace("attenuation.linear", "0.0");
+        obj.properties.emplace("attenuation.exp", "0.0");
+        obj.properties.emplace("coneDirection", "1.5 -1.0 0.0");
+        obj.properties.emplace("cosineConeAngle", "0.86"); // ~cos(30 degrees)
+        m_spotLights[5] = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_spotLights[6] = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::SpotLight;
+        obj.properties.emplace("colour", "1.0 1.0 1.0");
+        obj.properties.emplace("ambientIntensity", "0.1");
+        obj.properties.emplace("diffuseIntensity", "0.6");
+        obj.properties.emplace("position", "-1427.0 918.0 -1740.0");
+        obj.properties.emplace("attenuation.constant", "2.0");
+        obj.properties.emplace("attenuation.linear", "0.0");
+        obj.properties.emplace("attenuation.exp", "0.0");
+        obj.properties.emplace("coneDirection", "0.84 -0.51 0.15");
+        obj.properties.emplace("cosineConeAngle", "0.86"); // ~cos(30 degrees)
+        m_spotLights[6] = m_renderer->CreateRenderObject(obj);
     }
 }
 
 void Game::LoadEnts()
 {
+    // Camera
     m_camera = m_entity_system.CreateEntity();
     {
         PhysicalComponent physical;
@@ -375,50 +640,103 @@ void Game::LoadEnts()
         m_entity_system.AttachComponent(m_camera, &physical);
     }
 
+
+    // Room
+    m_roomEnt = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        m_entity_system.AttachComponent(m_roomEnt, &physical);
+
+        GraphicalComponent graphical;
+        graphical.mesh = m_roomMesh;
+        graphical.material = m_wallBumpMaterial;
+        m_entity_system.AttachComponent(m_roomEnt, &graphical);
+    }
+
+    // Floor
     m_floorEnt = m_entity_system.CreateEntity();
     {
         PhysicalComponent physical;
-        physical.position = glm::vec3(0.0f, -100.0f, 0.0f);
+        physical.position = glm::vec3(0.0f, 0.0f, 0.0f);
         m_entity_system.AttachComponent(m_floorEnt, &physical);
 
         GraphicalComponent graphical;
         graphical.mesh = m_floorMesh;
-        graphical.material = m_jesusMaterial;
+        graphical.material = m_woodFloorMaterial;
         m_entity_system.AttachComponent(m_floorEnt, &graphical);
     }
 
-    m_teapotTextured = m_entity_system.CreateEntity();
+    // Pedestals and teapots
+    m_pedestalTeapot1 = m_entity_system.CreateEntity();
     {
         PhysicalComponent physical;
-        m_entity_system.AttachComponent(m_teapotTextured, &physical);
-
-        GraphicalComponent graphical;
-        graphical.mesh = m_teapotMesh;
-        graphical.material = m_teapotDefaultMaterial;
-        m_entity_system.AttachComponent(m_teapotTextured, &graphical);
-    }
-
-    m_teapotBumped = m_entity_system.CreateEntity();
-    {
-        PhysicalComponent physical;
-        physical.position = glm::vec3(100.0f, 0.0f, 0.0f);
-        m_entity_system.AttachComponent(m_teapotBumped, &physical);
-
-        GraphicalComponent graphical;
-        graphical.mesh = m_teapotMesh;
-        graphical.material = m_teapotDefaultMaterial;
-        m_entity_system.AttachComponent(m_teapotBumped, &graphical);
-    }
-
-    m_pedestal = m_entity_system.CreateEntity();
-    {
-        PhysicalComponent physical;
-        m_entity_system.AttachComponent(m_pedestal, &physical);
+        physical.position = glm::vec3(-400.0f, 185.0f, -600.0f);
+        m_entity_system.AttachComponent(m_pedestalTeapot1, &physical);
 
         GraphicalComponent graphical;
         graphical.mesh = m_pedestalMesh;
         graphical.material = m_pedestalBumpMaterial;
-        m_entity_system.AttachComponent(m_pedestal, &graphical);
+        m_entity_system.AttachComponent(m_pedestalTeapot1, &graphical);
+    }
+
+    m_teapotBumpedEnt = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        physical.position = glm::vec3(-400.0f, 370.0f, -600.0f);
+        m_entity_system.AttachComponent(m_teapotBumpedEnt, &physical);
+
+        GraphicalComponent graphical;
+        graphical.mesh = m_teapotMesh;
+        graphical.material = m_teapotBumpMaterial;
+        m_entity_system.AttachComponent(m_teapotBumpedEnt, &graphical);
+    }
+
+    m_pedestalTeapot2 = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        physical.position = glm::vec3(0.0f, 185.0f, -600.0f);
+        m_entity_system.AttachComponent(m_pedestalTeapot2, &physical);
+
+        GraphicalComponent graphical;
+        graphical.mesh = m_pedestalMesh;
+        graphical.material = m_pedestalBumpMaterial;
+        m_entity_system.AttachComponent(m_pedestalTeapot2, &graphical);
+    }
+
+    m_teapotMarbleEnt = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        physical.position = glm::vec3(0.0f, 370.0f, -600.0f);
+        m_entity_system.AttachComponent(m_teapotMarbleEnt, &physical);
+
+        GraphicalComponent graphical;
+        graphical.mesh = m_teapotMesh;
+        graphical.material = m_teapotMarbleMaterial;
+        m_entity_system.AttachComponent(m_teapotMarbleEnt, &graphical);
+    }
+
+    m_pedestalTeapot3 = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        physical.position = glm::vec3(400.0f, 185.0f, -600.0f);
+        m_entity_system.AttachComponent(m_pedestalTeapot3, &physical);
+
+        GraphicalComponent graphical;
+        graphical.mesh = m_pedestalMesh;
+        graphical.material = m_pedestalBumpMaterial;
+        m_entity_system.AttachComponent(m_pedestalTeapot3, &graphical);
+    }
+
+    m_teapotCelEnt = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        physical.position = glm::vec3(400.0f, 370.0f, -600.0f);
+        m_entity_system.AttachComponent(m_teapotCelEnt, &physical);
+
+        GraphicalComponent graphical;
+        graphical.mesh = m_teapotMesh;
+        graphical.material = m_teapotCelMaterial;
+        m_entity_system.AttachComponent(m_teapotCelEnt, &graphical);
     }
 
     m_moonLightEnt = m_entity_system.CreateEntity();
@@ -431,15 +749,169 @@ void Game::LoadEnts()
         m_entity_system.AttachComponent(m_moonLightEnt, &graphical);
     }
 
+    // Billboards
     m_billboardTextEnts[0] = m_entity_system.CreateEntity();
     {
         PhysicalComponent physical;
-        physical.position = glm::vec3(200.0f, 0.0f, 0.0f);
+        physical.position = glm::vec3(-400.0f, 490.0f, -650.0f);
         m_entity_system.AttachComponent(m_billboardTextEnts[0], &physical);
 
         GraphicalComponent graphical;
         graphical.mesh = m_billboardMesh;
         graphical.material = m_billboardTextMaterials[0];
         m_entity_system.AttachComponent(m_billboardTextEnts[0], &graphical);
+    }
+
+    m_billboardTextEnts[1] = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        physical.position = glm::vec3(0.0f, 490.0f, -650.0f);
+        m_entity_system.AttachComponent(m_billboardTextEnts[1], &physical);
+
+        GraphicalComponent graphical;
+        graphical.mesh = m_billboardMesh;
+        graphical.material = m_billboardTextMaterials[1];
+        m_entity_system.AttachComponent(m_billboardTextEnts[1], &graphical);
+    }
+
+    m_billboardTextEnts[2] = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        physical.position = glm::vec3(400.0f, 490.0f, -650.0f);
+        m_entity_system.AttachComponent(m_billboardTextEnts[2], &physical);
+
+        GraphicalComponent graphical;
+        graphical.mesh = m_billboardMesh;
+        graphical.material = m_billboardTextMaterials[2];
+        m_entity_system.AttachComponent(m_billboardTextEnts[2], &graphical);
+    }
+
+    // Paintings
+
+    // gladimir 1998
+    m_paintingEnts[0] = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        physical.position = glm::vec3(-450.0f, 400.0f, -1065.0f);
+        physical.orientation = glm::quat(glm::vec3{0.0f, glm::pi<float>(), 0.0f});
+        m_entity_system.AttachComponent(m_paintingEnts[0], &physical);
+
+        GraphicalComponent graphical;
+        graphical.mesh = m_painting173;
+        graphical.material = m_paintingMaterials[0];
+        m_entity_system.AttachComponent(m_paintingEnts[0], &graphical);
+    }
+
+    // 
+    m_paintingEnts[1] = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        physical.position = glm::vec3(-40.0f, 425.0f, 550.0f);
+        physical.orientation = glm::quat(glm::vec3{ 0.0f, -glm::half_pi<float>(), 0.0f });
+        m_entity_system.AttachComponent(m_paintingEnts[1], &physical);
+
+        GraphicalComponent graphical;
+        graphical.mesh = m_painting100;
+        graphical.material = m_paintingMaterials[1];
+        m_entity_system.AttachComponent(m_paintingEnts[1], &graphical);
+    }
+
+    // bob
+    m_paintingEnts[2] = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        physical.position = glm::vec3(900.0f, 400.0f, -685.0f);
+        physical.orientation = glm::quat(glm::vec3{ 0.0f, glm::half_pi<float>(), 0.0f });
+        m_entity_system.AttachComponent(m_paintingEnts[2], &physical);
+
+        GraphicalComponent graphical;
+        graphical.mesh = m_painting100;
+        graphical.material = m_paintingMaterials[2];
+        m_entity_system.AttachComponent(m_paintingEnts[2], &graphical);
+    }
+
+    // bert stare
+    m_paintingEnts[3] = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        physical.position = glm::vec3(65.0f, 425.0f, 550.0f);
+        physical.orientation = glm::quat(glm::vec3{ 0.0f, glm::half_pi<float>(), 0.0f });
+        m_entity_system.AttachComponent(m_paintingEnts[3], &physical);
+
+        GraphicalComponent graphical;
+        graphical.mesh = m_paintint133;
+        graphical.material = m_paintingMaterials[3];
+        m_entity_system.AttachComponent(m_paintingEnts[3], &graphical);
+    }
+
+    // Spotlights
+    m_spotLightEnts[0] = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        m_entity_system.AttachComponent(m_spotLightEnts[0], &physical);
+
+        GraphicalComponent graphical;
+        graphical.spotLight = m_spotLights[0];
+        m_entity_system.AttachComponent(m_spotLightEnts[0], &graphical);
+    }
+
+    m_spotLightEnts[1] = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        m_entity_system.AttachComponent(m_spotLightEnts[1], &physical);
+
+        GraphicalComponent graphical;
+        graphical.spotLight = m_spotLights[1];
+        m_entity_system.AttachComponent(m_spotLightEnts[1], &graphical);
+    }
+
+    m_spotLightEnts[2] = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        m_entity_system.AttachComponent(m_spotLightEnts[2], &physical);
+
+        GraphicalComponent graphical;
+        graphical.spotLight = m_spotLights[2];
+        m_entity_system.AttachComponent(m_spotLightEnts[2], &graphical);
+    }
+
+    m_spotLightEnts[3] = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        m_entity_system.AttachComponent(m_spotLightEnts[3], &physical);
+
+        GraphicalComponent graphical;
+        graphical.spotLight = m_spotLights[3];
+        m_entity_system.AttachComponent(m_spotLightEnts[3], &graphical);
+    }
+
+    /*m_spotLightEnts[4] = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        m_entity_system.AttachComponent(m_spotLightEnts[4], &physical);
+
+        GraphicalComponent graphical;
+        graphical.spotLight = m_spotLights[4];
+        m_entity_system.AttachComponent(m_spotLightEnts[4], &graphical);
+    }*/
+
+    m_spotLightEnts[5] = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        m_entity_system.AttachComponent(m_spotLightEnts[5], &physical);
+
+        GraphicalComponent graphical;
+        graphical.spotLight = m_spotLights[5];
+        m_entity_system.AttachComponent(m_spotLightEnts[5], &graphical);
+    }
+
+    m_spotLightEnts[6] = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        m_entity_system.AttachComponent(m_spotLightEnts[6], &physical);
+
+        GraphicalComponent graphical;
+        graphical.spotLight = m_spotLights[6];
+        m_entity_system.AttachComponent(m_spotLightEnts[6], &graphical);
     }
 }

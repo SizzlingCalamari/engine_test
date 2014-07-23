@@ -4,7 +4,6 @@
 #include "GLContext.h"
 #include "Viewport.h"
 #include "ShaderProgram.h"
-#include "Renderable.h"
 #include "ShadowMap.h"
 #include <vector>
 

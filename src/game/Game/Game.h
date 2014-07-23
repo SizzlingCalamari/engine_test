@@ -48,34 +48,57 @@ private:
     RenderProxy *m_renderer;
     PhysicsProxy *m_physics;
 
+    uint m_roomMesh;
     uint m_floorMesh;
+    uint m_teapotMesh;
+    uint m_pedestalMesh;
+    uint m_billboardMesh;
+
+    uint m_woodFloorMaterial;
     uint m_jesusMaterial;
     uint m_teapotDefaultMaterial;
     uint m_teapotMarbleMaterial;
     uint m_teapotBumpMaterial;
     uint m_teapotCelMaterial;
-    uint m_moonLightDirectional;
-    uint m_teapotMesh;
-    uint m_pedestalMesh;
     uint m_wallBumpMaterial;
     uint m_pedestalBumpMaterial;
 
-    uint m_camera;
-    uint m_floorEnt;
-    uint m_teapotTextured;
-    uint m_teapotBumped;
-    uint m_pedestal;
-    uint m_moonLightEnt;
+    uint m_moonLightDirectional;
 
-    uint m_billboardMesh;
-    uint m_billboardTextMaterials[4];
-    uint m_billboardTextEnts[4];
+    uint m_camera;
+    uint m_roomEnt;
+    uint m_floorEnt;
+
+    uint m_pedestalTeapot1;
+    uint m_teapotBumpedEnt;
+
+    uint m_pedestalTeapot2;
+    uint m_teapotMarbleEnt;
+
+    uint m_pedestalTeapot3;
+    uint m_teapotCelEnt;
+
+    uint m_moonLightEnt;
+    
+    uint m_billboardTextMaterials[3];
+    uint m_billboardTextEnts[3];
+
+    uint m_painting173;
+    uint m_painting100;
+    uint m_paintint133;
+
+    uint m_paintingMaterials[6];
+    uint m_paintingEnts[6];
+
+    uint m_spotLights[9];
+    uint m_spotLightEnts[9];
 
     CameraController_ThirdPerson m_thirdperson_controller;
     CameraController_InterpolatedPath m_cameraPathController;
     BillboardController m_billboardController;
 
     uint m_inputIdZ;
+    uint m_inputIdP;
 
     enum CameraType
     {

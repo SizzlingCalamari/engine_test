@@ -69,7 +69,7 @@ void Engine::Run()
     uint32 currentTime = SDL_GetTicks();
     uint32 accumulator = 0;
 
-    uint32 fpsMax = 121;
+    uint32 fpsMax = 60;
     std::chrono::nanoseconds renderPeriod(1000000000 / fpsMax);
     auto currentRenderTime = std::chrono::high_resolution_clock::now();
     auto renderAccumulator = std::chrono::high_resolution_clock::duration();

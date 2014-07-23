@@ -48,6 +48,11 @@ void ShaderProgram::Unbind()
     glUseProgram(0);
 }
 
+bool ShaderProgram::SetUniform(const std::string& name, const void* data)
+{
+    return SetUniform(name.c_str(), data);
+}
+
 bool ShaderProgram::SetUniform(const char* name, const void* data)
 {
     // check if the uniform name exists in the program
@@ -88,6 +93,12 @@ bool ShaderProgram::SetUniform(const char* name, const void* data)
     case GL_INT:
         {
             int value = *static_cast<const int*>(data);
+            glUniform1i(info.index, value);
+        }
+        break;
+    case GL_BOOL_ARB:
+        {
+            bool value = *static_cast<const bool*>(data);
             glUniform1i(info.index, value);
         }
         break;

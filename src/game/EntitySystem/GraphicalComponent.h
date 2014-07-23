@@ -5,11 +5,19 @@
 
 struct GraphicalComponent
 {
-    uint mesh = 0;
-    uint material = 0;
-    uint directionalLight = 0;
-    uint pointLight = 0;
-    uint spotLight = 0;
+    GraphicalComponent():
+        mesh(0),
+        material(0),
+        directionalLight(0),
+        pointLight(0),
+        spotLight(0)
+    {
+    }
+    uint mesh;
+    uint material;
+    uint directionalLight;
+    uint pointLight;
+    uint spotLight;
 
     void FreeComponent()
     {

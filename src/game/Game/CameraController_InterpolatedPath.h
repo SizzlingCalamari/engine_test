@@ -17,6 +17,7 @@ public:
         m_startTime(0),
         m_curTime(0),
         m_period(5000),
+        m_timePerControlPoint(1000),
         m_shouldLoop(false)
     {
     }
@@ -47,6 +48,11 @@ public:
         m_period = period;
     }
 
+    void SetTimePerControlPoint(uint time)
+    {
+        m_timePerControlPoint = time;
+    }
+
     void AddControlPoint(const glm::vec3& position,
                          const glm::quat& orientation)
     {
@@ -66,6 +72,7 @@ private:
     uint m_startTime;
     uint m_curTime;
     uint m_period;
+    uint m_timePerControlPoint;
     bool m_shouldLoop;
 
     std::vector<glm::vec3> m_positions;

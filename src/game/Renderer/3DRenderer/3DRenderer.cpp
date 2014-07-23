@@ -9,6 +9,7 @@
 #include "Light.h"
 #include "Material.h"
 #include "Scene.h"
+#include <sstream>
 
 static void STDCALL GLErrorCallback(
     GLenum source, GLenum type,
@@ -79,7 +80,7 @@ void Renderer3D::Init(const renderer3d_config& config)
     assert(linked);
     m_shadowMapping.Init(m_resourceLoader,
                          std::move(shadowMapShader),
-                         glm::vec3{5000.0f, 5000.0f, 10000.0f},
+                         glm::vec3{7000.0f, 7000.0f, 15000.0f},
                          4096, 4096);
 }
 
@@ -133,134 +134,112 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
     auto aspect = viewport->GetAspectRatio();
     auto pv = glm::perspective(glm::radians(70.0f), aspect, 0.1f, 10000.0f) * cam->GetView();
 
-    // categorize the renderables by shader
-    m_colour_shader_cache.clear();
-    m_texture_shader_cache.clear();
-    for (auto &obj : scene->m_objects.GetDataArray())
-    {
-        if (obj.materialId > 0)
-        {
-            auto *material = m_resourceLoader->GetMaterial(obj.materialId);
-            if (material->diffuseMap > 0)
-            {
-                m_texture_shader_cache.emplace_back(&obj);
-            }
-            else
-            {
-                m_colour_shader_cache.emplace_back(&obj);
-            }
-        }
-        else
-        {
-            m_colour_shader_cache.emplace_back(&obj);
-        }
-    }
-
-    // render using the colour shader
-    m_colour_shader.Bind();
-    for (auto obj : m_colour_shader_cache)
-    {
-        auto mvp = pv * obj->transform;
-        m_colour_shader.SetUniform("MVP", &mvp);
-
-        auto *mesh = m_resourceLoader->GetMesh(obj->meshId);
-        GLsizei num_verticies = static_cast<GLsizei>(mesh->numVerticies);
-
-        m_colour_shader.SetUniform("minAABB", &mesh->minAABB);
-
-        glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBufferId);
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-            glDrawArrays(GL_TRIANGLES, 0, num_verticies);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
-    m_colour_shader.Unbind();
 
     // render using the texture shader
     m_texture_shader.Bind();
 
+    // directional lighting
     m_texture_shader.SetUniform("g_directionalLight.base.colour", &directionalLight->colour);
     m_texture_shader.SetUniform("g_directionalLight.base.ambientIntensity", &directionalLight->ambientIntensity);
     m_texture_shader.SetUniform("g_directionalLight.base.diffuseIntensity", &directionalLight->diffuseIntensity);
     m_texture_shader.SetUniform("g_directionalLight.direction", &directionalLight->direction);
 
-    int numPointLights = 1;
-    m_texture_shader.SetUniform("g_numPointLights", &numPointLights);
-
-    PointLight light;
-    light.colour = glm::vec3(0.0f, 0.0f, 1.0f);
-    light.ambientIntensity = 0.0f;
-    light.diffuseIntensity = 0.3f;
-    light.position = glm::vec3(-50.0f, 0.0f, -50.0f);
-
-    m_texture_shader.SetUniform("g_pointLights[0].base.colour", &light.colour);
-    m_texture_shader.SetUniform("g_pointLights[0].base.ambientIntensity", &light.ambientIntensity);
-    m_texture_shader.SetUniform("g_pointLights[0].base.diffuseIntensity", &light.diffuseIntensity);
-    m_texture_shader.SetUniform("g_pointLights[0].position", &light.position);
-    m_texture_shader.SetUniform("g_pointLights[0].attenuation.constant", &light.attenuation.constant);
-    m_texture_shader.SetUniform("g_pointLights[0].attenuation.linear", &light.attenuation.linear);
-    m_texture_shader.SetUniform("g_pointLights[0].attenuation.exponential", &light.attenuation.exp);
-
-    int numSpotLights = 1;
+    // spot lights
+    auto &spotLights = scene->m_spotLights.GetDataArray();
+    int numSpotLights = static_cast<int>(spotLights.size());
     m_texture_shader.SetUniform("g_numSpotLights", &numSpotLights);
+    for (int i = 0; i < numSpotLights; ++i)
+    {
+        auto& spotLight = spotLights[i];
 
-    SpotLight spotLight;
-    spotLight.colour = glm::vec3(0.0f, 1.0f, 0.0f);
-    spotLight.ambientIntensity = 0.0f;
-    spotLight.diffuseIntensity = 0.3f;
-    spotLight.position = glm::vec3(50.0f, 0.0f, -50.0f);
-    spotLight.coneDirection = (glm::vec3(0.0f) - spotLight.position);
-    spotLight.cosineConeAngle = glm::cos(20.0f);
+        std::stringstream ss;
+        ss << "g_spotLights[" << i << "].";
 
-    m_texture_shader.SetUniform("g_spotLights[0].base.base.colour", &spotLight.colour);
-    m_texture_shader.SetUniform("g_spotLights[0].base.base.ambientIntensity", &spotLight.ambientIntensity);
-    m_texture_shader.SetUniform("g_spotLights[0].base.base.diffuseIntensity", &spotLight.diffuseIntensity);
-    m_texture_shader.SetUniform("g_spotLights[0].base.position", &spotLight.position);
-    m_texture_shader.SetUniform("g_spotLights[0].base.attenuation.constant", &spotLight.attenuation.constant);
-    m_texture_shader.SetUniform("g_spotLights[0].base.attenuation.linear", &spotLight.attenuation.linear);
-    m_texture_shader.SetUniform("g_spotLights[0].base.attenuation.exponential", &spotLight.attenuation.exp);
-    m_texture_shader.SetUniform("g_spotLights[0].coneDirection", &spotLight.coneDirection);
-    m_texture_shader.SetUniform("g_spotLights[0].cosineConeAngle", &spotLight.cosineConeAngle);
+        m_texture_shader.SetUniform(ss.str() + "base.base.colour", &spotLight.colour);
+        m_texture_shader.SetUniform(ss.str() + "base.base.ambientIntensity", &spotLight.ambientIntensity);
+        m_texture_shader.SetUniform(ss.str() + "base.base.diffuseIntensity", &spotLight.diffuseIntensity);
+        m_texture_shader.SetUniform(ss.str() + "base.position", &spotLight.position);
+        m_texture_shader.SetUniform(ss.str() + "base.attenuation.constant", &spotLight.attenuation.constant);
+        m_texture_shader.SetUniform(ss.str() + "base.attenuation.linear", &spotLight.attenuation.linear);
+        m_texture_shader.SetUniform(ss.str() + "base.attenuation.exponential", &spotLight.attenuation.exp);
+        m_texture_shader.SetUniform(ss.str() + "coneDirection", &spotLight.coneDirection);
+        m_texture_shader.SetUniform(ss.str() + "cosineConeAngle", &spotLight.cosineConeAngle);
+    }
 
-    Material material;
-    material.specularIntensity = 1.0f;
-    material.specularPower = 32.0f;
+    // point lights
+    auto &pointLights = scene->m_pointLights.GetDataArray();
+    int numPointLights = static_cast<int>(pointLights.size());
+    m_texture_shader.SetUniform("g_numPointLights", &numPointLights);
+    for (int i = 0; i < numPointLights; ++i)
+    {
+        auto& light = pointLights[i];
 
-    m_texture_shader.SetUniform("g_materialProps.specularIntensity", &material.specularIntensity);
-    m_texture_shader.SetUniform("g_materialProps.specularPower", &material.specularPower);
+        std::stringstream ss;
+        ss << "g_pointLights[" << i << "].";
+
+        m_texture_shader.SetUniform(ss.str() + "base.colour", &light.colour);
+        m_texture_shader.SetUniform(ss.str() + "base.ambientIntensity", &light.ambientIntensity);
+        m_texture_shader.SetUniform(ss.str() + "base.diffuseIntensity", &light.diffuseIntensity);
+        m_texture_shader.SetUniform(ss.str() + "position", &light.position);
+        m_texture_shader.SetUniform(ss.str() + "attenuation.constant", &light.attenuation.constant);
+        m_texture_shader.SetUniform(ss.str() + "attenuation.linear", &light.attenuation.linear);
+        m_texture_shader.SetUniform(ss.str() + "attenuation.exponential", &light.attenuation.exp);
+    }
 
     int texture_sampler = 0;
-    m_texture_shader.SetUniform("myTextureSampler", &texture_sampler);
+    m_texture_shader.SetUniform("g_diffuseMapSampler", &texture_sampler);
 
     int depthSampler = 1;
     m_texture_shader.SetUniform("g_shadowMapSampler", &depthSampler);
 
-    for (auto &obj : m_texture_shader_cache)
+    m_texture_shader.SetUniform("eyePosition_worldspace", &cam->GetPosition());
+
+    for (auto &obj : scene->m_objects.GetDataArray())
     {
-        auto mvp = pv * obj->transform;
-        auto depthMVP = m_shadowMapping.GetBiasDepthPV() * obj->transform;
+        auto mvp = pv * obj.transform;
+        auto depthMVP = m_shadowMapping.GetBiasDepthPV() * obj.transform;
         m_texture_shader.SetUniform("MVP", &mvp[0][0]);
         m_texture_shader.SetUniform("g_depthMVP", &depthMVP[0][0]);
-        m_texture_shader.SetUniform("modelToWorld", &obj->transform);
-        m_texture_shader.SetUniform("eyePosition_worldspace", &cam->GetPosition());
+        m_texture_shader.SetUniform("modelToWorld", &obj.transform);
 
-        auto *mesh = m_resourceLoader->GetMesh(obj->meshId);
-        auto *material = m_resourceLoader->GetMaterial(obj->materialId);
-        auto *texture = m_resourceLoader->GetTexture(material->diffuseMap);
+        auto *material = m_resourceLoader->GetMaterial(obj.materialId);
+        m_texture_shader.SetUniform("g_diffuseColour", &material->diffuseSolidColour);
+        m_texture_shader.SetUniform("g_noiseDiffuseMap", &material->noiseDiffuseMap);
+        m_texture_shader.SetUniform("g_noiseBumpMap", &material->noiseBumpMap);
+        m_texture_shader.SetUniform("g_celShaded", &material->celShaded);
+        m_texture_shader.SetUniform("g_specularIntensity", &material->specularIntensity);
+        m_texture_shader.SetUniform("g_specularPower", &material->specularPower);
+        bool usingDiffuseColour = false;
+        if (material->diffuseMap == 0 && !material->noiseDiffuseMap)
+        {
+            usingDiffuseColour = true;
+        }
+        m_texture_shader.SetUniform("g_solidDiffuseColour", &usingDiffuseColour);
+
+        auto *mesh = m_resourceLoader->GetMesh(obj.meshId);
+        m_texture_shader.SetUniform("minAABB", &mesh->minAABB);
 
         glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBufferId);
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
-        glBindBuffer(GL_ARRAY_BUFFER, mesh->uvBufferId);
+        if (mesh->uvBufferId > 0)
+        {
+            glBindBuffer(GL_ARRAY_BUFFER, mesh->uvBufferId);
             glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+        }
 
         glBindBuffer(GL_ARRAY_BUFFER, mesh->normalBufferId);
-            glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
-        glActiveTexture(GL_TEXTURE0);
+        if (material->diffuseMap > 0)
+        {
+            auto *texture = m_resourceLoader->GetTexture(material->diffuseMap);
+            glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, texture->GetGLId());
+        }
 
         glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, m_shadowMapping.GetShadowMapId());
+        glBindTexture(GL_TEXTURE_2D, m_shadowMapping.GetShadowMapId());
             
         auto num_verticies = static_cast<GLsizei>(mesh->numVerticies);
         glDrawArrays(GL_TRIANGLES, 0, num_verticies);

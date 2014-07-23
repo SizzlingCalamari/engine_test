@@ -17,6 +17,7 @@ public:
     void Bind();
     void Unbind();
 
+    bool SetUniform(const std::string& name, const void* data);
     bool SetUniform(const char* name, const void* data);
 
 private:

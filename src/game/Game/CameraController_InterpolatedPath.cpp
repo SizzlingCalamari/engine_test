@@ -16,7 +16,7 @@ void CameraController_InterpolatedPath::Update(uint32 dt)
 
     auto numPoints = m_positions.size();
 
-    uint timePerControlPoint = static_cast<uint>(m_period / numPoints);
+    uint timePerControlPoint = m_timePerControlPoint;
     float interpValue = (float)(m_curTime % timePerControlPoint) / timePerControlPoint;
 
     uint point1 = (m_curTime / timePerControlPoint) % numPoints;
@@ -30,7 +30,7 @@ void CameraController_InterpolatedPath::Update(uint32 dt)
     m_physical_components->EditComponent(m_cameraEnt, &camera);
 
     // update the current time
-    m_curTime = (m_curTime + dt) % m_period;
+    m_curTime = (m_curTime + dt) % (timePerControlPoint*numPoints);
 }
 
 glm::vec3 CameraController_InterpolatedPath::InterpPosition(uint index1, uint index2, const float t)

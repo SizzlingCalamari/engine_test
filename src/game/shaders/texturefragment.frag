@@ -40,6 +40,11 @@ struct MaterialLightProps
     float specularPower;
 };
 
+uniform bool g_solidDiffuseColour;
+uniform bool g_noiseDiffuseMap;
+uniform bool g_noiseBumpMap;
+uniform bool g_celShaded;
+
 vec3 CalcLightInternal(BaseLight light, vec3 lightDirection,
                        vec3 vertexNormal, vec3 vertexToEye,
                        MaterialLightProps materialProps,
@@ -53,8 +58,11 @@ vec3 CalcLightInternal(BaseLight light, vec3 lightDirection,
     float diffuseFactor = dot(vertexNormal, -lightDirection);
     vec3 diffuseColour = vec3(0.0f);
     vec3 specularColour = vec3(0.0f);
-    diffuseFactor = 0.5f * step(0.3f, diffuseFactor)
-                    + 1.0f * step(0.6f, diffuseFactor);
+    if (g_celShaded)
+    {
+        diffuseFactor = 0.5f * step(0.3f, diffuseFactor)
+                        + 1.0f * step(0.8f, diffuseFactor);
+    }
     if (diffuseFactor > 0.0f)
     {
         diffuseColour = light.colour
@@ -63,7 +71,7 @@ vec3 CalcLightInternal(BaseLight light, vec3 lightDirection,
         
         vec3 lightReflect = normalize(reflect(lightDirection, vertexNormal));
         float specularFactor = pow(dot(vertexToEye, lightReflect), materialProps.specularPower);
-        if (specularFactor > 0.0f)
+        if ((specularFactor > 0.0f) && !g_celShaded)
         {
             specularColour = light.colour
                              * materialProps.specularIntensity
@@ -113,36 +121,74 @@ vec3 CalcSpotLight(SpotLight light, vec3 lightToVertex,
     return spotColour;
 }
 
-const int MAX_POINT_LIGHTS = 4;
-const int MAX_SPOT_LIGHTS = 4;
+const int MAX_POINT_LIGHTS = 1;
+const int MAX_SPOT_LIGHTS = 10;
 
 // Interpolated values from the vertex shaders
 in vec2 UV;
 in vec3 normal;
 in vec3 worldPosition;
 in vec4 directionalLightSpacePosition;
+in vec3 position_noiseCoords;
 
 // Ouput data
 out vec4 fragColour;
 
 // Values that stay constant for the whole mesh.
-uniform sampler2D myTextureSampler;
+uniform vec3 eyePosition_worldspace;
+
 uniform sampler2D g_shadowMapSampler;
 uniform DirectionalLight g_directionalLight;
+
 uniform int g_numPointLights;
 uniform PointLight g_pointLights[MAX_POINT_LIGHTS];
+
 uniform int g_numSpotLights;
 uniform SpotLight g_spotLights[MAX_SPOT_LIGHTS];
-uniform vec3 eyePosition_worldspace;
-uniform MaterialLightProps g_materialProps;
+
+uniform sampler2D g_diffuseMapSampler;
+uniform vec3 g_diffuseColour;
+
+uniform float g_specularIntensity;
+uniform float g_specularPower;
 
 float snoise(vec3 v);
 
+float turbulence(vec3 position,
+                 int octaves,
+                 float lacunarity, float gain)
+{
+    float sum = 0.0f;
+    float scale = 1.0f;
+    float totalGain = 1.0f;
+    for (int i = 0; i < octaves; ++i)
+    {
+        sum += totalGain * snoise(position*scale);
+        scale *= lacunarity;
+        totalGain *= gain;
+    }
+    return abs(sum);
+}
+
+vec4 noiseDiffuseMap()
+{
+    float noise = turbulence(position_noiseCoords, 8, 2, 0.5);
+    vec3 colour1 = vec3(0.0f);
+    vec3 colour2 = vec3(1.0f);
+    return vec4(mix(colour1, colour2, noise), 1.0f);
+}
+
 void main()
 {
-    vec3 vertexNormal = vec3(normal.x*(snoise(1.5f*worldPosition) * 0.5f + 1.0f),
-                             normal.y*(snoise(3.2f*worldPosition) * 0.5f + 1.0f),
-                             normal.z*(snoise(2.3f*worldPosition) * 0.5f + 1.0f));
+    vec3 vertexNormal = normal;
+    
+    // mess with the normal if bump mapping is enabled
+    if (g_noiseBumpMap)
+    {
+        vertexNormal = vec3(normal.x*(snoise(1.5f*worldPosition) * 0.5f + 1.0f),
+                            normal.y*(snoise(2.2f*worldPosition) * 0.5f + 1.0f),
+                            normal.z*(snoise(5.3f*worldPosition) * 0.5f + 1.0f));
+    }
     vertexNormal = normalize(vertexNormal);
     vec3 vertexToEye = normalize(eyePosition_worldspace - worldPosition);
 
@@ -153,18 +199,34 @@ void main()
         shadowFactor = 0.0f;
     }
 
-    vec3 totalLight = CalcDirectionalLight(g_directionalLight, vertexNormal, vertexToEye, g_materialProps, shadowFactor);
+    MaterialLightProps materialProps;
+    materialProps.specularIntensity = g_specularIntensity;
+    materialProps.specularPower = g_specularPower;
+
+    vec3 totalLight = CalcDirectionalLight(g_directionalLight, vertexNormal, vertexToEye, materialProps, shadowFactor);
     for (int i = 0; i < g_numPointLights; ++i)
     {
         vec3 lightToVertex = (worldPosition - g_pointLights[i].position);
-        totalLight += CalcPointLight(g_pointLights[i], lightToVertex, vertexNormal, vertexToEye, g_materialProps, 1.0f);
+        totalLight += CalcPointLight(g_pointLights[i], lightToVertex, vertexNormal, vertexToEye, materialProps, 1.0f);
     }
     for (int i = 0; i < g_numSpotLights; ++i)
     {
         vec3 lightToVertex = (worldPosition - g_spotLights[i].base.position);
-        totalLight += CalcSpotLight(g_spotLights[i], lightToVertex, vertexNormal, vertexToEye, g_materialProps, 1.0f);
+        totalLight += CalcSpotLight(g_spotLights[i], lightToVertex, vertexNormal, vertexToEye, materialProps, 1.0f);
     }
 
-    vec4 tex = texture(myTextureSampler, UV);
+    vec4 tex = vec4(1.0);
+    if (g_noiseDiffuseMap)
+    {
+        tex = noiseDiffuseMap();
+    }
+    else if (g_solidDiffuseColour)
+    {
+        tex = vec4(g_diffuseColour, 1.0f);
+    }
+    else
+    {
+        tex = texture(g_diffuseMapSampler, UV);
+    }
     fragColour = vec4(tex.xyz * totalLight, tex.a);
 }
