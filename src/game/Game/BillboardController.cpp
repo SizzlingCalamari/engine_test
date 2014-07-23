@@ -34,18 +34,23 @@ void BillboardController::Update()
 bool BillboardController::IsBillboardActive(const glm::vec3& cameraForward,
                                             const glm::vec3& billboardInitialForward)
 {
-    return (glm::dot(cameraForward, billboardInitialForward) < 0);
+    return true;//(glm::dot(cameraForward, billboardInitialForward) < 0);
 }
 
 void BillboardController::OrientBillboard(const PhysicalComponent* camera,
                                           const CylindricalBillboard* constraints,
                                           PhysicalComponent* billboard)
 {
-    auto forward = math::limit_angle(constraints->initialDirection,
-                                     camera->position - billboard->position,
-                                     constraints->maxAngleFromForward);
+    auto forward = (camera->position - billboard->position);
+    if (constraints->maxAngleFromForward > 0.0f)
+    {
+        forward = math::limit_angle(constraints->initialDirection,
+                                    camera->position - billboard->position,
+                                    constraints->maxAngleFromForward);
+    }
     forward = glm::normalize(forward);
 
+    // TODO: guard against invalid cross product
     auto right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), forward));
     auto up = glm::normalize(glm::cross(forward, right));
 
