@@ -165,6 +165,6 @@ void main()
         totalLight += CalcSpotLight(g_spotLights[i], lightToVertex, vertexNormal, vertexToEye, g_materialProps, 1.0f);
     }
 
-    vec3 colour = texture(myTextureSampler, UV).xyz * totalLight;
-    fragColour = vec4(colour, 1.0f);
+    vec4 tex = texture(myTextureSampler, UV);
+    fragColour = vec4(tex.xyz * totalLight, tex.a);
 }
