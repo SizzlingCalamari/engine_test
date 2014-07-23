@@ -11,10 +11,15 @@
 //
 struct ButtonCombination
 {
+    ButtonCombination():
+        m_allbuttons(0)
+    {
+    }
+
     static const uint MAX_BUTTON_COMBINATION = 4;
     union
     {
-        uint64 m_allbuttons = 0;
+        uint64 m_allbuttons;
         uint16 m_buttons[MAX_BUTTON_COMBINATION];
     };
 

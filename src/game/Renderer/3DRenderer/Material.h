@@ -5,12 +5,23 @@
 
 struct Material
 {
-    uint diffuseMap = 0;
-    glm::vec3 diffuseSolidColour = glm::vec3();
-    float specularIntensity = 1.0f;
-    float specularPower = 32.0f;
+    Material():
+        diffuseMap(0),
+        diffuseSolidColour(1.0f),
+        specularIntensity(1.0f),
+        specularPower(32.0f),
+        noiseDiffuseMap(false),
+        noiseBumpMap(false),
+        celShaded(false)
+    {
+    }
+
+    uint diffuseMap;
+    glm::vec3 diffuseSolidColour;;
+    float specularIntensity;
+    float specularPower;
     
-    bool noiseDiffuseMap = false;
-    bool noiseBumpMap = false;
-    bool celShaded = false;
+    bool noiseDiffuseMap;
+    bool noiseBumpMap;
+    bool celShaded;
 };

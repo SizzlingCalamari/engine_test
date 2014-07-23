@@ -7,6 +7,12 @@
 
 struct SceneNode
 {
+    SceneNode():
+        meshId(0),
+        materialId(0)
+    {
+    }
+
     glm::mat4 transform;
     uint meshId;
     uint materialId;

@@ -6,9 +6,15 @@
 
 struct DynamicsComponent
 {
-    float mass = 0.0f;
+    DynamicsComponent():
+        mass(0.0f),
+        shape(nullptr)
+    {
+    }
+
+    float mass;
     glm::vec3 inertia;
-    btCollisionShape *shape = nullptr;
+    btCollisionShape *shape;
 
     void FreeComponent()
     {

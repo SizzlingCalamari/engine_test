@@ -7,6 +7,13 @@
 class Texture
 {
 public:
+    Texture():
+        m_texture_2d(0),
+        m_width(0),
+        m_height(0)
+    {
+    }
+
     void LoadTexture2D(const uint8* pixels, std::ptrdiff_t stride, uint width, uint height);
 
     void FreeTexture();
@@ -18,9 +25,9 @@ public:
     uint GetGLId() const;
 
 private:
-    uint m_texture_2d = 0;
-    uint m_width = 0;
-    uint m_height = 0;
+    uint m_texture_2d;
+    uint m_width;
+    uint m_height;
 };
 
 inline uint Texture::GetWidth() const
@@ -41,6 +48,11 @@ inline uint Texture::GetGLId() const
 class Texture3D
 {
 public:
+    Texture3D():
+        m_texture(0)
+    {
+    }
+
     void LoadTexture3D(const uint8* texels,
                        GLenum format, GLenum type,
                        uint width, uint height, uint depth);
@@ -58,6 +70,6 @@ public:
     }
     
 private:
-    uint m_texture = 0;
-    glm::uvec3 m_dimensions = glm::uvec3();
+    uint m_texture;
+    glm::uvec3 m_dimensions;
 };
