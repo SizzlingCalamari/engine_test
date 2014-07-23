@@ -35,6 +35,9 @@ void Renderer3D::Init(const renderer3d_config& config)
     GLContext::SetDebugMessageCallback(&GLErrorCallback);
     GLContext::EnableDepthTest(GL_LESS);
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     m_fullview.SetView(config.x, config.y, config.width, config.height);
     glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 

@@ -4,7 +4,7 @@
 in vec3 position_noiseCoords;
 
 // Ouput data
-out vec3 color;
+out vec4 color;
 
 float snoise(vec3 v);
 
@@ -29,5 +29,5 @@ void main()
     float noise = turbulence(position_noiseCoords, 8, 2, 0.5);
     vec3 colour1 = vec3(0.0f);
     vec3 colour2 = vec3(1.0f);
-    color = mix(colour1, colour2, noise);
+    color = vec4(mix(colour1, colour2, noise), 1.0f);
 }

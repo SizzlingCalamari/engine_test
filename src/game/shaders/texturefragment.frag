@@ -40,7 +40,7 @@ struct MaterialLightProps
     float specularPower;
 };
 
-vec4 CalcLightInternal(BaseLight light, vec3 lightDirection,
+vec3 CalcLightInternal(BaseLight light, vec3 lightDirection,
                        vec3 vertexNormal, vec3 vertexToEye,
                        MaterialLightProps materialProps,
                        float shadowFactor)
@@ -48,16 +48,16 @@ vec4 CalcLightInternal(BaseLight light, vec3 lightDirection,
     lightDirection = normalize(lightDirection);
     vertexToEye = normalize(vertexToEye);
 
-    vec4 ambientColour = vec4(light.colour, 1.0f) * light.ambientIntensity;
+    vec3 ambientColour = light.colour * light.ambientIntensity;
 
     float diffuseFactor = dot(vertexNormal, -lightDirection);
-    vec4 diffuseColour = vec4(0.0f);
-    vec4 specularColour = vec4(0.0f);
+    vec3 diffuseColour = vec3(0.0f);
+    vec3 specularColour = vec3(0.0f);
     diffuseFactor = 0.5f * step(0.3f, diffuseFactor)
                     + 1.0f * step(0.6f, diffuseFactor);
     if (diffuseFactor > 0.0f)
     {
-        diffuseColour = vec4(light.colour, 1.0f)
+        diffuseColour = light.colour
                         * light.diffuseIntensity
                         * diffuseFactor;
         
@@ -65,7 +65,7 @@ vec4 CalcLightInternal(BaseLight light, vec3 lightDirection,
         float specularFactor = pow(dot(vertexToEye, lightReflect), materialProps.specularPower);
         if (specularFactor > 0.0f)
         {
-            specularColour = vec4(light.colour, 1.0f)
+            specularColour = light.colour
                              * materialProps.specularIntensity
                              * specularFactor;
         }
@@ -74,7 +74,7 @@ vec4 CalcLightInternal(BaseLight light, vec3 lightDirection,
     return (ambientColour + shadowFactor*(diffuseColour + specularColour));
 }
 
-vec4 CalcDirectionalLight(DirectionalLight light,
+vec3 CalcDirectionalLight(DirectionalLight light,
                           vec3 vertexNormal, vec3 vertexToEye,
                           MaterialLightProps materialProps,
                           float shadowFactor)
@@ -83,12 +83,12 @@ vec4 CalcDirectionalLight(DirectionalLight light,
                              vertexNormal, vertexToEye, materialProps, shadowFactor);
 }
 
-vec4 CalcPointLight(PointLight light, vec3 lightToVertex,
+vec3 CalcPointLight(PointLight light, vec3 lightToVertex,
                     vec3 vertexNormal, vec3 vertexToEye,
                     MaterialLightProps materialProps,
                     float shadowFactor)
 {
-    vec4 colour = CalcLightInternal(light.base, lightToVertex,
+    vec3 colour = CalcLightInternal(light.base, lightToVertex,
                                     vertexNormal, vertexToEye, materialProps, shadowFactor);
     float distToVertex = length(lightToVertex);
     float attenuation = light.attenuation.constant
@@ -97,16 +97,16 @@ vec4 CalcPointLight(PointLight light, vec3 lightToVertex,
     return colour / attenuation;
 }
 
-vec4 CalcSpotLight(SpotLight light, vec3 lightToVertex,
+vec3 CalcSpotLight(SpotLight light, vec3 lightToVertex,
                    vec3 vertexNormal, vec3 vertexToEye,
                    MaterialLightProps materialProps,
                    float shadowFactor)
 {
     float spotFactor = dot(normalize(lightToVertex), normalize(light.coneDirection));
-    vec4 spotColour = vec4(0.0f);
+    vec3 spotColour = vec3(0.0f);
     if (spotFactor > light.cosineConeAngle)
     {
-        vec4 colour = CalcPointLight(light.base, lightToVertex,
+        vec3 colour = CalcPointLight(light.base, lightToVertex,
                                      vertexNormal, vertexToEye, materialProps, shadowFactor);
         spotColour = colour * (1.0f - (1.0f - spotFactor) * 1.0f / (1.0f - light.cosineConeAngle));
     }
@@ -153,7 +153,7 @@ void main()
         shadowFactor = 0.0f;
     }
 
-    vec4 totalLight = CalcDirectionalLight(g_directionalLight, vertexNormal, vertexToEye, g_materialProps, shadowFactor);
+    vec3 totalLight = CalcDirectionalLight(g_directionalLight, vertexNormal, vertexToEye, g_materialProps, shadowFactor);
     for (int i = 0; i < g_numPointLights; ++i)
     {
         vec3 lightToVertex = (worldPosition - g_pointLights[i].position);
@@ -165,5 +165,6 @@ void main()
         totalLight += CalcSpotLight(g_spotLights[i], lightToVertex, vertexNormal, vertexToEye, g_materialProps, 1.0f);
     }
 
-    fragColour = texture(myTextureSampler, UV) * totalLight;
+    vec3 colour = texture(myTextureSampler, UV).xyz * totalLight;
+    fragColour = vec4(colour, 1.0f);
 }
