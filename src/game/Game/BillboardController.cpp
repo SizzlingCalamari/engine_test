@@ -41,14 +41,14 @@ void BillboardController::OrientBillboard(const PhysicalComponent* camera,
                                           const CylindricalBillboard* constraints,
                                           PhysicalComponent* billboard)
 {
-    auto forward = (camera->position - billboard->position);
+    auto forward = glm::normalize(camera->position - billboard->position);
     if (constraints->maxAngleFromForward > 0.0f)
     {
         forward = math::limit_angle(constraints->initialDirection,
-                                    camera->position - billboard->position,
+                                    forward,
                                     constraints->maxAngleFromForward);
+        forward = glm::normalize(forward);
     }
-    forward = glm::normalize(forward);
 
     // TODO: guard against invalid cross product
     auto right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), forward));

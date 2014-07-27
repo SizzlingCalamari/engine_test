@@ -9,7 +9,6 @@
 
 namespace math
 {
-    // Input vectors are assumed to be normalized.
     // Performs an slerp on two vectors v1 and v2 with parameter t[0,1]
     template <typename T, glm::precision P>
     inline glm::detail::tvec3<T, P> slerp(glm::detail::tvec3<T, P> const & v1,
@@ -40,7 +39,8 @@ namespace math
         }
 
         T t = angleLimit / angle;
-        return math::slerp(nv1, nv2, angle, t);
+        auto c = v2 - v1;
+        return v1 + c*t;
     }
 
     template <typename T, glm::precision P>
