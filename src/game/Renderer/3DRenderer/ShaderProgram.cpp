@@ -78,7 +78,7 @@ bool ShaderProgram::SetUniform(const char* name, const void* data)
             glUniform1i(info.index, value);
         }
         break;
-    case GL_FLOAT_VEC3_ARB:
+    case GL_FLOAT_VEC3:
         {
             auto float3 = static_cast<const float*>(data);
             glUniform3f(info.index, *float3, *(float3 + 1), *(float3 + 2));
@@ -96,7 +96,7 @@ bool ShaderProgram::SetUniform(const char* name, const void* data)
             glUniform1i(info.index, value);
         }
         break;
-    case GL_BOOL_ARB:
+    case GL_BOOL:
         {
             bool value = *static_cast<const bool*>(data);
             glUniform1i(info.index, value);
