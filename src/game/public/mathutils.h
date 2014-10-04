@@ -81,19 +81,19 @@ namespace math
 
     template <typename T, glm::precision P>
     inline glm::detail::tquat<T, P> rotate_local(glm::detail::tquat<T, P> const & q,
-                                                        T angle_degrees,
-                                                        glm::detail::tvec3<T, P> const & v)
+                                                 T angle,
+                                                 glm::detail::tvec3<T, P> const & v)
     {
-        auto angle_axis = glm::normalize(glm::angleAxis(angle_degrees, v));
+        auto angle_axis = glm::normalize(glm::angleAxis(angle, v));
         return glm::normalize(q * angle_axis);
     }
 
     template <typename T, glm::precision P>
     inline glm::detail::tquat<T, P> rotate_world(glm::detail::tquat<T, P> const & q,
-                                                        T angle_degrees,
-                                                        glm::detail::tvec3<T, P> const & v)
+                                                 T angle,
+                                                 glm::detail::tvec3<T, P> const & v)
     {
-        auto angle_axis = glm::normalize(glm::angleAxis(angle_degrees, v));
+        auto angle_axis = glm::normalize(glm::angleAxis(angle, v));
         return glm::normalize(angle_axis * q);
     }
 
@@ -105,9 +105,9 @@ namespace math
     // V1 and V2 (see Quaternion::Align), and q_twist is a rotation about V1.
     template <typename T, glm::precision P>
     inline void decompose_twist_swing(glm::detail::tquat<T, P> const & q,
-                                             glm::detail::tvec3<T, P> const & twist_axis,
-                                             glm::detail::tquat<T, P> & swing,
-                                             glm::detail::tquat<T, P> & twist)
+                                      glm::detail::tvec3<T, P> const & twist_axis,
+                                      glm::detail::tquat<T, P> & swing,
+                                      glm::detail::tquat<T, P> & twist)
     {
         auto rotated = glm::rotate(q, twist_axis);
         swing = glm::normalize(glm::rotation(twist_axis, rotated));
@@ -122,9 +122,9 @@ namespace math
     // V1 and V2 (see Quaternion::Align), and q_twist is a rotation about V1.
     template <typename T, glm::precision P>
     inline void decompose_swing_twist(glm::detail::tquat<T, P> const & q,
-                                             glm::detail::tvec3<T, P> const & twist_axis,
-                                             glm::detail::tquat<T, P> & swing,
-                                             glm::detail::tquat<T, P> & twist)
+                                      glm::detail::tvec3<T, P> const & twist_axis,
+                                      glm::detail::tquat<T, P> & swing,
+                                      glm::detail::tquat<T, P> & twist)
     {
         auto rotated = glm::rotate(q, twist_axis);
         swing = glm::normalize(glm::rotation(twist_axis, rotated));
@@ -134,7 +134,7 @@ namespace math
     // Based on code from David Eberly's "Constrained Quaternions Using Euler Angles"
     template <typename T, glm::precision P>
     inline glm::detail::tquat<T, P> closest_x(glm::detail::tquat<T, P> const & q,
-                                                     T min_angle, T max_angle)
+                                              T min_angle, T max_angle)
     {
         min_angle = min_angle * T(0.5);
         max_angle = max_angle * T(0.5);
@@ -193,13 +193,13 @@ namespace math
     
     template <typename T, glm::precision P>
     inline glm::detail::tquat<T, P> limit_rotation_xaxis(glm::detail::tquat<T, P> const & q,
-                                                                T max_degrees)
+                                                         T maxAngle)
     {
         const auto x_axis = glm::vec3(1.0f, 0.0f, 0.0f);
         glm::detail::tquat<T, P> swing;
         glm::detail::tquat<T, P> twist;
         math::decompose_swing_twist(q, x_axis, swing, twist);
-        twist = math::closest_x(twist, -max_degrees, max_degrees);
+        twist = math::closest_x(twist, -maxAngle, maxAngle);
         return swing * twist;
     }
 }
