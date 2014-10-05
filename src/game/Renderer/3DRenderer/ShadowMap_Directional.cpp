@@ -121,11 +121,11 @@ void ShadowMapDirectional::RenderShadowMap(const glm::vec3& lightDirection,
         auto mvp = pv * obj.transform;
         m_shadowMapShader.SetUniform("g_depthMVP", &mvp[0][0]);
 
-        GLsizei numVerticies = static_cast<GLsizei>(mesh->numVerticies);
+        GLsizei numVertices = static_cast<GLsizei>(mesh->numVertices);
 
         glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBufferId);
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-            glDrawArrays(GL_TRIANGLES, 0, numVerticies);
+            glDrawArrays(GL_TRIANGLES, 0, numVertices);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 

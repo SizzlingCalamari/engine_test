@@ -60,7 +60,7 @@ inline void UpdateAABB(const glm::vec3& vertex,
 }
 
 void ParseOBJ(const char *filename,
-              std::vector<glm::vec3>& verticies,
+              std::vector<glm::vec3>& vertices,
               std::vector<glm::vec2>& uvcoords,
               std::vector<glm::vec3>& normals,
               glm::vec3& minAABB,
@@ -69,7 +69,7 @@ void ParseOBJ(const char *filename,
     minAABB = glm::vec3();
     maxAABB = glm::vec3();
 
-    std::deque<glm::vec3> verticies_temp;
+    std::deque<glm::vec3> vertices_temp;
     std::deque<glm::vec2> uvs_temp;
     std::deque<glm::vec3> normals_temp;
 
@@ -98,7 +98,7 @@ void ParseOBJ(const char *filename,
             glm::vec3 vertex;
             fscanf(file, "%f %f %f", &vertex.x, &vertex.y, &vertex.z);
             UpdateAABB(vertex, minAABB, maxAABB);
-            verticies_temp.emplace_back(vertex);
+            vertices_temp.emplace_back(vertex);
         }
         else if (firstOnLine == 'v' && secondOnLine == 't')
         {
@@ -158,10 +158,10 @@ void ParseOBJ(const char *filename,
 
             if (verts[0] != 0)
             {
-                verticies.reserve(verticies_temp.size());
-                verticies.emplace_back(verticies_temp[verts[0] - 1]);
-                verticies.emplace_back(verticies_temp[verts[1] - 1]);
-                verticies.emplace_back(verticies_temp[verts[2] - 1]);
+                vertices.reserve(vertices_temp.size());
+                vertices.emplace_back(vertices_temp[verts[0] - 1]);
+                vertices.emplace_back(vertices_temp[verts[1] - 1]);
+                vertices.emplace_back(vertices_temp[verts[2] - 1]);
             }
             if (norms[0] != 0)
             {
@@ -186,19 +186,19 @@ void ParseOBJ(const char *filename,
 Mesh LoadMeshFromOBJ(const char *filename)
 {
     Mesh mesh;
-    ParseOBJ(filename, mesh.verticies, mesh.uvcoords, mesh.normals, mesh.minAABB, mesh.maxAABB);
-    mesh.numVerticies = mesh.verticies.size();
-    if (mesh.numVerticies > 0)
+    ParseOBJ(filename, mesh.vertices, mesh.uvcoords, mesh.normals, mesh.minAABB, mesh.maxAABB);
+    mesh.numVertices = mesh.vertices.size();
+    if (mesh.numVertices > 0)
     {
-        mesh.vertexBufferId = LoadVerticies(mesh.verticies.data(), sizeof(glm::vec3), mesh.numVerticies);
+        mesh.vertexBufferId = LoadVertices(mesh.vertices.data(), sizeof(glm::vec3), mesh.numVertices);
     }
     if (mesh.uvcoords.size() > 0)
     {
-        mesh.uvBufferId = LoadVerticies(mesh.uvcoords.data(), sizeof(glm::vec2), mesh.uvcoords.size());
+        mesh.uvBufferId = LoadVertices(mesh.uvcoords.data(), sizeof(glm::vec2), mesh.uvcoords.size());
     }
     if (mesh.normals.size() > 0)
     {
-        mesh.normalBufferId = LoadVerticies(mesh.normals.data(), sizeof(glm::vec3), mesh.normals.size());
+        mesh.normalBufferId = LoadVertices(mesh.normals.data(), sizeof(glm::vec3), mesh.normals.size());
     }
     
     return mesh;

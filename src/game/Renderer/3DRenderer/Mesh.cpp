@@ -2,13 +2,13 @@
 #include "Mesh.h"
 #include "GL/glew.h"
 
-uint LoadVerticies(const void* verticies, ptrdiff_t stride, size_t num_verticies)
+uint LoadVertices(const void* vertices, ptrdiff_t stride, size_t num_vertices)
 {
     uint bufferId = 0;
     glGenBuffers(1, &bufferId);
     assert(bufferId > 0);
     glBindBuffer(GL_ARRAY_BUFFER, bufferId);
-    glBufferData(GL_ARRAY_BUFFER, num_verticies*stride, verticies, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, num_vertices*stride, vertices, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     return bufferId;
 }
@@ -35,5 +35,5 @@ void FreeMesh(Mesh* mesh)
     mesh->vertexBufferId = 0;
     mesh->normalBufferId = 0;
     mesh->uvBufferId = 0;
-    mesh->numVerticies = 0;
+    mesh->numVertices = 0;
 }

@@ -241,8 +241,8 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, m_shadowMapping.GetShadowMapId());
             
-        auto num_verticies = static_cast<GLsizei>(mesh->numVerticies);
-        glDrawArrays(GL_TRIANGLES, 0, num_verticies);
+        auto num_vertices = static_cast<GLsizei>(mesh->numVertices);
+        glDrawArrays(GL_TRIANGLES, 0, num_vertices);
 
         glBindTexture(GL_TEXTURE_2D, 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);

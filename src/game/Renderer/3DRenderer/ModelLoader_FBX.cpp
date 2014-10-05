@@ -60,7 +60,7 @@ bool LoadFbxScene(FbxManager *fbxManager, FbxScene *fbxScene, const char *filena
 
 vector<glm::vec3> ParseFBX(const char *filename)
 {
-    vector<glm::vec3> verticies;
+    vector<glm::vec3> vertices;
 
     FbxManager *fbxManager = nullptr;
     FbxScene *fbxScene = nullptr;
@@ -85,31 +85,31 @@ vector<glm::vec3> ParseFBX(const char *filename)
         }
 
         auto *nodeMesh = static_cast<FbxMesh*>(nodeAttribute);
-        FbxVector4 *nodeVerticies = nodeMesh->GetControlPoints();
+        FbxVector4 *nodeVertices = nodeMesh->GetControlPoints();
         for (int j = 0; j < nodeMesh->GetPolygonCount(); ++j)
         {
-            int numVerticies = nodeMesh->GetPolygonSize(j);
-            assert(numVerticies == 3);
+            int numVertices = nodeMesh->GetPolygonSize(j);
+            assert(numVertices == 3);
 
-            for (int k = 0; k < numVerticies; ++k)
+            for (int k = 0; k < numVertices; ++k)
             {
                 int controlPointIndex = nodeMesh->GetPolygonVertex(j, k);
 
-                verticies.emplace_back(nodeVerticies[controlPointIndex].mData[0],
-                                       nodeVerticies[controlPointIndex].mData[1],
-                                       nodeVerticies[controlPointIndex].mData[2]);
+                vertices.emplace_back(nodeVertices[controlPointIndex].mData[0],
+                                       nodeVertices[controlPointIndex].mData[1],
+                                       nodeVertices[controlPointIndex].mData[2]);
             }
         }
     }
     DestroyFbxObjects(fbxManager);
-    return verticies;
+    return vertices;
 }
 
 Mesh LoadMeshFromFBX(const char *filename)
 {
     Mesh mesh;
-    mesh.verticies = ParseFBX(filename);
-    mesh.numVerticies = mesh.verticies.size();
-    mesh.vertexBufferId = LoadVerticies(mesh.verticies.data(), sizeof(glm::vec3), mesh.numVerticies);
+    mesh.vertices = ParseFBX(filename);
+    mesh.numVertices = mesh.vertices.size();
+    mesh.vertexBufferId = LoadVertices(mesh.vertices.data(), sizeof(glm::vec3), mesh.numVertices);
     return mesh;
 }
