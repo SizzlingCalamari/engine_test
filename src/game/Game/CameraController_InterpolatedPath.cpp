@@ -44,5 +44,5 @@ glm::vec3 CameraController_InterpolatedPath::InterpPosition(uint index1, uint in
 
 glm::quat CameraController_InterpolatedPath::InterpOrientation(uint index1, uint index2, const float t)
 {
-    return glm::slerp(m_orientations[index1], m_orientations[index2], t);
+    return glm::normalize(glm::slerp(m_orientations[index1], m_orientations[index2], t));
 }
