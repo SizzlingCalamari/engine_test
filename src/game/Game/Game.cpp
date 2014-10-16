@@ -37,6 +37,8 @@ Game::Game():
     m_billboardTextMaterials(),
     m_billboardTextEnts(),
     m_inputIdZ(0),
+    m_inputIdP(0),
+    m_inputIdX(0),
     m_activeCameraType(Camera_InterpolatedPath)
 {
 }
@@ -51,10 +53,10 @@ void Game::Initialize(const EngineContext& engine)
         m_inputIdZ = keyboardContext.AddMapping(temp, std::bind(&Game::InputEventCallback, this, _1));
         temp[0] = SDL_SCANCODE_P;
         m_inputIdP = keyboardContext.AddMapping(temp, std::bind(&Game::InputEventCallback, this, _1));
+        temp[0] = SDL_SCANCODE_X;
+        m_inputIdX = keyboardContext.AddMapping(temp, std::bind(&Game::InputEventCallback, this, _1));
     }
-    {
 
-    }
     engine.input->LoadContext(std::move(keyboardContext));
 
     m_renderer = engine.renderer;
@@ -75,14 +77,12 @@ void Game::Initialize(const EngineContext& engine)
 
     m_thirdperson_controller.SetCameraEnt(m_camera);
     m_thirdperson_controller.SetTargetEnt(m_teapotMarbleEnt);
-    m_thirdperson_controller.SetRadiusFromTarget(75.0f);
+    m_thirdperson_controller.SetRadiusFromTarget(200.0f);
     
     m_cameraPathController.SetCameraEnt(m_camera);
     m_cameraPathController.SetTimePerControlPoint(5000);
     m_cameraPathController.SetShouldLoop(false);
     m_cameraPathController.SetStartTime(0);
-
-    float mid = 75.0f * glm::root_two<float>();
 
     m_cameraPathController.AddControlPoint(glm::vec3{ -700.0f, 600.0f, 0.0f }, glm::quat(glm::vec3{ 0.0f, glm::pi<float>(), 0.0f }));
 
@@ -186,6 +186,10 @@ void Game::InputEventCallback(const KeyboardEventInfo& info)
         auto forward = math::forward(physical->orientation);
         std::cout << forward.x << " " << forward.y << " " << forward.z << std::endl;
     }
+    else if (info.mappingId == m_inputIdX && info.pressed)
+    {
+        m_activeCameraType = Camera_ThirdPerson;
+    }
 }
 
 void Game::CameraSimulation(uint32 dt)
@@ -203,7 +207,15 @@ void Game::CameraSimulation(uint32 dt)
         }
         break;
     case Camera_ThirdPerson:
-        m_thirdperson_controller.Update(dt);
+        {
+            const uint target = m_thirdperson_controller.GetTargetEnt();
+            auto physical = physical_table->GetComponent(target);
+            if (HandleCameraMovement(&physical, dt))
+            {
+                physical_table->EditComponent(target, &physical);
+            }
+            m_thirdperson_controller.Update(dt);
+        }
         break;
     case Camera_InterpolatedPath:
         m_cameraPathController.Update(dt);
@@ -834,7 +846,7 @@ void Game::LoadEnts()
     m_paintingEnts[3] = m_entity_system.CreateEntity();
     {
         PhysicalComponent physical;
-        physical.position = glm::vec3(65.0f, 425.0f, 550.0f);
+        physical.position = glm::vec3(70.0f, 425.0f, 550.0f);
         physical.orientation = glm::quat(glm::vec3{ 0.0f, glm::half_pi<float>(), 0.0f });
         m_entity_system.AttachComponent(m_paintingEnts[3], &physical);
 

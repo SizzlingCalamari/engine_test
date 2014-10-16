@@ -99,6 +99,7 @@ private:
 
     uint m_inputIdZ;
     uint m_inputIdP;
+    uint m_inputIdX;
 
     enum CameraType
     {

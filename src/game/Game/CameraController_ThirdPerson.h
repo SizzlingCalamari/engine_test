@@ -22,6 +22,11 @@ public:
         m_target_ent = ent;
     }
 
+    uint GetTargetEnt() const
+    {
+        return m_target_ent;
+    }
+
     void SetRadiusFromTarget(float radius)
     {
         m_radius_from_target = radius;
