@@ -35,7 +35,7 @@ void ShaderProgram::Bind()
     glUseProgram(m_id);
     for (GLint i = 0; i < m_num_attributes; ++i)
     {
-        glEnableVertexAttribArray(i);
+        //glEnableVertexAttribArray(i);
     }
 }
 

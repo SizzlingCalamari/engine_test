@@ -221,15 +221,18 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
 
         glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBufferId);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+        glEnableVertexAttribArray(0);
 
         if (mesh->uvBufferId > 0)
         {
             glBindBuffer(GL_ARRAY_BUFFER, mesh->uvBufferId);
             glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+            glEnableVertexAttribArray(1);
         }
 
         glBindBuffer(GL_ARRAY_BUFFER, mesh->normalBufferId);
         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+        glEnableVertexAttribArray(2);
 
         if (material->diffuseMap > 0)
         {
