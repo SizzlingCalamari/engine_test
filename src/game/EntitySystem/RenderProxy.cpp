@@ -66,7 +66,7 @@ void RenderProxy::RenderScene(const Viewport* viewport, uint camera)
     m_renderer->RenderScene(viewport, &m_camera, &m_scene);
 }
 
-uint RenderProxy::CreateRenderObject(RenderObject& obj)
+uint RenderProxy::CreateRenderObject(const RenderObject& obj)
 {
     uint id = 0xffff;
     switch (obj.type)

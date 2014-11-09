@@ -48,7 +48,7 @@ public:
 
     void Update();
 
-    uint CreateRenderObject(RenderObject& obj);
+    uint CreateRenderObject(const RenderObject& obj);
 
 private:
     void SetActiveCamera(uint camera);
