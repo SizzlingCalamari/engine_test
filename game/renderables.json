@@ -1,0 +1,152 @@
+{
+    "models": [
+        {
+            "name": "Room",
+            "meshFile": "models/room.obj"
+        },
+        {
+            "name": "Floor",
+            "meshFile": "models/floor.obj"
+        },
+        {
+            "name": "Teapot",
+            "meshFile": "models/teapot/teapot.obj"
+        },
+        {
+            "name": "Pedestal",
+            "meshFile": "models/pedestal.obj"
+        },
+        {
+            "name": "Billboard",
+            "meshFile": "models/billboard.obj"
+        },
+        {
+            "name": "Painting173",
+            "meshFile": "models/painting173.obj"
+        },
+        {
+            "name": "Painting100",
+            "meshFile": "models/painting100.obj"
+        },
+        {
+            "name": "Painting133",
+            "meshFile": "models/painting133.obj"
+        }
+    ],
+    "materials": [
+        {
+            "name": "WoodFloor",
+            "diffuseMapFile": "textures/hardwood.jpg",
+            "specularIntensity": 1.0,
+            "specularPower": 32.0
+        },
+        {
+            "name": "JesusBond",
+            "diffuseMapFile": "textures/jesusbond_feelingfresh.jpg",
+            "specularIntensity": 1.0,
+            "specularPower": 32.0
+        },
+        {
+            "name": "TeapotDefault",
+            "diffuseMapFile": "models/teapot/default.png",
+            "specularIntensity": 1.0,
+            "specularPower": 32.0
+        },
+        {
+            "name": "TeapotMarble",
+            "specularIntensity": 1.0,
+            "specularPower": 32.0,
+            "noiseDiffuseMap": true
+        },
+        {
+            "name": "TeapotBump",
+            "diffuseSolidColour": "0.5 0.5 0.5",
+            "specularIntensity": 1.0,
+            "specularPower": 32.0,
+            "noiseBumpMap": true
+        },
+        {
+            "name": "TeapotCel",
+            "diffuseSolidColour": "0.1 0.7 0.1",
+            "specularIntensity": 1.0,
+            "specularPower": 32.0,
+            "celShaded": true
+        },
+        {
+            "name": "WallBump",
+            "diffuseSolidColour": "0.5 0.5 0.5",
+            "specularIntensity": 1.0,
+            "specularPower": 32.0,
+            "noiseBumpMap": true
+        },
+        {
+            "name": "PedestalBump",
+            "diffuseSolidColour": "0.6 0.6 0.6",
+            "specularIntensity": 1.0,
+            "specularPower": 32.0,
+            "noiseBumpMap": true
+        },
+        {
+            "name": "BumpMapText",
+            "diffuseMapFile": "textures/bumpmapping.png",
+            "specularIntensity": 1.0,
+            "specularPower": 32.0
+        },
+        {
+            "name": "FractalNoiseText",
+            "diffuseMapFile": "textures/fractalnoise.png",
+            "specularIntensity": 1.0,
+            "specularPower": 32.0
+        },
+        {
+            "name": "CelShadingText",
+            "diffuseMapFile": "textures/celshading.png",
+            "specularIntensity": 1.0,
+            "specularPower": 32.0
+        },
+        {
+            "name": "Gladimir1998",
+            "diffuseMapFile": "textures/mos98-02.png",
+            "specularIntensity": 1.0,
+            "specularPower": 32.0
+        },
+        {
+            "name": "UtahTeapot",
+            "diffuseMapFile": "textures/utah_teapot.jpg",
+            "specularIntensity": 1.0,
+            "specularPower": 32.0
+        },
+        {
+            "name": "BobOmb",
+            "diffuseMapFile": "textures/bob.jpg",
+            "specularIntensity": 1.0,
+            "specularPower": 32.0
+        },
+        {
+            "name": "BertStare",
+            "diffuseMapFile": "textures/bertstare.jpg",
+            "specularIntensity": 1.0,
+            "specularPower": 32.0
+        }
+    ],
+    "lights": [
+        {
+            "name": "MoonLight",
+            "type": "directional",
+            "colour": "1.0 1.0 1.0",
+            "ambientIntensity": 0.03,
+            "diffuseIntensity": 0.3
+        },
+        {
+            "name": "SpotLight",
+            "type": "spot",
+            "colour": "1.0 1.0 1.0",
+            "ambientIntensity": 0.1,
+            "diffuseIntensity": 0.6,
+            "attenuation.constant": 1.0,
+            "attenuation.linear": 0.0,
+            "attenuation.exp": 0.0,
+            "cosineConeAngle": 0.86
+        }
+    ]
+}
