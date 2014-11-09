@@ -7,18 +7,28 @@
 
 #include "mathutils.h"
 
+static inline bool EpsilonNotEqual(const glm::quat& a, const glm::quat& b)
+{
+    return glm::abs(glm::dot(a, b)) < 0.99999f;
+}
+
 void CameraController_ThirdPerson::Update(uint32 dt)
 {
     assert(m_physical_components);
-    auto physical_camera = m_physical_components->GetComponent(m_camera_ent);
-    auto *physical_target = m_physical_components->PeekComponent(m_target_ent);
+    const auto cameraEnt = m_camera_ent;
+    auto physical_camera = m_physical_components->GetComponent(cameraEnt);
+    const auto *physical_target = m_physical_components->PeekComponent(m_target_ent);
 
-    // linear interpolation between positions
-    auto new_orientation = glm::slerp(physical_camera.orientation, physical_target->orientation, 0.05f);
-    auto forward = math::forward(new_orientation);
+    const auto targetOrientation = physical_target->orientation;
+    if (EpsilonNotEqual(physical_camera.orientation, targetOrientation))
+    {
+        // linear interpolation between positions
+        physical_camera.orientation = glm::slerp(physical_camera.orientation, targetOrientation, 0.05f);
+    }
+
+    const auto forward = math::forward(physical_camera.orientation);
     physical_camera.position = physical_target->position - (forward * m_radius_from_target);
-    physical_camera.orientation = new_orientation;
-    
+
     // Set the updated component.
-    m_physical_components->EditComponent(m_camera_ent, &physical_camera);
+    m_physical_components->EditComponent(cameraEnt, &physical_camera);
 }
