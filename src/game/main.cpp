@@ -3,38 +3,6 @@
 #include "Application/Application.h"
 
 #include "Engine.h"
-
-/*void callback(const KeyboardEventInfo& info)
-{
-    ButtonCombination b = info.buttons;
-    if (b.m_buttons[0])
-    {
-        std::cout << b.m_buttons[0] << " ";
-    }
-    if (info.buttons.m_buttons[1])
-    {
-        std::cout << b.m_buttons[1] << " ";
-    }
-    if (info.buttons.m_buttons[2])
-    {
-        std::cout << b.m_buttons[2] << " ";
-    }
-    if (info.buttons.m_buttons[3])
-    {
-        std::cout << b.m_buttons[3] << " ";
-    }
-
-    if (info.pressed)
-    {
-        std::cout << "down";
-    }
-    else
-    {
-        std::cout << "up";
-    }
-    std::cout << std::endl;
-}*/
-
 #include <type_traits>
 
 using EngineStorage = std::aligned_storage<sizeof(Engine), 16U>::type;
@@ -45,10 +13,18 @@ using EngineStorage = std::aligned_storage<sizeof(Engine), 16U>::type;
 #include <unistd.h>
 #endif
 
+#include <pmmintrin.h>
+#include <xmmintrin.h>
+
 int main(int argc, const char *argv[])
 {
-    // fix up working directory
     {
+        // disable denormal floats
+        _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+        _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
+    }
+    {
+        // fix up working directory
         char temp[128] = {};
         const char *dir = getcwd(temp, sizeof(temp));
         const char *bin_pos = strstr(dir, "bin");
@@ -60,16 +36,6 @@ int main(int argc, const char *argv[])
         }
     }
     ApplicationService::Initialize();
-
-    /*KeyboardContext k;
-    k.AddMapping({ SDL_SCANCODE_A }, &::callback);
-    k.AddMapping({ SDL_SCANCODE_S }, &::callback);
-    k.AddMapping({ SDL_SCANCODE_D }, &::callback);
-    k.AddMapping({ SDL_SCANCODE_W }, &::callback);
-    k.AddMapping({ SDL_SCANCODE_LCTRL, SDL_SCANCODE_X }, &::callback);
-
-    InputMapper input;
-    input.LoadContext(std::move(k));*/
 
     auto *engine_storage = new EngineStorage;
 
