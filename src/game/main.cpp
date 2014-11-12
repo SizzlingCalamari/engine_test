@@ -1,11 +1,10 @@
 
-#include <iostream>
 #include "Application/Application.h"
-
 #include "Engine.h"
-#include <type_traits>
 
-using EngineStorage = std::aligned_storage<sizeof(Engine), 16U>::type;
+#include <pmmintrin.h>
+#include <xmmintrin.h>
+#include <memory>
 
 #ifdef _WIN32
 #include <direct.h>
@@ -13,8 +12,36 @@ using EngineStorage = std::aligned_storage<sizeof(Engine), 16U>::type;
 #include <unistd.h>
 #endif
 
-#include <pmmintrin.h>
-#include <xmmintrin.h>
+template<typename T, size_t Align>
+class heap_aligned_alloc
+{
+public:
+    heap_aligned_alloc() noexcept
+    {
+        std::size_t length = sizeof(T) + Align - 1;
+        void* ptr = malloc(length);
+        m_mem = reinterpret_cast<unsigned char*>(ptr);
+        std::align(Align, sizeof(T), ptr, length);
+        m_ptr = new(ptr) T;
+    }
+
+    ~heap_aligned_alloc()
+    {
+        m_ptr->~T();
+        free(m_mem);
+        m_ptr = nullptr;
+        m_mem = nullptr;
+    }
+
+    inline T* operator->() const noexcept
+    {
+        return m_ptr;
+    }
+
+private:
+    T* m_ptr;
+    unsigned char* m_mem;
+};
 
 int main(int argc, const char *argv[])
 {
@@ -37,15 +64,13 @@ int main(int argc, const char *argv[])
     }
     ApplicationService::Initialize();
 
-    auto *engine_storage = new EngineStorage;
+    {
+        heap_aligned_alloc<Engine, 16U> engine;
 
-    Engine *engine = new(engine_storage) Engine;
-    engine->Initialize();
-    engine->Run();
-    engine->Shutdown();
-    engine->~Engine();
-
-    delete engine_storage;
+        engine->Initialize();
+        engine->Run();
+        engine->Shutdown();
+    }
 
     ApplicationService::Shutdown();
     return 0;
