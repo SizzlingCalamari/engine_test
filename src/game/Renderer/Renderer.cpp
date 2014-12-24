@@ -13,7 +13,7 @@ namespace Renderer
         // the gl_createcontext call
         static RunOnce glew([]
         {
-            glewExperimental = true;
+            glewExperimental = GL_TRUE;
             glewInit();
         });
 
