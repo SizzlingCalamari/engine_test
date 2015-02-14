@@ -13,6 +13,8 @@
 #include "EntitySystem/EntitySystem.h"
 #include <chrono>
 
+#include "Audio/public/hAudioDevice.h"
+
 void Engine::Initialize()
 {
     renderer3d_config config;
@@ -33,6 +35,34 @@ void Engine::Initialize()
     m_dynamics_world.Initialize();
     m_physics_proxy = PhysicsProxy(&m_dynamics_world);
 
+    m_audioSystem = SDLAudio::CreateAudioSystem();
+    {
+        printf("Audio Driver: %s\n", m_audioSystem->GetCurrentAudioDriver());
+
+        SDL_AudioSpec spec{};
+        Uint8* audioBuf = nullptr;
+        Uint32 audioLen = 0;
+        if (SDL_LoadWAV("sounds/jesus_poops.wav", &spec, &audioBuf, &audioLen))
+        {
+            SDLAudio::AudioDeviceDesc desc{};
+            desc.deviceName = nullptr;
+            desc.audioSpec = spec;
+            //desc.audioSpec.freq = 44100;
+            //desc.audioSpec.samples = 8192;
+            //desc.audioSpec.channels = 2;
+            auto device = m_audioSystem->OpenAudioDevice(desc);
+            if (device)
+            {
+                printf("Audio Device: %s\n", device->GetDeviceDesc().deviceName);
+                device->PushAudio(audioBuf, audioLen);
+                device->StartPlayback();
+            }
+            SDL_FreeWAV(audioBuf);
+        }
+
+
+    }
+
     EngineContext engine;
     engine.renderer = m_render_proxy;
     engine.physics = &m_physics_proxy;
@@ -48,6 +78,8 @@ void Engine::Initialize()
 void Engine::Shutdown()
 {
     m_game.Shutdown();
+
+    SDLAudio::FreeAudioSystem(m_audioSystem);
 
     m_dynamics_world.Shutdown();
 

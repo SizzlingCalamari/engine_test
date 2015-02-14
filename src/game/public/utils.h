@@ -42,16 +42,16 @@ inline auto RValPtr(T&& p) -> RValPtrClass<T>
 // Turns a pair of begin/end iterators into a class
 // that can be used with c++11 for each loops.
 // Example:
-//      auto h = ForEachHelper(m_events.cbegin(), m_events.cbegin() + num_events);
+//      auto h = IteratorPair(m_events.cbegin(), m_events.cbegin() + num_events);
 //      for (auto &event : h) { ... }
 //
 template<class T>
-class ForEachHelperClass
+class IteratorPair
 {
 public:
-    explicit inline ForEachHelperClass(T&& begin, T&& end) noexcept:
-        m_begin(std::forward<T>(begin)),
-        m_end(std::forward<T>(end))
+    explicit inline IteratorPair(T begin, T end) noexcept :
+        m_begin(begin),
+        m_end(end)
     {
     }
 
@@ -63,9 +63,9 @@ private:
 };
 
 template<class T>
-inline auto ForEachHelper(T&& begin, T&& end) -> ForEachHelperClass<T>
+inline auto IteratorPairHelper(T begin, T end) -> IteratorPair<T>
 {
-    return ForEachHelperClass<T>(std::forward<T>(begin), std::forward<T>(end));
+    return IteratorPair<T>(begin, end);
 }
 
 namespace utils

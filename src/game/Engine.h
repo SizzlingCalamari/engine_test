@@ -3,6 +3,7 @@
 
 #include "Game/Game.h"
 #include "Application/Window.h"
+#include "Audio/public/hAudioSystem.h"
 #include "EntitySystem/RenderProxy.h"
 #include "Physics/DynamicsWorld.h"
 #include "EntitySystem/PhysicsProxy.h"
@@ -36,4 +37,6 @@ private:
     PhysicsProxy m_physics_proxy;
 
     InputMapper m_inputMapper;
+
+    SDLAudio::AudioSystem* m_audioSystem;
 };
