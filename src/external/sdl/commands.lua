@@ -10,6 +10,8 @@ function clone()
     if not os.isdir(getdir() .. "/.hg") then
         os.execute("hg clone " .. repo .. " " .. getdir())
     end
+    os.execute("hg pull")
+    os.execute("hg update")
 end
 
 function buildLinux()
