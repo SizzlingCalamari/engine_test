@@ -12,6 +12,37 @@
 #include <unistd.h>
 #endif
 
+// gcc < 5.0 doesn't have std::align
+// Copied from trunk:
+#if defined(__GNUC__) && (__GNUC__ < 5)
+
+#include <cstdint>
+
+namespace std _GLIBCXX_VISIBILITY(default)
+{
+_GLIBCXX_BEGIN_NAMESPACE_VERSION
+
+inline void* align(size_t __align, size_t __size, void*& __ptr, size_t& __space) noexcept
+{
+    const auto __intptr = reinterpret_cast<uintptr_t>(__ptr);
+    const auto __aligned = (__intptr - 1u + __align) & -__align;
+    const auto __diff = __aligned - __intptr;
+    if ((__size + __diff) > __space)
+    {
+        return nullptr;
+    }
+    else
+    {
+        __space -= __diff;
+        return __ptr = reinterpret_cast<void*>(__aligned);
+    }
+}
+
+_GLIBCXX_END_NAMESPACE_VERSION
+} // namespace
+
+#endif
+
 template<typename T, size_t Align>
 class heap_aligned_alloc
 {
