@@ -63,21 +63,22 @@ vec3 CalcLightInternal(BaseLight light, vec3 lightDirection,
         diffuseFactor = 0.5f * step(0.3f, diffuseFactor)
                         + 1.0f * step(0.8f, diffuseFactor);
     }
-    if (diffuseFactor > 0.0f)
-    {
-        diffuseColour = light.colour
-                        * light.diffuseIntensity
-                        * diffuseFactor;
+    diffuseFactor = max(diffuseFactor, 0.0f);
+
+    diffuseColour = light.colour
+                    * light.diffuseIntensity
+                    * diffuseFactor;
         
-        vec3 lightReflect = normalize(reflect(lightDirection, vertexNormal));
-        float specularFactor = pow(dot(vertexToEye, lightReflect), materialProps.specularPower);
-        if ((specularFactor > 0.0f) && !g_celShaded)
-        {
-            specularColour = light.colour
-                             * materialProps.specularIntensity
-                             * specularFactor;
-        }
+    vec3 lightReflect = normalize(reflect(lightDirection, vertexNormal));
+    float specularFactor = pow(dot(vertexToEye, lightReflect), materialProps.specularPower);
+    specularFactor = max(specularFactor, 0.0f);
+    if (!g_celShaded)
+    {
+        specularColour = light.colour
+                            * materialProps.specularIntensity
+                            * specularFactor;
     }
+
 
     return (ambientColour + shadowFactor*(diffuseColour + specularColour));
 }
@@ -154,9 +155,11 @@ uniform float g_specularPower;
 
 float snoise(vec3 v);
 
-float turbulence(vec3 position,
-                 int octaves,
-                 float lacunarity, float gain)
+float turbulence(
+    vec3    position,
+    int     octaves,
+    float   lacunarity,
+    float   gain)
 {
     float sum = 0.0f;
     float scale = 1.0f;
@@ -192,12 +195,8 @@ void main()
     vertexNormal = normalize(vertexNormal);
     vec3 vertexToEye = normalize(eyePosition_worldspace - worldPosition);
 
-    float shadowFactor = 1.0f;
     float depth = texture(g_shadowMapSampler, directionalLightSpacePosition.xy).x;
-    if (depth < directionalLightSpacePosition.z)
-    {
-        shadowFactor = 0.0f;
-    }
+    float shadowFactor = float(depth >= directionalLightSpacePosition.z);
 
     MaterialLightProps materialProps;
     materialProps.specularIntensity = g_specularIntensity;
