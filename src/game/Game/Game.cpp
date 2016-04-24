@@ -402,8 +402,8 @@ void Game::LoadResources()
         RenderObject obj;
         obj.type = RenderObject::DirectionalLight;
         obj.properties.emplace("colour", "1.0 1.0 1.0");
-        obj.properties.emplace("ambientIntensity", "0.03");
-        obj.properties.emplace("diffuseIntensity", "0.3");
+        obj.properties.emplace("ambientIntensity", "0.01");
+        obj.properties.emplace("diffuseIntensity", "0.1");
         obj.properties.emplace("direction", "-0.5 -1.0 -1.0");
         m_moonLightDirectional = m_renderer->CreateRenderObject(obj);
     }

@@ -126,6 +126,7 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
     }
     viewport->SetActive();
 
+    glEnable(GL_FRAMEBUFFER_SRGB);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
