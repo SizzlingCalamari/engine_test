@@ -34,6 +34,25 @@ void PhysicsProxy::CheckEntChanges()
 {
     auto *bullet_dynamics = m_dynamics->GetDynamicsWorld();
 
+    auto& edits = m_physical_components->GetEdits();
+    for (uint ent : edits)
+    {
+        if(!m_dynamics_components->HasComponent(ent))
+        {
+            continue;
+        }
+        auto *physical = m_physical_components->PeekComponent(ent);
+        auto *dynamics = m_dynamics_components->PeekComponent(ent);
+
+        btVector3 origin(physical->position.x, physical->position.y, physical->position.z);
+        btQuaternion rotation(physical->orientation.x, physical->orientation.y, physical->orientation.z, physical->orientation.w);
+        btTransform transform(rotation, origin);
+
+        btRigidBody* body = reinterpret_cast<btRigidBody*>(dynamics->shape->getUserPointer());
+        body->setWorldTransform(transform);
+        body->setActivationState(ACTIVE_TAG);
+    }
+
     auto &removals = m_dynamics_components->GetRemovals();
     for (uint ent : removals)
     {

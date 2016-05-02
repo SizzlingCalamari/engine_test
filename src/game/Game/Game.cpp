@@ -676,6 +676,12 @@ void Game::LoadEnts()
         graphical.mesh = m_floorMesh;
         graphical.material = m_woodFloorMaterial;
         m_entity_system.AttachComponent(m_floorEnt, &graphical);
+
+        DynamicsComponent dynamics;
+        dynamics.mass = 0.0f;
+        dynamics.inertia = glm::vec3(0.0f);
+        dynamics.shape = new btBoxShape(btVector3(1000.0f, 10.0f, 1000.0f));
+        m_entity_system.AttachComponent(m_floorEnt, &dynamics);
     }
 
     // Pedestals and teapots
@@ -725,6 +731,12 @@ void Game::LoadEnts()
         graphical.mesh = m_teapotMesh;
         graphical.material = m_teapotMarbleMaterial;
         m_entity_system.AttachComponent(m_teapotMarbleEnt, &graphical);
+
+        DynamicsComponent dynamics;
+        dynamics.mass = 1.0f;
+        dynamics.inertia = glm::vec3(0.0f);
+        dynamics.shape = new btBoxShape(btVector3(10.0f, 10.0f, 10.0f));
+        m_entity_system.AttachComponent(m_teapotMarbleEnt, &dynamics);
     }
 
     m_pedestalTeapot3 = m_entity_system.CreateEntity();

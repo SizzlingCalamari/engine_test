@@ -26,7 +26,7 @@ DynamicsWorld::~DynamicsWorld()
 
 void DynamicsWorld::Initialize()
 {
-    m_DynamicsWorld->setGravity({ 0.0f, -0.5f, 0.0f });
+    m_DynamicsWorld->setGravity({ 0.0f, -9.8f, 0.0f });
 }
 
 void DynamicsWorld::Shutdown()
