@@ -50,7 +50,7 @@ void PhysicsProxy::CheckEntChanges()
 
         btRigidBody* body = reinterpret_cast<btRigidBody*>(dynamics->shape->getUserPointer());
         body->setWorldTransform(transform);
-        body->setActivationState(ACTIVE_TAG);
+        body->activate();
     }
 
     auto &removals = m_dynamics_components->GetRemovals();
