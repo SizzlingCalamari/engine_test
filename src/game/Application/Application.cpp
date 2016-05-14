@@ -9,7 +9,7 @@ namespace ApplicationService
     {
         std::cout << "Hello World!" << std::endl;
         SDL_SetMainReady();
-        bool ret = (SDL_Init(SDL_INIT_EVERYTHING) == 0);
+        bool ret = (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS) == 0);
 
         SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
         SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
