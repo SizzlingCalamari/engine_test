@@ -12,7 +12,7 @@ void PhysicsProxy::Cleanup()
 {
     auto *bullet_dynamics = m_dynamics->GetDynamicsWorld();
 
-    auto &collision_objects = bullet_dynamics->getCollisionObjectArray();
+    auto collision_objects = bullet_dynamics->getCollisionObjectArray();
     auto num_obj = collision_objects.size();
     for (auto i = 0; i < num_obj; ++i)
     {
