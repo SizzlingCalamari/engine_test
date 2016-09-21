@@ -16,21 +16,13 @@ uint LoadVertices(const void* vertices, ptrdiff_t stride, size_t num_vertices)
 void FreeMesh(Mesh* mesh)
 {
     assert(mesh);
-    uint vertexBufferId = mesh->vertexBufferId;
-    uint normalBufferId = mesh->normalBufferId;
-    uint uvBufferId = mesh->uvBufferId;
-    if (vertexBufferId > 0)
+    const GLuint bufferIds[] =
     {
-        glDeleteBuffers(1, &vertexBufferId);
-    }
-    if (normalBufferId > 0)
-    {
-        glDeleteBuffers(1, &vertexBufferId);
-    }
-    if (uvBufferId > 0)
-    {
-        glDeleteBuffers(1, &uvBufferId);
-    }
+        mesh->vertexBufferId,
+        mesh->normalBufferId,
+        mesh->uvBufferId,
+    };
+    glDeleteBuffers(3, bufferIds);
 
     mesh->vertexBufferId = 0;
     mesh->normalBufferId = 0;
