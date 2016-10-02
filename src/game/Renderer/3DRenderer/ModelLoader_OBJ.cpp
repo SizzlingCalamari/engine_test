@@ -5,8 +5,8 @@
 #include <glm/vec3.hpp>
 #include <vector>
 #include <deque>
+#include <cstring>
 #include <cstdio>
-#include <string>
 #include <regex>
 
 enum FaceType
@@ -18,7 +18,7 @@ enum FaceType
     Pos
 };
 
-FaceType identifyFace(const std::string& face)
+FaceType identifyFace(const char* face)
 {
     std::regex posUvNorm("\\d+/\\d+/\\d+");
     if (std::regex_search(face, posUvNorm))
@@ -116,9 +116,9 @@ void ParseOBJ(const char *filename,
         {
             if (faceType == Unclassified)
             {
-                std::string face(64, '\0');
-                fgets(&face[0], 64, file);
-                int length = static_cast<int>(strlen(face.c_str()));
+                char face[64];
+                fgets(face, sizeof(face), file);
+                int length = static_cast<int>(strlen(face));
                 // back up to start of line
                 for (int i = length-1; i >= 0; --i)
                 {
