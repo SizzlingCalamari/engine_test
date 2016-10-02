@@ -159,7 +159,7 @@ namespace math
         auto sin_diff = sin_max - sin_min;
 
         if (((q.w - cos_min) * sin_diff >= (q.x - sin_min) * cos_diff) ||
-            ((q.w + cos_min) * sin_diff <= (q.x - sin_min) * cos_diff))
+            ((q.w + cos_min) * sin_diff <= (q.x + sin_min) * cos_diff))
         {
             ret.w = q.w * length_inv;
             ret.x = q.x * length_inv;
