@@ -1,7 +1,6 @@
 
 local repo = "https://github.com/g-truc/glm.git"
 local dir = path.getbasename(repo)
-local current_rev = "682979ddd8b4b0839c36bb0796a71c095b71cbd6"
 
 function getdir()
     return dir
@@ -13,8 +12,7 @@ function clone()
     end
     os.chdir(dir)
     os.execute("git reset --hard")
-    os.execute("git fetch origin master")
-    os.execute("git checkout " .. current_rev)
+    os.execute("git fetch origin 0.9.8-align")
 end
 
 function buildLinux()
