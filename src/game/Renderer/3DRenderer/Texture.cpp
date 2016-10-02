@@ -19,7 +19,7 @@ void Texture::LoadTexture2D(const uint8* pixels, ptrdiff_t stride, uint width, u
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     const auto format = (stride == 3) ? GL_RGB : GL_RGBA;
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA_EXT, width, height, 0, format, GL_UNSIGNED_BYTE, pixels);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8, width, height, 0, format, GL_UNSIGNED_BYTE, pixels);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
