@@ -461,29 +461,12 @@ void Game::LoadResources()
         m_billboardTextMaterials[2] = m_renderer->CreateRenderObject(obj);
     }
 
-    // Painting mesh with aspect ratio 1.73
-    m_painting173 = 0;
-    {
-        RenderObject obj;
-        obj.type = RenderObject::MeshObject;
-        obj.properties.emplace("meshFile", "models/painting173.obj");
-        m_painting173 = m_renderer->CreateRenderObject(obj);
-    }
-
     m_painting100 = 0;
     {
         RenderObject obj;
         obj.type = RenderObject::MeshObject;
         obj.properties.emplace("meshFile", "models/painting100.obj");
         m_painting100 = m_renderer->CreateRenderObject(obj);
-    }
-
-    m_paintint133 = 0;
-    {
-        RenderObject obj;
-        obj.type = RenderObject::MeshObject;
-        obj.properties.emplace("meshFile", "models/painting133.obj");
-        m_paintint133 = m_renderer->CreateRenderObject(obj);
     }
 
     // Painting Descriptions
@@ -525,6 +508,16 @@ void Game::LoadResources()
         obj.properties.emplace("specularIntensity", "1.0");
         obj.properties.emplace("specularPower", "32.0");
         m_paintingMaterials[3] = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_paintingMaterials[4] = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::Material;
+        obj.properties.emplace("diffuseMapFile", "textures/carmack_working.jpg");
+        obj.properties.emplace("specularIntensity", "1.0");
+        obj.properties.emplace("specularPower", "32.0");
+        m_paintingMaterials[4] = m_renderer->CreateRenderObject(obj);
     }
 
     // Spot Light Descriptions
@@ -651,7 +644,6 @@ void Game::LoadEnts()
         physical.orientation = glm::quat();
         m_entity_system.AttachComponent(m_camera, &physical);
     }
-
 
     // Room
     m_roomEnt = m_entity_system.CreateEntity();
@@ -818,10 +810,12 @@ void Game::LoadEnts()
         PhysicalComponent physical;
         physical.position = glm::vec3(-450.0f, 400.0f, -1065.0f);
         physical.orientation = glm::quat(glm::vec3{0.0f, glm::pi<float>(), 0.0f});
+        const float scale = 1.5f;
+        physical.scale = scale * glm::vec3(1.0f, 0.5764f, 1.0f);
         m_entity_system.AttachComponent(m_paintingEnts[0], &physical);
 
         GraphicalComponent graphical;
-        graphical.mesh = m_painting173;
+        graphical.mesh = m_painting100;
         graphical.material = m_paintingMaterials[0];
         m_entity_system.AttachComponent(m_paintingEnts[0], &graphical);
     }
@@ -860,10 +854,11 @@ void Game::LoadEnts()
         PhysicalComponent physical;
         physical.position = glm::vec3(70.0f, 425.0f, 550.0f);
         physical.orientation = glm::quat(glm::vec3{ 0.0f, glm::half_pi<float>(), 0.0f });
+        physical.scale = glm::vec3(1.0f, 0.75f, 1.0f);
         m_entity_system.AttachComponent(m_paintingEnts[3], &physical);
 
         GraphicalComponent graphical;
-        graphical.mesh = m_paintint133;
+        graphical.mesh = m_painting100;
         graphical.material = m_paintingMaterials[3];
         m_entity_system.AttachComponent(m_paintingEnts[3], &graphical);
     }

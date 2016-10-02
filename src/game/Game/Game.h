@@ -83,9 +83,7 @@ private:
     uint m_billboardTextMaterials[3];
     uint m_billboardTextEnts[3];
 
-    uint m_painting173;
     uint m_painting100;
-    uint m_paintint133;
 
     uint m_paintingMaterials[6];
     uint m_paintingEnts[6];
