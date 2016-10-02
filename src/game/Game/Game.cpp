@@ -868,6 +868,22 @@ void Game::LoadEnts()
         m_entity_system.AttachComponent(m_paintingEnts[3], &graphical);
     }
 
+    // carmack
+    m_paintingEnts[4] = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        physical.position = glm::vec3(475.0f, 380.0f, -1065.0f);
+        physical.orientation = glm::quat(glm::vec3{0.0f, glm::pi<float>(), 0.0f});
+        const float scale = 1.60f;
+        physical.scale = scale * glm::vec3(1.0f, 0.7094f, 1.0f);
+        m_entity_system.AttachComponent(m_paintingEnts[4], &physical);
+
+        GraphicalComponent graphical;
+        graphical.mesh = m_painting100;
+        graphical.material = m_paintingMaterials[4];
+        m_entity_system.AttachComponent(m_paintingEnts[4], &graphical);
+    }
+
     // Spotlights
     m_spotLightEnts[0] = m_entity_system.CreateEntity();
     {
