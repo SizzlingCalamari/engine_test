@@ -171,10 +171,10 @@ void RenderProxy::CheckEntChanges()
 void RenderProxy::LoadRenderable(SceneNode* node, const PhysicalComponent* physical)
 {
     // Load the transformation
-    // TODO: scale
     auto translation = glm::translate(physical->position);
     auto orientation = glm::mat4_cast(physical->orientation);
-    node->transform = translation * orientation;
+    auto scale = glm::scale(physical->scale);
+    node->transform = translation * (orientation * scale);
 }
 
 void RenderProxy::LoadRenderable(SceneNode* node, const GraphicalComponent* graphical)
