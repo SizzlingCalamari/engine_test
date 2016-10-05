@@ -36,37 +36,29 @@ void Engine::Initialize()
     m_physics_proxy = PhysicsProxy(&m_dynamics_world);
 
     m_audioSystem = SDLAudio::CreateAudioSystem();
+
+    SDLAudio::AudioDeviceDesc desc{};
+    desc.deviceName = nullptr;
+    desc.audioSpec.freq = 44100;
+    desc.audioSpec.format = AUDIO_S16;
+    desc.audioSpec.channels = 1;
+    desc.audioSpec.samples = 2048;
+    desc.audioSpec.callback = nullptr;
+    desc.audioSpec.userdata = nullptr;
+
+    SDLAudio::AudioDevice* audioDevice = m_audioSystem->OpenAudioDevice(desc);
+    if(audioDevice)
     {
         printf("Audio Driver: %s\n", m_audioSystem->GetCurrentAudioDriver());
-
-        SDL_AudioSpec spec{};
-        Uint8* audioBuf = nullptr;
-        Uint32 audioLen = 0;
-        if (SDL_LoadWAV("sounds/jesus_poops.wav", &spec, &audioBuf, &audioLen))
-        {
-            SDLAudio::AudioDeviceDesc desc{};
-            desc.deviceName = nullptr;
-            desc.audioSpec = spec;
-            //desc.audioSpec.freq = 44100;
-            //desc.audioSpec.samples = 8192;
-            //desc.audioSpec.channels = 2;
-            auto device = m_audioSystem->OpenAudioDevice(desc);
-            if (device)
-            {
-                printf("Audio Device: %s\n", device->GetDeviceDesc().deviceName);
-                device->PushAudio(audioBuf, audioLen);
-                device->StartPlayback();
-            }
-            SDL_FreeWAV(audioBuf);
-        }
-
-
+        printf("Audio Device: %s\n", audioDevice->GetDeviceDesc().deviceName);
+        audioDevice->StartPlayback();
     }
 
     EngineContext engine;
     engine.renderer = m_render_proxy;
     engine.physics = &m_physics_proxy;
     engine.input = &m_inputMapper;
+    engine.audio = audioDevice;
 
     m_game.Initialize(engine);
 

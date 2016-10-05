@@ -12,11 +12,17 @@ class PhysicsProxy;
 class InputMapper;
 struct PhysicalComponent;
 
+namespace SDLAudio
+{
+    class AudioDevice;
+}
+
 struct EngineContext
 {
     RenderProxy *renderer;
     PhysicsProxy *physics;
     InputMapper *input;
+    SDLAudio::AudioDevice* audio;
 };
 
 class Game
@@ -47,6 +53,7 @@ private:
 
     RenderProxy *m_renderer;
     PhysicsProxy *m_physics;
+    SDLAudio::AudioDevice* m_audio;
 
     uint m_roomMesh;
     uint m_floorMesh;

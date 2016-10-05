@@ -15,11 +15,14 @@
 #include "SDL_keyboard.h"
 #include "SDL_mouse.h"
 
+#include "../Audio/public/hAudioDevice.h"
+
 #include <iostream>
 
 Game::Game():
     m_renderer(nullptr),
     m_physics(nullptr),
+    m_audio(nullptr),
     m_floorMesh(0),
     m_jesusMaterial(0),
     m_teapotDefaultMaterial(0),
@@ -61,6 +64,7 @@ void Game::Initialize(const EngineContext& engine)
 
     m_renderer = engine.renderer;
     m_physics = engine.physics;
+    m_audio = engine.audio;
 
     m_renderer->SetComponentTables(m_entity_system.GetTable<PhysicalComponent>(),
                                    m_entity_system.GetTable<GraphicalComponent>());
