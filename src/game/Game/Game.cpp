@@ -138,6 +138,21 @@ void Game::Initialize(const EngineContext& engine)
         m_billboardController.AddBillboard(m_billboardTextEnts[1], billboard);
         m_billboardController.AddBillboard(m_billboardTextEnts[2], billboard);
     }
+
+    m_thwomp.SetComponentTables(m_entity_system.GetTable<PhysicalComponent>());
+    m_thwomp.SetThwompEnt(m_thwompEnt);
+    m_thwomp.OnHitGround([&]()
+    {
+        m_audio->PushAudio(m_jesusThwompBuf, m_jesusThwompLen);
+    });
+
+    SDL_AudioSpec spec = m_audio->GetDeviceDesc().audioSpec;
+    if (SDL_LoadWAV("sounds/urgh.wav", &spec, &m_jesusThwompBuf, &m_jesusThwompLen))
+    {
+        //m_audio->PushAudio(m_jesusThwompBuf, m_jesusThwompLen);
+    }
+    const char* error = SDL_GetError();
+    printf("%s\n", error);
 }
 
 void Game::Shutdown()
@@ -148,11 +163,14 @@ void Game::Shutdown()
     m_physics->Cleanup();
     m_renderer->Update();
     m_entity_system.CommitChanges();
+
+    SDL_FreeWAV(m_jesusThwompBuf);
 }
 
 void Game::Simulate(uint64 tick, uint32 dt)
 {
     CameraSimulation(dt);
+    m_thwomp.Update(dt);
     m_billboardController.Update();
 
     m_physics->Simulate(dt);
@@ -339,6 +357,22 @@ void Game::LoadResources()
         m_billboardMesh = m_renderer->CreateRenderObject(obj);
     }
 
+    m_thwompMesh = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::MeshObject;
+        obj.properties.emplace("meshFile", "models/thwomp.obj");
+        m_thwompMesh = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_pipeMesh = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::MeshObject;
+        obj.properties.emplace("meshFile", "models/kartbase.obj");
+        m_pipeMesh = m_renderer->CreateRenderObject(obj);
+    }
+
     m_woodFloorMaterial = 0;
     {
         RenderObject obj;
@@ -522,6 +556,26 @@ void Game::LoadResources()
         obj.properties.emplace("specularIntensity", "1.0");
         obj.properties.emplace("specularPower", "32.0");
         m_paintingMaterials[4] = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_thwompMat = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::Material;
+        obj.properties.emplace("diffuseMapFile", "textures/jesus_thwomp.png");
+        obj.properties.emplace("specularIntensity", "1.0");
+        obj.properties.emplace("specularPower", "32.0");
+        m_thwompMat = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_pipeMat = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::Material;
+        obj.properties.emplace("diffuseSolidColour", "0.0 1.0 0.0");
+        obj.properties.emplace("specularIntensity", "1.0");
+        obj.properties.emplace("specularPower", "32.0");
+        m_pipeMat = m_renderer->CreateRenderObject(obj);
     }
 
     // Spot Light Descriptions
@@ -881,6 +935,33 @@ void Game::LoadEnts()
         graphical.mesh = m_painting100;
         graphical.material = m_paintingMaterials[4];
         m_entity_system.AttachComponent(m_paintingEnts[4], &graphical);
+    }
+
+    // jesus thwomp
+    m_thwompEnt = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        physical.position = glm::vec3(0.0f, 370.0f, -600.0f);
+        physical.orientation = glm::quat(glm::vec3{ 0.0f, glm::pi<float>(), 0.0f });
+        m_entity_system.AttachComponent(m_thwompEnt, &physical);
+
+        GraphicalComponent graphical;
+        graphical.mesh = m_thwompMesh;
+        graphical.material = m_thwompMat;
+        m_entity_system.AttachComponent(m_thwompEnt, &graphical);
+    }
+
+    m_pipeEnt = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        physical.position = glm::vec3(50.0f, 370.0f, -600.0f);
+        physical.orientation = glm::quat(glm::vec3{ 0.0f, glm::pi<float>(), 0.0f });
+        m_entity_system.AttachComponent(m_pipeEnt, &physical);
+
+        GraphicalComponent graphical;
+        graphical.mesh = m_pipeMesh;
+        graphical.material = m_pipeMat;
+        m_entity_system.AttachComponent(m_pipeEnt, &graphical);
     }
 
     // Spotlights

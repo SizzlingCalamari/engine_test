@@ -6,6 +6,7 @@
 #include "CameraController_InterpolatedPath.h"
 #include "../Input/InputContext.h"
 #include "BillboardController.h"
+#include "Thwomp.h"
 
 class RenderProxy;
 class PhysicsProxy;
@@ -54,6 +55,9 @@ private:
     RenderProxy *m_renderer;
     PhysicsProxy *m_physics;
     SDLAudio::AudioDevice* m_audio;
+
+    Uint8* m_jesusThwompBuf;
+    Uint32 m_jesusThwompLen;
 
     uint m_roomMesh;
     uint m_floorMesh;
@@ -113,4 +117,15 @@ private:
         Camera_InterpolatedPath
     };
     CameraType m_activeCameraType;
+
+    Thwomp m_thwomp;
+
+    uint m_thwompEnt;
+    uint m_thwompMesh;
+    uint m_thwompMat;
+
+    uint m_pipeEnt;
+    uint m_pipeMesh;
+    uint m_pipeMat;
+
 };
