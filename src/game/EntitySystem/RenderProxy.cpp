@@ -215,8 +215,6 @@ template<typename T>
 bool FindAndLoad(const RenderObject::PropertyMap& props,
                  const std::string& str, T& out)
 {
-    out = T();
-
     auto it = props.find(str);
     if (it == props.end())
     {
@@ -300,6 +298,7 @@ void RenderProxy::ParseMaterial(Material &mat, const RenderObject& obj)
     FindAndLoad(props, "specularIntensity", mat.specularIntensity);
     FindAndLoad(props, "specularPower", mat.specularPower);
     FindAndLoad(props, "noiseDiffuseMap", mat.noiseDiffuseMap);
+    FindAndLoad(props, "alphaTestValue", mat.alphaTestValue);
     FindAndLoad(props, "noiseBumpMap", mat.noiseBumpMap);
     FindAndLoad(props, "celShaded", mat.celShaded);
 }

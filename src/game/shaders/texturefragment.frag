@@ -152,6 +152,7 @@ uniform vec3 g_diffuseColour;
 
 uniform float g_specularIntensity;
 uniform float g_specularPower;
+uniform float g_alphaTestValue;
 
 float snoise(vec3 v);
 
@@ -227,5 +228,5 @@ void main()
     {
         tex = texture(g_diffuseMapSampler, UV);
     }
-    fragColour = vec4(tex.xyz * totalLight, tex.a);
+    fragColour = vec4(tex.xyz * totalLight, tex.a * step(tex.x, g_alphaTestValue));
 }

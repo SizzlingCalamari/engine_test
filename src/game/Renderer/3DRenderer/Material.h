@@ -10,6 +10,7 @@ struct Material
         diffuseSolidColour(1.0f),
         specularIntensity(1.0f),
         specularPower(32.0f),
+        alphaTestValue(1.0f),
         noiseDiffuseMap(false),
         noiseBumpMap(false),
         celShaded(false)
@@ -17,9 +18,10 @@ struct Material
     }
 
     uint diffuseMap;
-    glm::vec3 diffuseSolidColour;;
+    glm::vec3 diffuseSolidColour;
     float specularIntensity;
     float specularPower;
+    float alphaTestValue;
     
     bool noiseDiffuseMap;
     bool noiseBumpMap;

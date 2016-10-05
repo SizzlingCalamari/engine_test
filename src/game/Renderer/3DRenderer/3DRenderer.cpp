@@ -210,6 +210,7 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
         m_texture_shader.SetUniform("g_celShaded", &material->celShaded);
         m_texture_shader.SetUniform("g_specularIntensity", &material->specularIntensity);
         m_texture_shader.SetUniform("g_specularPower", &material->specularPower);
+        m_texture_shader.SetUniform("g_alphaTestValue", &material->alphaTestValue);
         bool usingDiffuseColour = false;
         if (material->diffuseMap == 0 && !material->noiseDiffuseMap)
         {

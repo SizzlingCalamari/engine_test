@@ -79,6 +79,8 @@ void Game::Initialize(const EngineContext& engine)
     LoadResources();
     LoadEnts();
 
+    LoadFur();
+
     m_thirdperson_controller.SetCameraEnt(m_camera);
     m_thirdperson_controller.SetTargetEnt(m_teapotMarbleEnt);
     m_thirdperson_controller.SetRadiusFromTarget(200.0f);
@@ -1033,5 +1035,54 @@ void Game::LoadEnts()
         GraphicalComponent graphical;
         graphical.spotLight = m_spotLights[6];
         m_entity_system.AttachComponent(m_spotLightEnts[6], &graphical);
+    }
+}
+
+void Game::LoadFur()
+{
+    {
+        RenderObject obj;
+        obj.type = RenderObject::MeshObject;
+        obj.properties.emplace("meshFile", "models/fur.obj");
+        m_furMesh = m_renderer->CreateRenderObject(obj);
+    }
+
+    const char* furTextures[4] =
+    {
+        "textures/sz_fur_a1.nto.png",
+        "textures/sz_fur_a2.nto.png",
+        "textures/sz_fur_a3.nto.png",
+        "textures/sz_fur_a_sita.nto.png"
+    };
+    for (int i = 0; i < 4; ++i)
+    {
+        RenderObject obj;
+        obj.type = RenderObject::Material;
+        if (i < 3)
+        {
+            obj.properties.emplace("alphaTestValue", "0.18");
+        }
+        obj.properties.emplace("diffuseMapFile", furTextures[i]);
+        obj.properties.emplace("specularIntensity", "1.0");
+        obj.properties.emplace("specularPower", "32.0");
+        m_furMats[i] = m_renderer->CreateRenderObject(obj);
+    }
+
+    const glm::vec3 furPos(-400.0f, 400.0f, -900.0f);
+    const glm::vec3 furStep(1.0f, -2.0f, 2.0f);
+
+    for (int i = 0; i < 7; ++i)
+    {
+        const uint ent = m_entity_system.CreateEntity();
+        m_furEnts[i] = ent;
+
+        PhysicalComponent physical;
+        physical.position = furPos + (furStep * static_cast<float>(i));
+        m_entity_system.AttachComponent(ent, &physical);
+
+        GraphicalComponent graphical;
+        graphical.mesh = m_furMesh;
+        graphical.material = (i == 0) ? m_furMats[3] : m_furMats[(i-1) / 2];
+        m_entity_system.AttachComponent(ent, &graphical);
     }
 }

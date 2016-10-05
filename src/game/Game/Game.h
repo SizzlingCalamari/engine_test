@@ -42,12 +42,13 @@ public:
 private:
     void InputEventCallback(const KeyboardEventInfo& info);
 
-private:
     void CameraSimulation(uint32 dt);
     static bool HandleCameraMovement(PhysicalComponent *camera, uint32 dt);
 
     void LoadResources();
     void LoadEnts();
+
+    void LoadFur();
 
 private:
     EntitySystem m_entity_system;
@@ -128,4 +129,7 @@ private:
     uint m_pipeMesh;
     uint m_pipeMat;
 
+    uint m_furMesh;
+    uint m_furMats[4];
+    uint m_furEnts[7];
 };
