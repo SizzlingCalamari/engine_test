@@ -1,24 +1,25 @@
 
-local repo = "http://hg.libsdl.org/SDL"
-local dir = path.getbasename(repo)
+local repo = "https://github.com/spurious/SDL-mirror.git"
+local dir = "SDL"
 
 function getdir()
     return dir
 end
 
 function clone()
-    if not os.isdir(getdir() .. "/.hg") then
-        os.execute("hg clone " .. repo .. " " .. getdir())
+    if not os.isdir(getdir() .. "/.git") then
+        os.execute("git clone " .. repo .. " " .. getdir())
     end
-    os.execute("hg pull")
-    os.execute("hg update")
+    os.chdir(dir)
+    os.execute("git reset --hard")
+    os.execute("git fetch origin release-2.0.4")
 end
 
 function buildLinux()
-    if (not os.isfile("SDL/Makefile")) then
-        os.execute("cd SDL; ./autogen.sh; ./configure; make -j4")
+    if (not os.isfile("Makefile")) then
+        os.execute("cd " .. dir .. "; ./autogen.sh; ./configure; make -j4")
     else
-        os.execute("cd SDL; make -j4")
+        os.execute("cd " .. dir .. "; make -j4")
     end
 end
 
