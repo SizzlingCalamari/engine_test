@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include <utility>
+
 // Runs a section of code only once. Passing over it after the first run.
 // Create static RunOnce variable and place in method scope.
 // Example:
