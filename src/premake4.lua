@@ -57,8 +57,6 @@ solution "engine_test"
     -- os specific configurations
     configuration "windows"
         defines "WIN32"
-    configuration "linux"
-        toolset "clang"
     configuration {}
     
     -- hidden option to improve optimized code debugging
