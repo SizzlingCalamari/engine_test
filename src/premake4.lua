@@ -17,6 +17,11 @@ src_dir = vs_include_prefix .. "game/"
 g_output_dir = os.getcwd() .. "/../bin/"
 g_externals_dir = vs_include_prefix .. "/external/"
 
+local pathsep = "/"
+if os.is("windows") then
+    pathsep = "\\"
+end
+
 -- A solution contains projects, and defines the available configurations
 solution "engine_test"
     location "build"
@@ -113,15 +118,15 @@ solution "engine_test"
             links "opengl32"
         configuration {}
         
-        local shader_src = path.translate(os.getcwd() .. "/game/shaders/*")
-        local shader_dest = path.translate(os.getcwd() .. "/../shaders/")
+        local shader_src = path.translate(os.getcwd() .. "/game/shaders/*", pathsep)
+        local shader_dest = path.translate(os.getcwd() .. "/../shaders/", pathsep)
         configuration { "windows" }
             postbuildcommands {
-                "copy /Y \"" .. shader_src .. "\" " .. shader_dest .. "\""
+                "copy /Y \"" .. shader_src .. "\" \"" .. shader_dest .. "\""
             }
         configuration { "linux" }
             postbuildcommands {
-                "cp \"" .. shader_src .. "\" " .. shader_dest .. "\""
+                "cp -r " .. shader_src .. " \"" .. shader_dest .. "\""
             }
         configuration {}
 
