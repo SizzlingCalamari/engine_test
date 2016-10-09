@@ -12,9 +12,9 @@ auto ToImpl(T* thisptr) -> typename T::Impl*
 }
 
 template<typename T>
-auto ToImpl(const T* thisptr) -> typename T::Impl const*
+auto ToImpl(const T* thisptr) -> const typename T::Impl*
 {
-    auto ptr = static_cast<typename T::Impl const*>(thisptr);
+    auto ptr = static_cast<const typename T::Impl*>(thisptr);
     SDL_assert(ptr);
     return ptr;
 }
