@@ -130,7 +130,7 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_DEPTH_BUFFER_BIT);
 
     auto aspect = viewport->GetAspectRatio();
     auto pv = glm::perspective(glm::radians(70.0f), aspect, 0.1f, 10000.0f) * cam->GetView();

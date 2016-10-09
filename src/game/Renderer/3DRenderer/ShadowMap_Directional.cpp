@@ -89,7 +89,7 @@ void ShadowMapDirectional::RenderShadowMap(const glm::vec3& lightDirection,
     glEnable(GL_CULL_FACE);
     glCullFace(GL_FRONT);
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_DEPTH_BUFFER_BIT);
 
     float halfWidth = m_frustumDimensions.x / 2.0f;
     float halfHeight = m_frustumDimensions.y / 2.0f;
