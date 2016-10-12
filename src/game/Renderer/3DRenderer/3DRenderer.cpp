@@ -24,7 +24,8 @@ Renderer3D::Renderer3D(void *GLContext):
     m_glcontext(GLContext),
     m_shader_manager(nullptr),
     m_colour_shader(0),
-    m_texture_shader(0)
+    m_texture_shader(0),
+    m_depth_prepass_shader(0)
 {
 }
 
@@ -34,7 +35,7 @@ void Renderer3D::Init(const renderer3d_config& config)
     glBindVertexArray(m_vao);
 
     GLContext::SetDebugMessageCallback(&GLErrorCallback);
-    GLContext::EnableDepthTest(GL_LESS);
+    GLContext::EnableDepthTest(GL_LEQUAL);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -78,6 +79,7 @@ void Renderer3D::Init(const renderer3d_config& config)
     shadowMapShader.AttachShader(fragmentShaders[2]);
     linked = shadowMapShader.Link();
     assert(linked);
+    m_depth_prepass_shader = shadowMapShader;
     m_shadowMapping.Init(m_resourceLoader,
                          std::move(shadowMapShader),
                          glm::vec3{7000.0f, 7000.0f, 15000.0f},
@@ -130,11 +132,28 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
-    glClear(GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     auto aspect = viewport->GetAspectRatio();
     auto pv = glm::perspective(glm::radians(70.0f), aspect, 0.1f, 10000.0f) * cam->GetView();
 
+    // Perform depth prepass to help with overdraw in lighting calcs
+    m_depth_prepass_shader.Bind();
+    for (auto &obj : scene->m_objects.GetDataArray())
+    {
+        auto mvp = pv * obj.transform;
+        m_depth_prepass_shader.SetUniform("g_depthMVP", &mvp[0][0]);
+
+        auto *mesh = m_resourceLoader->GetMesh(obj.meshId);
+        auto num_vertices = static_cast<GLsizei>(mesh->numVertices);
+
+        glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBufferId);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+            glEnableVertexAttribArray(0);
+            glDrawArrays(GL_TRIANGLES, 0, num_vertices);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+    m_depth_prepass_shader.Unbind();
 
     // render using the texture shader
     m_texture_shader.Bind();

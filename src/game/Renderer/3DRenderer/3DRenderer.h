@@ -46,6 +46,7 @@ private:
     ShaderManager *m_shader_manager;
     ShaderProgram m_colour_shader;
     ShaderProgram m_texture_shader;
+    ShaderProgram m_depth_prepass_shader;
 
     std::vector<const SceneNode*> m_colour_shader_cache;
     std::vector<const SceneNode*> m_texture_shader_cache;
