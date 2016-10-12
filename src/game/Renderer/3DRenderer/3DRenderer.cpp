@@ -53,8 +53,8 @@ void Renderer3D::Init(const renderer3d_config& config)
     std::vector<uint> utilFragmentShaders;
 
     m_shader_manager->CompileShaders(
-        {"shaders/simplevertex.vert", "shaders/texturevertex.vert", "shaders/shadowmap.vert"},
-        {"shaders/simplefragment.frag", "shaders/texturefragment.frag", "shaders/shadowmap.frag"},
+        {"shaders/simplevertex.vert", "shaders/texturevertex.vert", "shaders/shadowmap.vert", "shaders/lambert.vert"},
+        {"shaders/simplefragment.frag", "shaders/texturefragment.frag", "shaders/shadowmap.frag", "shaders/lambert.frag"},
         {"shaders/noise3D.glsl"},
         {"shaders/noise3D.glsl"},
         vertexShaders, fragmentShaders,
@@ -68,8 +68,8 @@ void Renderer3D::Init(const renderer3d_config& config)
     assert(linked);
 
     m_texture_shader = m_shader_manager->CreateProgram();
-    m_texture_shader.AttachShader(vertexShaders[1]);
-    m_texture_shader.AttachShader(fragmentShaders[1]);
+    m_texture_shader.AttachShader(vertexShaders[3]);
+    m_texture_shader.AttachShader(fragmentShaders[3]);
     m_texture_shader.AttachShader(utilFragmentShaders[0]);
     linked = m_texture_shader.Link();
     assert(linked);
