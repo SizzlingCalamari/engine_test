@@ -121,7 +121,7 @@ void RenderProxy::Update()
 void RenderProxy::SetActiveCamera(uint camera)
 {
     auto *physical = m_physical_components->PeekComponent(camera);
-    m_camera.CalcView(physical->position, physical->orientation);
+    m_camera.SetTransform(physical->position, physical->orientation);
 }
 
 void RenderProxy::CheckEntChanges()

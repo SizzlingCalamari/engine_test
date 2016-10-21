@@ -134,14 +134,14 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    auto aspect = viewport->GetAspectRatio();
-    auto pv = glm::perspective(glm::radians(70.0f), aspect, 0.1f, 10000.0f) * cam->GetView();
+    const float aspectRatio = viewport->GetAspectRatio();
+    const glm::mat4 pv = cam->CalcViewProj(aspectRatio);
 
     // Perform depth prepass to help with overdraw in lighting calcs
     m_depth_prepass_shader.Bind();
     for (auto &obj : scene->m_objects.GetDataArray())
     {
-        auto mvp = pv * obj.transform;
+        const glm::mat4 mvp = pv * obj.transform;
         m_depth_prepass_shader.SetUniform("g_depthMVP", &mvp[0][0]);
 
         auto *mesh = m_resourceLoader->GetMesh(obj.meshId);

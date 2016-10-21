@@ -9,20 +9,32 @@
 class Camera
 {
 public:
-    void CalcView(const glm::vec3& position, const glm::quat& orientation)
+    Camera():
+        m_position(),
+        m_orientation(),
+        m_fovRad(glm::radians(70.0f)),
+        m_nearZ(0.1f),
+        m_farZ(10000.0f)
+    {
+    }
+
+    void SetTransform(const glm::vec3& position, const glm::quat& orientation)
     {
         m_position = position;
         m_orientation = orientation;
-
-        auto up = math::up(orientation);
-        auto forward = math::forward(orientation);
-
-        m_view = glm::lookAt(position, position + forward, up);
     }
 
-    const glm::mat4& GetView() const
+    glm::mat4 CalcViewProj(float aspectRatio) const
     {
-        return m_view;
+        const glm::vec3 position = m_position;
+        const glm::quat orientation = m_orientation;
+
+        const glm::vec3 up = math::up(orientation);
+        const glm::vec3 forward = math::forward(orientation);
+
+        const glm::mat4 view = glm::lookAt(position, position + forward, up);
+        const glm::mat4 perspective = glm::perspective(m_fovRad, aspectRatio, m_nearZ, m_farZ);
+        return perspective * view;
     }
 
     const glm::vec3& GetPosition() const
@@ -30,13 +42,11 @@ public:
         return m_position;
     }
 
-    const glm::quat& GetOrientation() const
-    {
-        return m_orientation;
-    }
-
 private:
-    glm::mat4 m_view;
     glm::vec3 m_position;
     glm::quat m_orientation;
+
+    float m_fovRad;
+    float m_nearZ;
+    float m_farZ;
 };
