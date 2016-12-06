@@ -86,13 +86,34 @@ void Engine::Shutdown()
     ApplicationService::FreeWindow(m_window);
 }
 
+class SDLStopWatch
+{
+public:
+    SDLStopWatch():
+        mStartTick(SDL_GetTicks())
+    {
+    }
+
+    uint32 Reset()
+    {
+        const uint32 now = SDL_GetTicks();
+        const uint32 elapsed = (now - mStartTick);
+        mStartTick = now;
+        return(elapsed);
+    }
+
+private:
+    uint32 mStartTick;
+};
+
 void Engine::Run()
 {
     uint64 cur_tick = 0;
-    const uint32 dt = 10;
 
-    uint32 currentTime = SDL_GetTicks();
-    uint32 accumulator = 0;
+    const uint32 logicPeriod = 10;
+
+    SDLStopWatch logicWatch;
+    uint32 logicAcc = logicPeriod;
 
     const float renderPeriodSec = (1.0f / 60.0f);
     const Time::Duration renderPeriod = Time::FromSeconds(renderPeriodSec);
@@ -103,22 +124,14 @@ void Engine::Run()
     while (ApplicationService::FlushAndRefreshEvents(),
             !ApplicationService::QuitRequested())
     {
-        uint32 newTime = SDL_GetTicks();
-        uint32 frameTime = newTime - currentTime;
-        if (frameTime > 250)
-        {
-            frameTime = 250;
-        }
-        currentTime = newTime;
-
-        accumulator += frameTime;
-
         m_inputMapper.DispatchCallbacks();
-        while (accumulator >= dt)
+
+        logicAcc += std::min(250u, logicWatch.Reset());
+        while (logicAcc >= logicPeriod)
         {
-            Simulate(cur_tick, dt);
-            cur_tick += dt;
-            accumulator -= dt;
+            Simulate(cur_tick, logicPeriod);
+            cur_tick += logicPeriod;
+            logicAcc -= logicPeriod;
         }
 
         renderAcc += renderWatch.Reset();
