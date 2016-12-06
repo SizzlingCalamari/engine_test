@@ -3,6 +3,8 @@
 #include "SDL_timer.h"
 #include "Application/Application.h"
 
+#include "Base/Time.h"
+
 #include "Renderer/Renderer.h"
 #include "Renderer/3DRenderer/3DRenderer.h"
 
@@ -11,7 +13,6 @@
 #include <glm/gtx/transform.hpp>
 
 #include "EntitySystem/EntitySystem.h"
-#include <chrono>
 
 #include "Audio/public/hAudioDevice.h"
 
@@ -93,10 +94,11 @@ void Engine::Run()
     uint32 currentTime = SDL_GetTicks();
     uint32 accumulator = 0;
 
-    uint32 fpsMax = 60;
-    std::chrono::nanoseconds renderPeriod(1000000000 / fpsMax);
-    auto currentRenderTime = std::chrono::high_resolution_clock::now();
-    auto renderAccumulator = std::chrono::high_resolution_clock::duration();
+    const float renderPeriodSec = (1.0f / 60.0f);
+    const Time::Duration renderPeriod = Time::FromSeconds(renderPeriodSec);
+    
+    Time::StopWatch renderWatch;
+    Time::Duration renderAcc = renderPeriod;
 
     while (ApplicationService::FlushAndRefreshEvents(),
             !ApplicationService::QuitRequested())
@@ -119,15 +121,11 @@ void Engine::Run()
             accumulator -= dt;
         }
 
-        auto now = std::chrono::high_resolution_clock::now();
-        auto deltaTime = (now - currentRenderTime);
-        currentRenderTime = now;
-        renderAccumulator += deltaTime;
-
-        if (renderAccumulator >= renderPeriod)
+        renderAcc += renderWatch.Reset();
+        if (renderAcc >= renderPeriod)
         {
             Render();
-            renderAccumulator %= std::chrono::duration_cast<decltype(renderAccumulator)>(renderPeriod);
+            renderAcc %= renderPeriod;
         }
     }
 }
