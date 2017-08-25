@@ -10,7 +10,10 @@
 #include "../Input/InputMapper.h"
 
 #include "BulletCollision/CollisionShapes/btBoxShape.h"
+#include "BulletCollision/CollisionShapes/btConvexHullShape.h"
 #include "mathutils.h"
+
+#include "../Renderer/3DRenderer/ModelLoader_OBJ.h"
 
 #include "SDL_keyboard.h"
 #include "SDL_mouse.h"
@@ -737,12 +740,6 @@ void Game::LoadEnts()
         graphical.mesh = m_floorMesh;
         graphical.material = m_woodFloorMaterial;
         m_entity_system.AttachComponent(m_floorEnt, &graphical);
-
-        DynamicsComponent dynamics;
-        dynamics.mass = 0.0f;
-        dynamics.inertia = glm::vec3(0.0f);
-        dynamics.shape = new btBoxShape(btVector3(1000.0f, 10.0f, 1000.0f));
-        m_entity_system.AttachComponent(m_floorEnt, &dynamics);
     }
 
     // Pedestals and teapots
@@ -780,12 +777,19 @@ void Game::LoadEnts()
         graphical.mesh = m_pedestalMesh;
         graphical.material = m_pedestalBumpMaterial;
         m_entity_system.AttachComponent(m_pedestalTeapot2, &graphical);
+
+        DynamicsComponent dynamics;
+        dynamics.mass = 0.0f;
+        dynamics.inertia = glm::vec3(0.0f);
+        dynamics.shape = new btBoxShape(btVector3(1000.0f, 185.0f, 1000.0f));
+        m_entity_system.AttachComponent(m_pedestalTeapot2, &dynamics);
     }
 
     m_teapotMarbleEnt = m_entity_system.CreateEntity();
     {
         PhysicalComponent physical;
         physical.position = glm::vec3(0.0f, 370.0f, -600.0f);
+        physical.orientation = glm::quat(glm::vec3{ -3.0f*glm::quarter_pi<float>(), -3.0f*glm::quarter_pi<float>(), 0.0f });
         m_entity_system.AttachComponent(m_teapotMarbleEnt, &physical);
 
         GraphicalComponent graphical;
@@ -793,10 +797,18 @@ void Game::LoadEnts()
         graphical.material = m_teapotMarbleMaterial;
         m_entity_system.AttachComponent(m_teapotMarbleEnt, &graphical);
 
+        Mesh m = LoadMeshFromOBJ("models/teapot/teapot.obj");
+
         DynamicsComponent dynamics;
         dynamics.mass = 1.0f;
         dynamics.inertia = glm::vec3(0.0f);
-        dynamics.shape = new btBoxShape(btVector3(10.0f, 10.0f, 10.0f));
+        btConvexHullShape* shape = new btConvexHullShape();
+        dynamics.shape = shape;
+        for(const glm::vec3& point : m.vertices)
+        {
+            const btVector3 v(point.x, point.y, point.z);
+            shape->addPoint(v);
+        }
         m_entity_system.AttachComponent(m_teapotMarbleEnt, &dynamics);
     }
 
