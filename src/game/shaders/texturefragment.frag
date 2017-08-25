@@ -227,6 +227,10 @@ void main()
     else
     {
         tex = texture(g_diffuseMapSampler, UV);
+        if(tex.x > g_alphaTestValue)
+        {
+            discard;
+        }
     }
-    fragColour = vec4(tex.xyz * totalLight, tex.a * step(tex.x, g_alphaTestValue));
+    fragColour = vec4(tex.xyz * totalLight, tex.a);
 }
