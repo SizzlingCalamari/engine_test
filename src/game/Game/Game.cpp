@@ -79,8 +79,6 @@ void Game::Initialize(const EngineContext& engine)
     LoadResources();
     LoadEnts();
 
-    LoadFur();
-
     m_thirdperson_controller.SetCameraEnt(m_camera);
     m_thirdperson_controller.SetTargetEnt(m_teapotMarbleEnt);
     m_thirdperson_controller.SetRadiusFromTarget(200.0f);
@@ -835,6 +833,8 @@ void Game::LoadEnts()
         graphical.directionalLight = m_moonLightDirectional;
         m_entity_system.AttachComponent(m_moonLightEnt, &graphical);
     }
+
+    LoadFur();
 
     // Billboards
     m_billboardTextEnts[0] = m_entity_system.CreateEntity();
