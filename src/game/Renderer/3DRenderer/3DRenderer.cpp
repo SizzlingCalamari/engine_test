@@ -25,7 +25,8 @@ Renderer3D::Renderer3D(void *GLContext):
     m_shader_manager(nullptr),
     m_colour_shader(0),
     m_texture_shader(0),
-    m_depth_prepass_shader(0)
+    m_depth_prepass_shader(0),
+    m_skybox_shader(0)
 {
 }
 
@@ -53,8 +54,8 @@ void Renderer3D::Init(const renderer3d_config& config)
     std::vector<uint> utilFragmentShaders;
 
     m_shader_manager->CompileShaders(
-        {"shaders/simplevertex.vert", "shaders/texturevertex.vert", "shaders/shadowmap.vert", "shaders/lambert.vert"},
-        {"shaders/simplefragment.frag", "shaders/texturefragment.frag", "shaders/shadowmap.frag", "shaders/lambert.frag"},
+        {"shaders/simplevertex.vert", "shaders/texturevertex.vert", "shaders/shadowmap.vert", "shaders/lambert.vert", "shaders/skybox.vert"},
+        {"shaders/simplefragment.frag", "shaders/texturefragment.frag", "shaders/shadowmap.frag", "shaders/lambert.frag", "shaders/skybox.frag"},
         {"shaders/noise3D.glsl"},
         {"shaders/noise3D.glsl"},
         vertexShaders, fragmentShaders,
@@ -68,8 +69,8 @@ void Renderer3D::Init(const renderer3d_config& config)
     assert(linked);
 
     m_texture_shader = m_shader_manager->CreateProgram();
-    m_texture_shader.AttachShader(vertexShaders[3]);
-    m_texture_shader.AttachShader(fragmentShaders[3]);
+    m_texture_shader.AttachShader(vertexShaders[1]);
+    m_texture_shader.AttachShader(fragmentShaders[1]);
     m_texture_shader.AttachShader(utilFragmentShaders[0]);
     linked = m_texture_shader.Link();
     assert(linked);
@@ -84,6 +85,12 @@ void Renderer3D::Init(const renderer3d_config& config)
                          std::move(shadowMapShader),
                          glm::vec3{7000.0f, 7000.0f, 15000.0f},
                          4096, 4096);
+
+    m_skybox_shader = m_shader_manager->CreateProgram();
+    m_skybox_shader.AttachShader(vertexShaders[4]);
+    m_skybox_shader.AttachShader(fragmentShaders[4]);
+    linked = m_skybox_shader.Link();
+    assert(linked);
 }
 
 void Renderer3D::Shutdown()
@@ -135,10 +142,36 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     const float aspectRatio = viewport->GetAspectRatio();
-    const glm::mat4 pv = cam->CalcViewProj(aspectRatio);
+    const glm::mat4 proj = cam->CalcProj(aspectRatio);
+    const glm::mat4 pv = proj * cam->CalcView();
+
+    {
+        m_skybox_shader.Bind();
+
+        const glm::mat4 invProj = glm::inverse(proj);
+        glm::mat4 triCoords(
+            glm::vec4(-1.0f, -1.0f, 0.0f, 0.0f),
+            glm::vec4(3.0f, -1.0f, 0.0f, 0.0f),
+            glm::vec4(-1.0f, 3.0f, 0.0f, 0.0f),
+            glm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+        triCoords = invProj * triCoords;
+        m_skybox_shader.SetUniform("TriCoords[0]", &triCoords[0]);
+        m_skybox_shader.SetUniform("TriCoords[1]", &triCoords[1]);
+        m_skybox_shader.SetUniform("TriCoords[2]", &triCoords[2]);
+
+        glDepthMask(GL_FALSE);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        glDepthMask(GL_TRUE);
+        m_skybox_shader.Unbind();
+    }
 
     // Perform depth prepass to help with overdraw in lighting calcs
-    m_depth_prepass_shader.Bind();
+    /*m_depth_prepass_shader.Bind();
     for (auto &obj : scene->m_objects.GetDataArray())
     {
         const glm::mat4 mvp = pv * obj.transform;
@@ -153,7 +186,7 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
             glDrawArrays(GL_TRIANGLES, 0, num_vertices);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
-    m_depth_prepass_shader.Unbind();
+    m_depth_prepass_shader.Unbind();*/
 
     // render using the texture shader
     m_texture_shader.Bind();

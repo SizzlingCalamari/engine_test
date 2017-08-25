@@ -24,7 +24,7 @@ public:
         m_orientation = orientation;
     }
 
-    glm::mat4 CalcViewProj(float aspectRatio) const
+    glm::mat4 CalcView() const
     {
         const glm::vec3 position = m_position;
         const glm::quat orientation = m_orientation;
@@ -33,8 +33,13 @@ public:
         const glm::vec3 forward = math::forward(orientation);
 
         const glm::mat4 view = glm::lookAt(position, position + forward, up);
-        const glm::mat4 perspective = glm::perspective(m_fovRad, aspectRatio, m_nearZ, m_farZ);
-        return perspective * view;
+        return view;
+    }
+
+    glm::mat4 CalcProj(float aspectRatio) const
+    {
+        const glm::mat4 proj = glm::perspective(m_fovRad, aspectRatio, m_nearZ, m_farZ);
+        return proj;
     }
 
     const glm::vec3& GetPosition() const
