@@ -285,6 +285,17 @@ bool Game::HandleCameraMovement(PhysicalComponent *camera, uint32 dt)
                 camera->position -= (right * key_factor);
             }
         }
+        if (keys[SDL_SCANCODE_Q] != keys[SDL_SCANCODE_E])
+        {
+            updated = true;
+            auto forward = math::forward(camera->orientation);
+            float angle = dt * 0.002f;
+            if (keys[SDL_SCANCODE_Q])
+            {
+                angle = -angle;
+            }
+            camera->orientation = math::rotate_world(camera->orientation, angle, forward);
+        }
     }
 
     // mouse camera handling
