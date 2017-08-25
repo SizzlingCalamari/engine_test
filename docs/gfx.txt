@@ -1,0 +1,31 @@
+https://learnopengl.com/#!Getting-started/Coordinate-Systems
+
+managing shaders:
+
+https://www.gamedev.net/topic/675184-shader-permutations/
+https://www.gamedev.net/topic/668718-efficiently-managingusing-shaders-common-to-many-objects-opengl/
+http://gamedev.stackexchange.com/questions/57957/game-engine-design-ubershader-shader-management-design
+http://stackoverflow.com/questions/20443560/how-to-practically-ship-glsl-shaders-with-your-c-software
+
+alpha testing
+- discard is bad for tile based rendering
+http://stackoverflow.com/questions/8509051/is-discard-bad-for-program-performance-in-opengl
+
+
+alpha blending
+- additive blending
+- multiplicative blending
+https://en.wikibooks.org/wiki/GLSL_Programming/Unity/Transparent_Textures
+https://en.wikibooks.org/wiki/GLSL_Programming/Unity/Transparency
+https://en.wikibooks.org/wiki/GLSL_Programming/Unity/Order-Independent_Transparency
+
+shader techniques:
+http://glampert.com/2013/12-08/implementing-a-shading-technique-system/
+
+skybox:
+http://ogldev.atspace.co.uk/www/tutorial25/tutorial25.html
+http://stackoverflow.com/questions/3912207/skybox-vs-skysphere
+http://stackoverflow.com/questions/2588875/whats-the-best-way-to-draw-a-fullscreen-quad-in-opengl-3-2
+https://rauwendaal.net/2014/06/14/rendering-a-screen-covering-triangle-in-opengl/
+http://antongerdelan.net/opengl/cubemaps.html
+https://www.khronos.org/opengl/wiki/Cubemap_Texture
