@@ -249,7 +249,7 @@ void Game::CameraSimulation(uint32 dt)
         break;
     }
 }
-
+#include <iomanip>
 bool Game::HandleCameraMovement(PhysicalComponent *camera, uint32 dt)
 {
     bool updated = false;
@@ -305,7 +305,6 @@ bool Game::HandleCameraMovement(PhysicalComponent *camera, uint32 dt)
         int x = 0;
         int y = 0;
         auto mouse = SDL_GetRelativeMouseState(&x, &y);
-
         if (mouse & SDL_BUTTON(SDL_BUTTON_RIGHT) && (x != 0 || y != 0))
         {
             updated = true;
@@ -313,6 +312,7 @@ bool Game::HandleCameraMovement(PhysicalComponent *camera, uint32 dt)
             {
                 // left/right rotations. no angle clamping
                 const auto y_axis = glm::vec3(0.0f, 1.0f, 0.0f);
+                //const auto y_axis = math::up(camera->orientation);
                 camera->orientation = math::rotate_world(camera->orientation, -x*mouse_factor, y_axis);
             }
             if (y != 0)
@@ -320,9 +320,26 @@ bool Game::HandleCameraMovement(PhysicalComponent *camera, uint32 dt)
                 // up/down rotations. clamp to +-90 degrees.
                 // A better idea would be to limit the rotation before
                 // the rotation calculation, but learning the quaternion math was fun.
-                const auto x_axis = glm::vec3(1.0f, 0.0f, 0.0f);
-                auto after_rotation = math::rotate_local(camera->orientation, y*mouse_factor, x_axis);
-                camera->orientation = math::limit_rotation_xaxis(after_rotation, glm::half_pi<float>());
+                //const auto x_axis = glm::vec3(1.0f, 0.0f, 0.0f);
+                const auto x_axis = math::right(camera->orientation);
+                auto after_rotation = math::rotate_world(camera->orientation, y*mouse_factor, x_axis);
+                auto right = math::right(after_rotation);
+                auto up = math::up(after_rotation);
+                auto fwd = math::forward(after_rotation);
+                std::cout << std::setprecision(10) << right.x << " " << right.y << " " << right.z << std::endl;
+                std::cout << std::setprecision(10) << up.x << " " << up.y << " " << up.z << std::endl;
+                std::cout << std::setprecision(10) << fwd.x << " " << fwd.y << " " << fwd.z << std::endl;
+
+                //camera->orientation = math::limit_rotation_xaxis(after_rotation, glm::quarter_pi<float>() / 2.0f);
+                camera->orientation = after_rotation;
+                
+                auto right2 = math::right(camera->orientation);
+                auto up2 = math::up(camera->orientation);
+                auto fwd2 = math::forward(camera->orientation);
+                std::cout << std::setprecision(10) << right2.x << " " << right2.y << " " << right2.z << std::endl;
+                std::cout << std::setprecision(10) << up2.x << " " << up2.y << " " << up2.z << std::endl;
+                std::cout << std::setprecision(10) << fwd2.x << " " << fwd2.y << " " << fwd2.z << std::endl;
+                std::cout << std::endl;
             }
         }
     }
