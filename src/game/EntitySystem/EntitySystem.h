@@ -16,7 +16,7 @@ public:
 
     uint CreateEntity()
     {
-        return m_ent_counter++;
+        return ++m_ent_counter;
     }
 
     void DestroyEntity(uint ent)
