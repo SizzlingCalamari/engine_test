@@ -95,7 +95,7 @@ private:
     uint m_billboardTextMaterials[3];
     uint m_billboardTextEnts[3];
 
-    uint m_painting100;
+    uint m_unitQuad;
 
     uint m_paintingMaterials[6];
     uint m_paintingEnts[6];

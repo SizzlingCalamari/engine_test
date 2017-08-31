@@ -520,12 +520,12 @@ void Game::LoadResources()
         m_billboardTextMaterials[2] = m_renderer->CreateRenderObject(obj);
     }
 
-    m_painting100 = 0;
+    // Unit quad
     {
         RenderObject obj;
         obj.type = RenderObject::MeshObject;
-        obj.properties.emplace("meshFile", "models/painting100.obj");
-        m_painting100 = m_renderer->CreateRenderObject(obj);
+        obj.properties.emplace("meshFile", "models/unitquad.obj");
+        m_unitQuad = m_renderer->CreateRenderObject(obj);
     }
 
     // Painting Descriptions
@@ -890,12 +890,12 @@ void Game::LoadEnts()
         PhysicalComponent physical;
         physical.position = glm::vec3(-450.0f, 400.0f, -1065.0f);
         physical.orientation = glm::quat(glm::vec3{0.0f, glm::pi<float>(), 0.0f});
-        const float scale = 1.5f;
+        const float scale = 150.0f;
         physical.scale = scale * glm::vec3(1.0f, 0.5764f, 1.0f);
         m_entity_system.AttachComponent(m_paintingEnts[0], &physical);
 
         GraphicalComponent graphical;
-        graphical.mesh = m_painting100;
+        graphical.mesh = m_unitQuad;
         graphical.material = m_paintingMaterials[0];
         m_entity_system.AttachComponent(m_paintingEnts[0], &graphical);
     }
@@ -906,10 +906,12 @@ void Game::LoadEnts()
         PhysicalComponent physical;
         physical.position = glm::vec3(-40.0f, 425.0f, 550.0f);
         physical.orientation = glm::quat(glm::vec3{ 0.0f, -glm::half_pi<float>(), 0.0f });
+        const float scale = 100.0f;
+        physical.scale = scale * glm::vec3(1.0f, 1.0f, 1.0f);
         m_entity_system.AttachComponent(m_paintingEnts[1], &physical);
 
         GraphicalComponent graphical;
-        graphical.mesh = m_painting100;
+        graphical.mesh = m_unitQuad;
         graphical.material = m_paintingMaterials[1];
         m_entity_system.AttachComponent(m_paintingEnts[1], &graphical);
     }
@@ -920,10 +922,12 @@ void Game::LoadEnts()
         PhysicalComponent physical;
         physical.position = glm::vec3(900.0f, 400.0f, -685.0f);
         physical.orientation = glm::quat(glm::vec3{ 0.0f, glm::half_pi<float>(), 0.0f });
+        const float scale = 100.0f;
+        physical.scale = scale * glm::vec3(1.0f, 1.0f, 1.0f);
         m_entity_system.AttachComponent(m_paintingEnts[2], &physical);
 
         GraphicalComponent graphical;
-        graphical.mesh = m_painting100;
+        graphical.mesh = m_unitQuad;
         graphical.material = m_paintingMaterials[2];
         m_entity_system.AttachComponent(m_paintingEnts[2], &graphical);
     }
@@ -934,11 +938,12 @@ void Game::LoadEnts()
         PhysicalComponent physical;
         physical.position = glm::vec3(70.0f, 425.0f, 550.0f);
         physical.orientation = glm::quat(glm::vec3{ 0.0f, glm::half_pi<float>(), 0.0f });
-        physical.scale = glm::vec3(1.0f, 0.75f, 1.0f);
+        const float scale = 100.0f;
+        physical.scale = scale * glm::vec3(1.0f, 0.75f, 1.0f);
         m_entity_system.AttachComponent(m_paintingEnts[3], &physical);
 
         GraphicalComponent graphical;
-        graphical.mesh = m_painting100;
+        graphical.mesh = m_unitQuad;
         graphical.material = m_paintingMaterials[3];
         m_entity_system.AttachComponent(m_paintingEnts[3], &graphical);
     }
@@ -949,12 +954,12 @@ void Game::LoadEnts()
         PhysicalComponent physical;
         physical.position = glm::vec3(475.0f, 380.0f, -1065.0f);
         physical.orientation = glm::quat(glm::vec3{0.0f, glm::pi<float>(), 0.0f});
-        const float scale = 1.60f;
+        const float scale = 160.0f;
         physical.scale = scale * glm::vec3(1.0f, 0.7094f, 1.0f);
         m_entity_system.AttachComponent(m_paintingEnts[4], &physical);
 
         GraphicalComponent graphical;
-        graphical.mesh = m_painting100;
+        graphical.mesh = m_unitQuad;
         graphical.material = m_paintingMaterials[4];
         m_entity_system.AttachComponent(m_paintingEnts[4], &graphical);
     }
