@@ -72,8 +72,8 @@ private:
     uint m_teapotMarbleMaterial;
     uint m_teapotBumpMaterial;
     uint m_teapotCelMaterial;
-    uint m_wallBumpMaterial;
-    uint m_pedestalBumpMaterial;
+    uint m_wallMaterial;
+    uint m_pedestalMaterial;
 
     uint m_moonLightDirectional;
 

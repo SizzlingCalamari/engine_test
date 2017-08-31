@@ -35,8 +35,8 @@ Game::Game():
     m_moonLightDirectional(0),
     m_teapotMesh(0),
     m_pedestalMesh(0),
-    m_wallBumpMaterial(0),
-    m_pedestalBumpMaterial(0),
+    m_wallMaterial(0),
+    m_pedestalMaterial(0),
     m_camera(0),
     m_floorEnt(0),
     m_moonLightEnt(0),
@@ -477,26 +477,24 @@ void Game::LoadResources()
         m_moonLightDirectional = m_renderer->CreateRenderObject(obj);
     }
 
-    m_wallBumpMaterial = 0;
+    m_wallMaterial = 0;
     {
         RenderObject obj;
         obj.type = RenderObject::Material;
         obj.properties.emplace("diffuseSolidColour", "0.5 0.5 0.5");
         obj.properties.emplace("specularIntensity", "1.0");
         obj.properties.emplace("specularPower", "32.0");
-        obj.properties.emplace("noiseBumpMap", "1");
-        m_wallBumpMaterial = m_renderer->CreateRenderObject(obj);
+        m_wallMaterial = m_renderer->CreateRenderObject(obj);
     }
 
-    m_pedestalBumpMaterial = 0;
+    m_pedestalMaterial = 0;
     {
         RenderObject obj;
         obj.type = RenderObject::Material;
         obj.properties.emplace("diffuseSolidColour", "0.6 0.6 0.6");
         obj.properties.emplace("specularIntensity", "1.0");
         obj.properties.emplace("specularPower", "32.0");
-        obj.properties.emplace("noiseBumpMap", "1");
-        m_pedestalBumpMaterial = m_renderer->CreateRenderObject(obj);
+        m_pedestalMaterial = m_renderer->CreateRenderObject(obj);
     }
 
     // Billboard materials
@@ -742,7 +740,7 @@ void Game::LoadEnts()
 
         GraphicalComponent graphical;
         graphical.mesh = m_roomMesh;
-        graphical.material = m_wallBumpMaterial;
+        graphical.material = m_wallMaterial;
         m_entity_system.AttachComponent(m_roomEnt, &graphical);
     }
 
@@ -768,7 +766,7 @@ void Game::LoadEnts()
 
         GraphicalComponent graphical;
         graphical.mesh = m_pedestalMesh;
-        graphical.material = m_pedestalBumpMaterial;
+        graphical.material = m_pedestalMaterial;
         m_entity_system.AttachComponent(m_pedestalTeapot1, &graphical);
     }
 
@@ -792,7 +790,7 @@ void Game::LoadEnts()
 
         GraphicalComponent graphical;
         graphical.mesh = m_pedestalMesh;
-        graphical.material = m_pedestalBumpMaterial;
+        graphical.material = m_pedestalMaterial;
         m_entity_system.AttachComponent(m_pedestalTeapot2, &graphical);
 
         DynamicsComponent dynamics;
@@ -837,7 +835,7 @@ void Game::LoadEnts()
 
         GraphicalComponent graphical;
         graphical.mesh = m_pedestalMesh;
-        graphical.material = m_pedestalBumpMaterial;
+        graphical.material = m_pedestalMaterial;
         m_entity_system.AttachComponent(m_pedestalTeapot3, &graphical);
     }
 
