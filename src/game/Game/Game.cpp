@@ -26,7 +26,6 @@ Game::Game():
     m_renderer(nullptr),
     m_physics(nullptr),
     m_audio(nullptr),
-    m_floorMesh(0),
     m_jesusMaterial(0),
     m_teapotDefaultMaterial(0),
     m_teapotMarbleMaterial(0),
@@ -354,14 +353,6 @@ void Game::LoadResources()
         obj.type = RenderObject::MeshObject;
         obj.properties.emplace("meshFile", "models/room.obj");
         m_roomMesh = m_renderer->CreateRenderObject(obj);
-    }
-
-    m_floorMesh = 0;
-    {
-        RenderObject obj;
-        obj.type = RenderObject::MeshObject;
-        obj.properties.emplace("meshFile", "models/floor.obj");
-        m_floorMesh = m_renderer->CreateRenderObject(obj);
     }
 
     m_teapotMesh = 0;

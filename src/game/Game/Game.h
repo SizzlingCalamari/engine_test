@@ -61,7 +61,6 @@ private:
     Uint32 m_jesusThwompLen;
 
     uint m_roomMesh;
-    uint m_floorMesh;
     uint m_teapotMesh;
     uint m_pedestalMesh;
     uint m_billboardMesh;
