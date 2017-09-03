@@ -16,6 +16,7 @@ out vec3 position_noiseCoords;
 uniform mat4 MVP;
 uniform mat4 g_depthMVP;
 uniform mat4 modelToWorld;
+uniform mat3x2 cUVTransform;
 uniform vec3 minAABB;
 
 float minOfVec3(vec3 vec)
@@ -38,8 +39,8 @@ void main()
     // output coordinates in directional light shadow depth coordinates
     directionalLightSpacePosition = g_depthMVP * vec4(vertexPosition_modelspace, 1.0f);
 
-	// UV of the vertex. No special space for this one.
-	UV = vertexUV;
+    // Apply uv scale, rot, offset
+    UV = (cUVTransform * vec3(vertexUV, 1.0)).xy;
 
     // convert the normal to world space
     normal = (modelToWorld * vec4(vertexNormal_modelspace, 0.0f)).xyz;

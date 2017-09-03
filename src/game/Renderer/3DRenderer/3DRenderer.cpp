@@ -256,6 +256,7 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
         m_texture_shader.SetUniform("modelToWorld", &obj.transform);
 
         auto *material = m_resourceLoader->GetMaterial(obj.materialId);
+        m_texture_shader.SetUniform("cUVTransform", &material->uvTransform[0][0]);
         m_texture_shader.SetUniform("g_diffuseColour", &material->diffuseSolidColour);
         m_texture_shader.SetUniform("g_noiseDiffuseMap", &material->noiseDiffuseMap);
         m_texture_shader.SetUniform("g_noiseBumpMap", &material->noiseBumpMap);

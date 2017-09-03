@@ -66,6 +66,12 @@ bool ShaderProgram::SetUniform(const char* name, const void* data)
     UniformInfo info = it->second;
     switch (info.type)
     {
+    case GL_FLOAT_MAT3x2:
+        {
+            const GLfloat* mat = static_cast<const GLfloat*>(data);
+            glUniformMatrix3x2fv(info.index, 1, GL_FALSE, mat);
+        }
+        break;
     case GL_FLOAT_MAT4:
         {
             auto mat4 = static_cast<const float*>(data);

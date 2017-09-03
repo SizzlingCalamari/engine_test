@@ -403,6 +403,8 @@ void Game::LoadResources()
         obj.properties.emplace("diffuseMapFile", "textures/hardwood.jpg");
         obj.properties.emplace("specularIntensity", "1.0");
         obj.properties.emplace("specularPower", "32.0");
+        obj.properties.emplace("uvScale", "8.0 8.0");
+        //obj.properties.emplace("uvOffset", "0.1 0.1");
         m_woodFloorMaterial = m_renderer->CreateRenderObject(obj);
     }
 
@@ -731,10 +733,12 @@ void Game::LoadEnts()
     {
         PhysicalComponent physical;
         physical.position = glm::vec3(0.0f, 0.0f, 0.0f);
+        physical.orientation = glm::quat(glm::vec3{ -glm::half_pi<float>(), 0.0f, 0.0f });
+        physical.scale = 3000.0f * glm::vec3(1.0f, 1.0f, 1.0f);
         m_entity_system.AttachComponent(m_floorEnt, &physical);
 
         GraphicalComponent graphical;
-        graphical.mesh = m_floorMesh;
+        graphical.mesh = m_unitQuad;
         graphical.material = m_woodFloorMaterial;
         m_entity_system.AttachComponent(m_floorEnt, &graphical);
     }

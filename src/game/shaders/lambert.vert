@@ -56,6 +56,7 @@ const int MAX_SPOT_LIGHTS = 10;
 uniform mat4 MVP;
 uniform mat4 g_depthMVP;
 uniform mat4 modelToWorld;
+uniform mat3x2 cUVTransform;
 
 uniform sampler2D g_shadowMapSampler;
 uniform DirectionalLight g_directionalLight;
@@ -200,8 +201,8 @@ void main()
     // Output position of the vertex, in clip space : MVP * position
     gl_Position =  MVP * vec4(vertexPosition_modelspace, 1.0f);
 
-    // UV of the vertex. No special space for this one.
-    UV = vertexUV;
+    // Apply uv scale, rot, offset
+    UV = (cUVTransform * vec3(vertexUV, 1.0)).xy;
 
     vertexLight = CalcVertexLight();
 }

@@ -2,6 +2,7 @@
 #pragma once
 
 #include <glm/vec3.hpp>
+#include <glm/vec2.hpp>
 #include <sstream>
 #include <string>
 
@@ -18,4 +19,12 @@ inline bool StringTo(const std::string& str, glm::vec3& out)
 {
     std::stringstream ss(str);
     return !!(ss >> out.x >> out.y >> out.z);
+}
+
+// format "%f %f"
+template<>
+inline bool StringTo(const std::string& str, glm::vec2& out)
+{
+    std::stringstream ss(str);
+    return !!(ss >> out.x >> out.y);
 }

@@ -2,6 +2,7 @@
 #pragma once
 
 #include <glm/vec3.hpp>
+#include <glm/mat3x2.hpp>
 
 struct Material
 {
@@ -22,7 +23,9 @@ struct Material
     float specularIntensity;
     float specularPower;
     float alphaTestValue;
-    
+
+    glm::mat3x2 uvTransform;
+
     bool noiseDiffuseMap;
     bool noiseBumpMap;
     bool celShaded;

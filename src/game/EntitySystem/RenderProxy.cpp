@@ -301,4 +301,16 @@ void RenderProxy::ParseMaterial(Material &mat, const RenderObject& obj)
     FindAndLoad(props, "alphaTestValue", mat.alphaTestValue);
     FindAndLoad(props, "noiseBumpMap", mat.noiseBumpMap);
     FindAndLoad(props, "celShaded", mat.celShaded);
+
+    glm::vec2 tempVec2;
+    if (FindAndLoad(props, "uvScale", tempVec2))
+    {
+        mat.uvTransform[0][0] = tempVec2.x;
+        mat.uvTransform[1][1] = tempVec2.y;
+    }
+    if (FindAndLoad(props, "uvOffset", tempVec2))
+    {
+        mat.uvTransform[0][2] = tempVec2.x;
+        mat.uvTransform[1][2] = tempVec2.y;
+    }
 }
