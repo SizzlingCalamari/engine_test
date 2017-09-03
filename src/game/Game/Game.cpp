@@ -1056,14 +1056,7 @@ void Game::LoadEnts()
 
 void Game::LoadFur()
 {
-    {
-        RenderObject obj;
-        obj.type = RenderObject::MeshObject;
-        obj.properties.emplace("meshFile", "models/fur.obj");
-        m_furMesh = m_renderer->CreateRenderObject(obj);
-    }
-
-    const char* furTextures[4] =
+    static const char* const furTextures[4] =
     {
         "textures/sz_fur_a1.nto.png",
         "textures/sz_fur_a2.nto.png",
@@ -1081,6 +1074,7 @@ void Game::LoadFur()
         obj.properties.emplace("diffuseMapFile", furTextures[i]);
         obj.properties.emplace("specularIntensity", "1.0");
         obj.properties.emplace("specularPower", "32.0");
+        obj.properties.emplace("uvScale", "4.0 4.0");
         m_furMats[i] = m_renderer->CreateRenderObject(obj);
     }
 
@@ -1094,10 +1088,11 @@ void Game::LoadFur()
 
         PhysicalComponent physical;
         physical.position = furPos + (furStep * static_cast<float>(i));
+        physical.scale = glm::vec3(100.0f);
         m_entity_system.AttachComponent(ent, &physical);
 
         GraphicalComponent graphical;
-        graphical.mesh = m_furMesh;
+        graphical.mesh = m_unitQuad;
         graphical.material = (i == 0) ? m_furMats[3] : m_furMats[(i-1) / 2];
         m_entity_system.AttachComponent(ent, &graphical);
     }

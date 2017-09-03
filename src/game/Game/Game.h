@@ -125,7 +125,6 @@ private:
     uint m_thwompMesh;
     uint m_thwompMat;
 
-    uint m_furMesh;
     uint m_furMats[4];
     uint m_furEnts[7];
 };
