@@ -796,11 +796,15 @@ void Game::LoadEnts()
         dynamics.inertia = glm::vec3(0.0f);
         btConvexHullShape* shape = new btConvexHullShape();
         dynamics.shape = shape;
+
         for(const glm::vec3& point : m.vertices)
         {
             const btVector3 v(point.x, point.y, point.z);
-            shape->addPoint(v);
+            const bool recalculateAABB = false;
+            shape->addPoint(v, recalculateAABB);
         }
+        shape->recalcLocalAabb();
+
         m_entity_system.AttachComponent(m_teapotMarbleEnt, &dynamics);
     }
 
