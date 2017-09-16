@@ -23,7 +23,7 @@
 #  endif // STDCALL
 #endif // STDCALL
 
-#ifdef _MSC_VER
+#if (_MSC_VER < 1900)
   // disable array initialization new behaviour warning
   #pragma warning(disable : 4351)
 #endif
