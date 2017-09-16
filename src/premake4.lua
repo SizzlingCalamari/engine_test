@@ -39,7 +39,12 @@ solution "engine_test"
         platforms { "x32", "x64" }
     end
     
-    flags { "StaticRuntime", "NoExceptions", "Symbols" }
+    flags { "StaticRuntime", "Symbols" }
+    if exceptionhandling ~= nil then
+        exceptionhandling "Off"
+    else
+        flags { "NoExceptions" }
+    end
     vectorextensions "SSE2"
     defines {
         "_CRT_SECURE_NO_WARNINGS",
