@@ -47,7 +47,7 @@ template<typename T, size_t Align>
 class heap_aligned_alloc
 {
 public:
-    heap_aligned_alloc() noexcept
+    heap_aligned_alloc()
     {
         std::size_t length = sizeof(T) + Align - 1;
         void* ptr = malloc(length);
@@ -64,7 +64,7 @@ public:
         m_mem = nullptr;
     }
 
-    inline T* operator->() const noexcept
+    inline T* operator->() const
     {
         return m_ptr;
     }

@@ -9,13 +9,13 @@ Image::Image():
 {
 }
 
-Image::Image(Image&& other) noexcept:
+Image::Image(Image&& other):
     pixelData(other.pixelData)
 {
     other.pixelData = nullptr;
 }
 
-Image& Image::operator=(Image&& other) noexcept
+Image& Image::operator=(Image&& other)
 {
     if(pixelData)
     {
@@ -23,9 +23,10 @@ Image& Image::operator=(Image&& other) noexcept
     }
     pixelData = other.pixelData;
     other.pixelData = nullptr;
+    return *this;
 }
 
-Image::~Image() noexcept
+Image::~Image()
 {
     if(pixelData)
     {
@@ -36,5 +37,5 @@ Image::~Image() noexcept
 
 Image LoadImageFromFilename(const char *filename)
 {
-
+    return Image();
 }

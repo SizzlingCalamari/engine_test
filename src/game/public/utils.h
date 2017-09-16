@@ -16,7 +16,7 @@ class RunOnce
 {
 public:
     template<typename T>
-    explicit inline RunOnce(const T& fn) noexcept { fn(); }
+    explicit inline RunOnce(const T& fn) { fn(); }
 };
 
 // Creates and returns a pointer to an rvalue.
@@ -29,8 +29,8 @@ template<class T>
 class RValPtrClass
 {
 public:
-    explicit inline RValPtrClass(T&& p) noexcept: m_ptr(std::forward<T>(p)) {}
-    inline operator T*() noexcept { return &m_ptr; }
+    explicit inline RValPtrClass(T&& p): m_ptr(std::forward<T>(p)) {}
+    inline operator T*() { return &m_ptr; }
 private:
     T m_ptr;
 };
@@ -51,14 +51,14 @@ template<class T>
 class IteratorPair
 {
 public:
-    explicit inline IteratorPair(T begin, T end) noexcept :
+    explicit inline IteratorPair(T begin, T end) :
         m_begin(begin),
         m_end(end)
     {
     }
 
-    inline T begin() const noexcept { return m_begin; }
-    inline T end() const noexcept { return m_end; }
+    inline T begin() const { return m_begin; }
+    inline T end() const { return m_end; }
 private:
     T m_begin;
     T m_end;

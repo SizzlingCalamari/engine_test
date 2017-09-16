@@ -7,11 +7,11 @@ struct Image
 {
     Image();
     Image(const Image& other) = delete;
-    Image(Image&& other) noexcept;
-    ~Image() noexcept;
+    Image(Image&& other);
+    ~Image();
 
     Image& operator=(const Image& other) = delete;
-    Image& operator=(Image&& other) noexcept;
+    Image& operator=(Image&& other);
 
     uint8* pixelData;
 };
