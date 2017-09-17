@@ -54,14 +54,14 @@ inline const Material* ResourceLoader::GetMaterial(uint id)
 
 inline void ResourceLoader::UnloadResources()
 {
-    for (auto it : m_meshes)
+    for (auto& it : m_meshes)
     {
-        auto &mesh = it.second;
+        Mesh& mesh = it.second;
         FreeMesh(&mesh);
     }
-    for (auto it : m_textures)
+    for (auto& it : m_textures)
     {
-        auto &texture = it.second;
+        Texture& texture = it.second;
         texture.FreeTexture();
     }
     m_materials.clear();
