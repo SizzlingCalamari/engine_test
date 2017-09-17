@@ -23,7 +23,6 @@ static void STDCALL GLErrorCallback(
 Renderer3D::Renderer3D(void *GLContext):
     m_glcontext(GLContext),
     m_shader_manager(nullptr),
-    m_colour_shader(0),
     m_texture_shader(0),
     m_depth_prepass_shader(0),
     m_skybox_shader(0)
@@ -54,30 +53,23 @@ void Renderer3D::Init(const renderer3d_config& config)
     std::vector<uint> utilFragmentShaders;
 
     m_shader_manager->CompileShaders(
-        {"shaders/simplevertex.vert", "shaders/texturevertex.vert", "shaders/shadowmap.vert", "shaders/lambert.vert", "shaders/skybox.vert"},
-        {"shaders/simplefragment.frag", "shaders/texturefragment.frag", "shaders/shadowmap.frag", "shaders/lambert.frag", "shaders/skybox.frag"},
+        {"shaders/texturevertex.vert", "shaders/shadowmap.vert", "shaders/lambert.vert", "shaders/skybox.vert"},
+        {"shaders/texturefragment.frag", "shaders/shadowmap.frag", "shaders/lambert.frag", "shaders/skybox.frag"},
         {"shaders/noise3D.glsl"},
         {"shaders/noise3D.glsl"},
         vertexShaders, fragmentShaders,
         utilVertexShaders, utilFragmentShaders);
 
-    m_colour_shader = m_shader_manager->CreateProgram();
-    m_colour_shader.AttachShader(vertexShaders[0]);
-    m_colour_shader.AttachShader(fragmentShaders[0]);
-    m_colour_shader.AttachShader(utilFragmentShaders[0]);
-    bool linked = m_colour_shader.Link();
-    assert(linked);
-
     m_texture_shader = m_shader_manager->CreateProgram();
-    m_texture_shader.AttachShader(vertexShaders[1]);
-    m_texture_shader.AttachShader(fragmentShaders[1]);
+    m_texture_shader.AttachShader(vertexShaders[0]);
+    m_texture_shader.AttachShader(fragmentShaders[0]);
     m_texture_shader.AttachShader(utilFragmentShaders[0]);
-    linked = m_texture_shader.Link();
+    bool linked = m_texture_shader.Link();
     assert(linked);
 
     auto shadowMapShader = m_shader_manager->CreateProgram();
-    shadowMapShader.AttachShader(vertexShaders[2]);
-    shadowMapShader.AttachShader(fragmentShaders[2]);
+    shadowMapShader.AttachShader(vertexShaders[1]);
+    shadowMapShader.AttachShader(fragmentShaders[1]);
     linked = shadowMapShader.Link();
     assert(linked);
     m_depth_prepass_shader = shadowMapShader;
@@ -87,8 +79,8 @@ void Renderer3D::Init(const renderer3d_config& config)
                          4096, 4096);
 
     m_skybox_shader = m_shader_manager->CreateProgram();
-    m_skybox_shader.AttachShader(vertexShaders[4]);
-    m_skybox_shader.AttachShader(fragmentShaders[4]);
+    m_skybox_shader.AttachShader(vertexShaders[3]);
+    m_skybox_shader.AttachShader(fragmentShaders[3]);
     linked = m_skybox_shader.Link();
     assert(linked);
 }

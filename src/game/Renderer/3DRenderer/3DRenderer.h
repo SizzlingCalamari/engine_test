@@ -44,7 +44,6 @@ private:
     ResourceLoader *m_resourceLoader;
 
     ShaderManager *m_shader_manager;
-    ShaderProgram m_colour_shader;
     ShaderProgram m_texture_shader;
     ShaderProgram m_depth_prepass_shader;
     ShaderProgram m_skybox_shader;
