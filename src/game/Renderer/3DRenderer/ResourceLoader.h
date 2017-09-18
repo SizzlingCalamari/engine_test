@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "Mesh.h"
+#include "GLMesh.h"
 #include "Texture.h"
 #include "Material.h"
 
@@ -17,7 +17,7 @@ public:
 
     void UnloadResources();
 
-    const Mesh* GetMesh(uint id);
+    const GLMesh* GetMesh(uint id);
 
     const Texture* GetTexture(uint id);
 
@@ -28,13 +28,13 @@ private:
 
 private:
     std::unordered_map<std::string, uint> m_resourceIds;
-    std::unordered_map<uint, Mesh> m_meshes;
+    std::unordered_map<uint, GLMesh> m_meshes;
     std::unordered_map<uint, Texture> m_textures;
     std::unordered_map<uint, Material> m_materials;
     uint m_resourceIdCounter = 0;
 };
 
-inline const Mesh* ResourceLoader::GetMesh(uint id)
+inline const GLMesh* ResourceLoader::GetMesh(uint id)
 {
     assert(m_meshes.find(id) != m_meshes.end());
     return &m_meshes[id];
@@ -56,8 +56,8 @@ inline void ResourceLoader::UnloadResources()
 {
     for (auto& it : m_meshes)
     {
-        Mesh& mesh = it.second;
-        FreeMesh(&mesh);
+        GLMesh& mesh = it.second;
+        mesh.FreeBuffers();
     }
     for (auto& it : m_textures)
     {

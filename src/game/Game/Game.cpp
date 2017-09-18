@@ -13,7 +13,7 @@
 #include "BulletCollision/CollisionShapes/btConvexHullShape.h"
 #include "mathutils.h"
 
-#include "../Renderer/3DRenderer/ModelLoader_OBJ.h"
+#include "ModelLoader_OBJ.h"
 
 #include "SDL_keyboard.h"
 #include "SDL_mouse.h"

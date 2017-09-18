@@ -22,11 +22,15 @@ uint ResourceLoader::LoadResource(const std::string& path)
     }
     else if (extension == "fbx")
     {
-        m_meshes.emplace(id, LoadMeshFromFBX(path.c_str()));
+        Mesh mesh = LoadMeshFromFBX(path.c_str());
+        GLMesh glMesh = GLMesh::GLMeshFromMesh(mesh);
+        m_meshes.emplace(id, std::move(glMesh));
     }
     else if (extension == "obj")
     {
-        m_meshes.emplace(id, LoadMeshFromOBJ(path.c_str()));
+        Mesh mesh = LoadMeshFromOBJ(path.c_str());
+        GLMesh glMesh = GLMesh::GLMeshFromMesh(mesh);
+        m_meshes.emplace(id, std::move(glMesh));
     }
     else
     {

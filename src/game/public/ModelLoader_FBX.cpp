@@ -109,7 +109,5 @@ Mesh LoadMeshFromFBX(const char *filename)
 {
     Mesh mesh;
     mesh.vertices = ParseFBX(filename);
-    mesh.numVertices = mesh.vertices.size();
-    mesh.vertexBufferId = LoadVertices(mesh.vertices.data(), sizeof(glm::vec3), mesh.numVertices);
     return mesh;
 }

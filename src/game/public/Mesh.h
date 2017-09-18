@@ -1,0 +1,18 @@
+
+#pragma once
+
+#include <glm/vec3.hpp>
+#include <glm/vec2.hpp>
+#include <vector>
+
+struct Mesh
+{
+    Mesh();
+    ~Mesh();
+
+    std::vector<glm::vec3> vertices;
+    std::vector<glm::vec2> uvcoords;
+    std::vector<glm::vec3> normals;
+    glm::vec3 minAABB;
+    glm::vec3 maxAABB;
+};

@@ -187,19 +187,5 @@ Mesh LoadMeshFromOBJ(const char *filename)
 {
     Mesh mesh;
     ParseOBJ(filename, mesh.vertices, mesh.uvcoords, mesh.normals, mesh.minAABB, mesh.maxAABB);
-    mesh.numVertices = mesh.vertices.size();
-    if (mesh.numVertices > 0)
-    {
-        mesh.vertexBufferId = LoadVertices(mesh.vertices.data(), sizeof(glm::vec3), mesh.numVertices);
-    }
-    if (mesh.uvcoords.size() > 0)
-    {
-        mesh.uvBufferId = LoadVertices(mesh.uvcoords.data(), sizeof(glm::vec2), mesh.uvcoords.size());
-    }
-    if (mesh.normals.size() > 0)
-    {
-        mesh.normalBufferId = LoadVertices(mesh.normals.data(), sizeof(glm::vec3), mesh.normals.size());
-    }
-    
     return mesh;
 }
