@@ -71,6 +71,7 @@ void Texture::FreeTexture()
     if (m_texture_2d != 0)
     {
         glDeleteTextures(1, &m_texture_2d);
+        m_texture_2d = 0;
     }
 }
 
