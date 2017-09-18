@@ -387,6 +387,14 @@ void Game::LoadResources()
         m_thwompMesh = m_renderer->CreateRenderObject(obj);
     }
 
+    m_moonMesh = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::MeshObject;
+        obj.properties.emplace("meshFile", "models/moon.obj");
+        m_moonMesh = m_renderer->CreateRenderObject(obj);
+    }
+
     m_woodFloorMaterial = 0;
     {
         RenderObject obj;
@@ -580,6 +588,16 @@ void Game::LoadResources()
         obj.properties.emplace("specularIntensity", "1.0");
         obj.properties.emplace("specularPower", "32.0");
         m_thwompMat = m_renderer->CreateRenderObject(obj);
+    }
+
+    m_moonMaterial = 0;
+    {
+        RenderObject obj;
+        obj.type = RenderObject::Material;
+        obj.properties.emplace("diffuseMapFile", "textures/moon_00_0.png");
+        obj.properties.emplace("specularIntensity", "1.0");
+        obj.properties.emplace("specularPower", "32.0");
+        m_moonMaterial = m_renderer->CreateRenderObject(obj);
     }
 
     // Spot Light Descriptions
@@ -975,6 +993,31 @@ void Game::LoadEnts()
         graphical.mesh = m_thwompMesh;
         graphical.material = m_thwompMat;
         m_entity_system.AttachComponent(m_thwompEnt, &graphical);
+    }
+
+    auto ModelLookAt = [](
+        const glm::vec3& position,
+        const glm::vec3& target,
+        const glm::vec3& up
+    ) -> glm::quat
+    {
+        const glm::vec3 fwd = glm::normalize(target - position);
+        const glm::vec3 right = glm::normalize(cross(up, fwd));
+        const glm::vec3 newUp = glm::cross(fwd, right);
+        return glm::quat(glm::mat3(right, newUp, fwd));
+    };
+
+    m_moonEnt = m_entity_system.CreateEntity();
+    {
+        PhysicalComponent physical;
+        physical.position = glm::vec3(2000.0f, 5000.0f, 0.0f);
+        physical.orientation = ModelLookAt(physical.position, glm::vec3(), glm::vec3(0.0f, 1.0f, 0.0f));
+        m_entity_system.AttachComponent(m_moonEnt, &physical);
+
+        GraphicalComponent graphical;
+        graphical.mesh = m_moonMesh;
+        graphical.material = m_moonMaterial;
+        m_entity_system.AttachComponent(m_moonEnt, &graphical);
     }
 
     // Spotlights

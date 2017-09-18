@@ -80,6 +80,10 @@ private:
     uint m_roomEnt;
     uint m_floorEnt;
 
+    uint m_moonEnt;
+    uint m_moonMaterial;
+    uint m_moonMesh;
+
     uint m_pedestalTeapot1;
     uint m_teapotBumpedEnt;
 
