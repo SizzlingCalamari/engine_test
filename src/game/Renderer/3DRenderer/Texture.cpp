@@ -1,6 +1,42 @@
 
 #include "Texture.h"
 #include "GL/glew.h"
+#include <assert.h>
+
+Texture::Texture():
+    m_texture_2d(0),
+    m_width(0),
+    m_height(0)
+{
+}
+
+Texture::Texture(Texture&& other):
+    m_texture_2d(other.m_texture_2d),
+    m_width(other.m_width),
+    m_height(other.m_height)
+{
+    other.m_texture_2d = 0;
+    other.m_width = 0;
+    other.m_height = 0;
+}
+
+Texture& Texture::operator=(Texture&& other)
+{
+    m_texture_2d = other.m_texture_2d;
+    m_width = other.m_width;
+    m_height = other.m_height;
+
+    other.m_texture_2d = 0;
+    other.m_width = 0;
+    other.m_height = 0;
+
+    return *this;
+}
+
+Texture::~Texture()
+{
+    assert(m_texture_2d == 0);
+}
 
 void Texture::LoadTexture2D(const uint8* pixels, ptrdiff_t stride, uint width, uint height)
 {

@@ -7,12 +7,12 @@
 class Texture
 {
 public:
-    Texture():
-        m_texture_2d(0),
-        m_width(0),
-        m_height(0)
-    {
-    }
+    Texture();
+    Texture(const Texture& other) = delete;
+    Texture(Texture&& other);
+    Texture& operator=(Texture&& other);
+    Texture& operator=(const Texture& other) = delete;
+    ~Texture();
 
     void LoadTexture2D(const uint8* pixels, std::ptrdiff_t stride, uint width, uint height);
 
