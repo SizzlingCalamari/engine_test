@@ -22,9 +22,11 @@ uint ResourceLoader::LoadResource(const std::string& path)
     }
     else if (extension == "fbx")
     {
+        #ifndef __APPLE__
         Mesh mesh = LoadMeshFromFBX(path.c_str());
         GLMesh glMesh = GLMesh::GLMeshFromMesh(mesh);
         m_meshes.emplace(id, std::move(glMesh));
+        #endif
     }
     else if (extension == "obj")
     {

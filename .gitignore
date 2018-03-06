@@ -38,3 +38,4 @@ src/external/sdl/**/
 
 shaders/
 !shaders/placeholder
+!/src/game/shaders/

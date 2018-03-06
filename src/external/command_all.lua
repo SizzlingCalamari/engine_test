@@ -17,7 +17,7 @@ for dir in dirs do
     elseif _ACTION == "build" then
         if (os.get() == "windows") then
             buildWindows()
-        elseif (os.get() == "linux") then
+        else
             buildLinux()
         end
     end

@@ -7,7 +7,7 @@ index b806564..6eaf99d 100644
    }
  
 -  
-+    if os.is("Linux") then
++    if os.is("Linux") or os.is("macosx") then
 +        if os.is64bit() then
 +            platforms {"x64"}
 +        else
@@ -49,3 +49,12 @@ index b806564..6eaf99d 100644
  	configuration{}
  
  	postfix="";
+@@ -124,7 +123,7 @@ solution "0BulletSolution"
+ 
+ if not _OPTIONS["with-nacl"] then
+ 
+- flags { "NoRTTI"}
++ -- flags { "NoRTTI"}
+  targetdir "../bin"
+ 
+  -- Disable exception handling on MSVC 2008 and higher. MSVC 2005 without service pack has some linker issue (ConvexDecompositionDemo uses STL through HACD library) 

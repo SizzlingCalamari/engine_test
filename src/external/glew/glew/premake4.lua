@@ -4,7 +4,7 @@ solution "glew"
     startproject "glew"
     language "C"
 
-    if os.is("linux") then
+    if os.is("linux") or os.is("macosx") then
         if os.is64bit() then
             platforms "x64"
         else
@@ -14,7 +14,8 @@ solution "glew"
         platforms { "x32", "x64" }
     end
 
-    flags { "StaticRuntime", "NoExceptions", "Symbols" }
+    -- flags { "StaticRuntime", "NoExceptions", "Symbols" }
+    flags { "StaticRuntime", "Symbols" }
     vectorextensions "SSE2"
 
     configurations { "Debug", "Release" }

@@ -29,7 +29,7 @@ solution "engine_test"
     language "C++"
     
     -- disable cross compiling on linux
-    if os.is("linux") then
+    if os.is("linux") or os.is("macosx") then
         if os.is64bit() then
             platforms "x64"
         else
@@ -90,12 +90,15 @@ solution "engine_test"
 
         configuration { "windows" }
             forceincludes "platform.h"
-        configuration { "linux" }
+        configuration { "linux or macosx" }
             forceincludes "game/public/platform.h"
         configuration {}
 
         defines { "GLEW_STATIC", "GLEW_NO_GLU", "SDL_MAIN_HANDLED", "GLM_FORCE_RADIANS" }
         files { "game/**.h", "game/**.cpp", "game/**.vert", "game/**.frag", "game/**.glsl" }
+        if os.is("macosx") then
+            excludes { "game/public/ModelLoader_FBX.h", "game/public/ModelLoader_FBX.cpp"}
+        end
         includedirs {
             src_dir .. "public/"
         }
@@ -114,10 +117,15 @@ solution "engine_test"
         dofile "external/glew/include_config.lua"
         
         -- fbxsdk linking
-        dofile "external/fbxsdk/include_config.lua"
-        
+        if not os.is("macosx") then
+            dofile "external/fbxsdk/include_config.lua"
+        end
+
         configuration "linux"
             links { "GL", "rt", "m", "pthread", "X11", "Xi" }
+            buildoptions { "-std=c++11" }
+        configuration "macosx"
+            links { "OpenGL.framework", "m", "pthread" }
             buildoptions { "-std=c++11" }
         configuration "windows"
             links "opengl32"
@@ -129,7 +137,7 @@ solution "engine_test"
             postbuildcommands {
                 "copy /Y \"" .. shader_src .. "\" \"" .. shader_dest .. "\""
             }
-        configuration { "linux" }
+        configuration { "linux or macosx" }
             postbuildcommands {
                 "cp -r " .. shader_src .. " \"" .. shader_dest .. "\""
             }
