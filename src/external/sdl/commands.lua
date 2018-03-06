@@ -10,9 +10,13 @@ function clone()
     if not os.isdir(getdir() .. "/.git") then
         os.execute("git clone " .. repo .. " " .. getdir())
     end
-    os.chdir(dir)
+    local success, msg, errno = os.chdir(dir)
+    if not success then
+        error(msg)
+    end
     os.execute("git reset --hard")
     os.execute("git fetch origin release-2.0.4")
+    os.execute("git checkout release-2.0.4")
 end
 
 function buildLinux()

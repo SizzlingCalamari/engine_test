@@ -14,7 +14,7 @@
 
 // gcc < 5.0 doesn't have std::align
 // Copied from trunk:
-#if defined(__GNUC__) && (__GNUC__ < 5)
+#if !defined(__APPLE__) && defined(__GNUC__) && (__GNUC__ < 5)
 
 #include <cstdint>
 

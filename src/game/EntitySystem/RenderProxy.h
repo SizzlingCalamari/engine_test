@@ -3,6 +3,7 @@
 
 #include "../Renderer/3DRenderer/Camera.h"
 #include "../Renderer/3DRenderer/Scene.h"
+#include <string>
 
 class Renderer3D;
 class ResourceLoader;

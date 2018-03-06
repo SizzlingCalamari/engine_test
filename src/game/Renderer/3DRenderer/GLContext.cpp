@@ -26,7 +26,7 @@ ShaderManager *GLContext::CreateShaderManager()
 bool GLContext::SetDebugMessageCallback(
     GLDEBUGPROCARB fn, void* userdata /*= nullptr*/)
 {
-    if (GL_ARB_debug_output)
+    if (GLEW_ARB_debug_output)
     {
         glDebugMessageCallbackARB(fn, userdata);
         glEnable(GL_DEBUG_OUTPUT);
