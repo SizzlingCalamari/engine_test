@@ -9,15 +9,14 @@ end
 
 function clone()
     if not os.isdir(getdir() .. "/.git") then
-        os.execute("git clone " .. repo .. " " .. getdir())
+        os.execute("git clone --single-branch --branch master " .. repo .. " " .. getdir())
     end
     local success, msg, errno = os.chdir(dir)
     if not success then
         error(msg)
     end
-    os.execute("git reset --hard")
-    os.execute("git fetch origin master")
     os.execute("git checkout " .. current_rev)
+    os.execute("git clean -ffdx .")
     os.execute("git apply --ignore-whitespace ../bullet_build.patch")
 end
 
