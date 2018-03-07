@@ -1,5 +1,6 @@
 
 local repo = "https://github.com/spurious/SDL-mirror.git"
+local branch = "release-2.0.4"
 local dir = "SDL"
 
 function getdir()
@@ -8,15 +9,14 @@ end
 
 function clone()
     if not os.isdir(getdir() .. "/.git") then
-        os.execute("git clone " .. repo .. " " .. getdir())
+        os.execute("git clone --depth 1 --branch " .. branch .. " " .. repo .. " " .. getdir())
     end
     local success, msg, errno = os.chdir(dir)
     if not success then
         error(msg)
     end
-    os.execute("git reset --hard")
-    os.execute("git fetch origin release-2.0.4")
-    os.execute("git checkout release-2.0.4")
+    os.execute("git checkout -- .")
+    os.execute("git clean -ffdx .")
 end
 
 function buildLinux()
