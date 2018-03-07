@@ -140,8 +140,12 @@ void ShaderProgram::QueryUniformInformation()
             // resize the string to the real name length
             name.resize(length);
 
-            // insert the uniform info into the hash map
-            m_uniforms.emplace(std::move(name), UniformInfo{ static_cast<GLuint>(i), type });
+            const GLint location = glGetUniformLocation(m_id, name.c_str());
+            if(location != -1)
+            {
+                // insert the uniform info into the hash map
+                m_uniforms.emplace(std::move(name), UniformInfo{ static_cast<GLuint>(location), type });
+            }
         }
     }
 }
