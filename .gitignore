@@ -1,6 +1,9 @@
 
-#ignore thumbnails created by windows
+#Ignore OS metadata
+.DS_Store
 Thumbs.db
+Desktop.ini
+
 #Ignore files build by Visual Studio
 *.exe
 *.pdb
@@ -36,6 +39,5 @@ src/external/glew/glew/lib/
 src/external/glm/**/
 src/external/sdl/**/
 
-shaders/
-!shaders/placeholder
-!/src/game/shaders/
+/shaders/
+!/shaders/placeholder
