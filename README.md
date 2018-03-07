@@ -15,5 +15,6 @@ make
 # Run the project
 cd ../../bin
 export DYLD_LIBRARY_PATH=. # Required for Mac OSX
+export LD_LIBRARY_PATH=.   # Required for Linux
 ./engine_test
 ```
