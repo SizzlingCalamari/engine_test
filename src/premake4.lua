@@ -96,9 +96,6 @@ solution "engine_test"
 
         defines { "GLEW_STATIC", "GLEW_NO_GLU", "SDL_MAIN_HANDLED", "GLM_FORCE_RADIANS" }
         files { "game/**.h", "game/**.cpp", "game/**.vert", "game/**.frag", "game/**.glsl" }
-        if os.is("macosx") then
-            excludes { "game/public/ModelLoader_FBX.h", "game/public/ModelLoader_FBX.cpp"}
-        end
         includedirs {
             src_dir .. "public/"
         }
@@ -117,9 +114,7 @@ solution "engine_test"
         dofile "external/glew/include_config.lua"
         
         -- fbxsdk linking
-        if not os.is("macosx") then
-            dofile "external/fbxsdk/include_config.lua"
-        end
+        dofile "external/fbxsdk/include_config.lua"
 
         configuration "linux"
             links { "GL", "rt", "m", "pthread", "X11", "Xi" }
