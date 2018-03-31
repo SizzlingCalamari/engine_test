@@ -13,6 +13,11 @@ elseif (os.get() == "linux") then
     lib_name = "libfbxsdk.so"
     path_sep = "/"
     copy_cmd = "cp -f "
+elseif (os.get() == "macosx") then
+    lib_dir = (g_externals_dir .. "fbxsdk/fbxsdk/lib/clang/")
+    lib_name = "libfbxsdk.dylib"
+    path_sep = "/"
+    copy_cmd = "cp -f "
 end
 
 includedirs (g_externals_dir .. "fbxsdk/fbxsdk/include")
@@ -29,7 +34,7 @@ configuration {}
 
 configuration { "windows" }
     links { "libfbxsdk" }
-configuration { "linux" }
+configuration { "linux or macosx" }
     links { "fbxsdk" }
 configuration {}
 
