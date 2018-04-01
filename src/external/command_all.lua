@@ -1,4 +1,14 @@
 
+-- These are here so premake doesn't complain about "no such action"
+newaction {
+    trigger = "clone",
+    description = "Clones dependencies",
+}
+newaction {
+    trigger = "build",
+    description = "Builds dependencies",
+}
+
 function listdirs()
     if (os.get() == "windows") then
         return io.popen('dir "'..os.getcwd()..'" /b /ad'):lines()
