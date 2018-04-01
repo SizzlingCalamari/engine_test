@@ -118,7 +118,7 @@ solution "engine_test"
 
         configuration "linux"
             links { "GL", "rt", "m", "pthread", "X11", "Xi" }
-            buildoptions { "-std=c++11" }
+            buildoptions { "-std=c++11", "-msse3" }
         configuration "macosx"
             links { "OpenGL.framework", "m", "pthread" }
             buildoptions { "-std=c++11" }

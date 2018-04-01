@@ -6,7 +6,15 @@ function getdir()
 end
 
 function clone()
-    if os.get() == "macosx" then
+    if os.get() == "linux" then
+        os.execute("rm -rf fbxsdk")
+        os.execute("curl -o fbxsdk.tar.gz http://images.autodesk.com/adsk/files/fbx20151_fbxsdk_linux.tar.gz")
+        os.execute("tar xzf fbxsdk.tar.gz")
+        os.execute("mkdir -p fbxsdk")
+        os.execute("(echo yes; echo no) | ./fbx20151_fbxsdk_linux ./fbxsdk > /dev/null")
+        -- cleanup
+        os.execute("rm fbxsdk.tar.gz fbx20151_fbxsdk_linux *.txt")
+    elseif os.get() == "macosx" then
         os.execute("rm -rf fbxsdk")
         os.execute("wget http://images.autodesk.com/adsk/files/fbx20151_fbxsdk_clang_mac.pkg.tgz")
         os.execute("tar xzf fbx20151_fbxsdk_clang_mac.pkg.tgz")
