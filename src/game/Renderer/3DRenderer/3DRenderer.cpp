@@ -22,10 +22,16 @@ static void STDCALL GLErrorCallback(
 
 Renderer3D::Renderer3D(void *GLContext):
     m_glcontext(GLContext),
+    m_vao(0),
+    m_fbo(0),
+    m_colorAttach0(0),
+    m_depthRbo(0),
+    m_fbo_vbo(0),
     m_shader_manager(nullptr),
     m_texture_shader(0),
     m_depth_prepass_shader(0),
-    m_skybox_shader(0)
+    m_skybox_shader(0),
+    m_post_process(0)
 {
 }
 
@@ -36,6 +42,8 @@ void Renderer3D::Init(const renderer3d_config& config)
 
     GLContext::SetDebugMessageCallback(&GLErrorCallback);
     GLContext::EnableDepthTest(GL_LEQUAL);
+
+    CreateSceneFbo(config.width, config.height);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -53,8 +61,8 @@ void Renderer3D::Init(const renderer3d_config& config)
     std::vector<uint> utilFragmentShaders;
 
     m_shader_manager->CompileShaders(
-        {"shaders/texturevertex.vert", "shaders/shadowmap.vert", "shaders/lambert.vert", "shaders/skybox.vert"},
-        {"shaders/texturefragment.frag", "shaders/shadowmap.frag", "shaders/lambert.frag", "shaders/skybox.frag"},
+        {"shaders/texturevertex.vert", "shaders/shadowmap.vert", "shaders/lambert.vert", "shaders/skybox.vert", "shaders/wave_post.vert"},
+        {"shaders/texturefragment.frag", "shaders/shadowmap.frag", "shaders/lambert.frag", "shaders/skybox.frag", "shaders/wave_post.frag"},
         {"shaders/noise3D.glsl"},
         {"shaders/noise3D.glsl"},
         vertexShaders, fragmentShaders,
@@ -83,6 +91,12 @@ void Renderer3D::Init(const renderer3d_config& config)
     m_skybox_shader.AttachShader(fragmentShaders[3]);
     linked = m_skybox_shader.Link();
     assert(linked);
+
+    m_post_process = m_shader_manager->CreateProgram();
+    m_post_process.AttachShader(vertexShaders[4]);
+    m_post_process.AttachShader(fragmentShaders[4]);
+    linked = m_post_process.Link();
+    assert(linked);
 }
 
 void Renderer3D::Shutdown()
@@ -92,6 +106,11 @@ void Renderer3D::Shutdown()
     m_resourceLoader->UnloadResources();
     delete m_resourceLoader;
     m_resourceLoader = nullptr;
+
+    glDeleteBuffers(1, &m_fbo_vbo);
+    glDeleteRenderbuffers(1, &m_depthRbo);
+    glDeleteTextures(1, &m_colorAttach0);
+    glDeleteFramebuffers(1, &m_fbo);
 
     glBindVertexArray(0);
     glDeleteVertexArrays(1, &m_vao);
@@ -131,6 +150,8 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
+    // Render to the fbo
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     const float aspectRatio = viewport->GetAspectRatio();
@@ -299,8 +320,103 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
     }
     m_texture_shader.Unbind();
 
+    // Post process and render to screen framebuffer0
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    m_post_process.Bind();
+
+    const int fbo_sampler = 0;
+    m_post_process.SetUniform("g_fboSampler", &fbo_sampler);
+
+    static float g_time = 0.0f;
+
+    g_time += 0.01f;
+    m_post_process.SetUniform("g_time", &g_time);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_colorAttach0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_fbo_vbo);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+        glEnableVertexAttribArray(0);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    m_post_process.Unbind();
+
     if (do_scissor)
     {
         glDisable(GL_SCISSOR_TEST);
     }
+}
+
+void Renderer3D::CreateSceneFbo(uint width, uint height)
+{
+    // Color attachment
+    {
+        if (m_colorAttach0 == 0)
+        {
+            glGenTextures(1, &m_colorAttach0);
+        }
+
+        glBindTexture(GL_TEXTURE_2D, m_colorAttach0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8_ALPHA8,
+                        width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    // 24-bit Depth attachment
+    {
+        GLint maxRenderBufferSize;
+        glGetIntegerv(GL_MAX_RENDERBUFFER_SIZE, &maxRenderBufferSize);
+        assert(width <= maxRenderBufferSize);
+        assert(height <= maxRenderBufferSize);
+
+        if (m_depthRbo == 0)
+        {
+            glGenRenderbuffers(1, &m_depthRbo);
+        }
+
+        glBindRenderbuffer(GL_RENDERBUFFER, m_depthRbo);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    }
+
+    // Fbo
+    {
+        if (m_fbo == 0)
+        {
+            glGenFramebuffers(1, &m_fbo);
+        }
+
+        glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_colorAttach0, 0);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthRbo);
+
+        GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+        assert(status == GL_FRAMEBUFFER_COMPLETE);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    // 
+    const GLfloat fbo_verts[] = {
+        -1.0f, -1.0f,
+         1.0f, -1.0f,
+        -1.0f,  1.0f,
+         1.0f,  1.0f,
+    };
+    glGenBuffers(1, &m_fbo_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, m_fbo_vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(fbo_verts), fbo_verts, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    
 }

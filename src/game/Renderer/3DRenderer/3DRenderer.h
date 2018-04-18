@@ -38,8 +38,16 @@ public:
     MaterialCache* GetMaterialCache() const;
 
 private:
+    void CreateSceneFbo(uint width, uint height);
+
+private:
     GLContext m_glcontext;
     uint m_vao;
+
+    uint m_fbo;
+    uint m_colorAttach0;
+    uint m_depthRbo;
+    uint m_fbo_vbo;
 
     ResourceLoader *m_resourceLoader;
 
@@ -47,6 +55,7 @@ private:
     ShaderProgram m_texture_shader;
     ShaderProgram m_depth_prepass_shader;
     ShaderProgram m_skybox_shader;
+    ShaderProgram m_post_process;
 
     std::vector<const SceneNode*> m_colour_shader_cache;
     std::vector<const SceneNode*> m_texture_shader_cache;
