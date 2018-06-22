@@ -29,7 +29,7 @@ solution "glew"
     project "glew"
         targetdir "lib"
         kind "StaticLib"
-        defines "GLEW_STATIC"
+        defines { "GLEW_STATIC", "GLEW_NO_GLU" }
         includedirs { "include" }
         files {
             "src/glew.c",

@@ -84,7 +84,7 @@ solution "engine_test"
             forceincludes "game/public/platform.h"
         configuration {}
 
-        defines { "GLEW_STATIC", "GLEW_NO_GLU", "SDL_MAIN_HANDLED", "GLM_FORCE_RADIANS" }
+        defines { "SDL_MAIN_HANDLED", "GLM_FORCE_RADIANS" }
         files { "game/**.h", "game/**.cpp", "game/**.vert", "game/**.frag", "game/**.glsl" }
         includedirs {
             src_dir .. "public/"
