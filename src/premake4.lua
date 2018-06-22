@@ -29,7 +29,7 @@ solution "engine_test"
     language "C++"
     platforms "x64"
     
-    flags { "StaticRuntime", "Symbols" }
+    flags { "StaticRuntime", "Symbols", "MultiProcessorCompile" }
     if exceptionhandling ~= nil then
         exceptionhandling "Off"
     else
@@ -51,7 +51,7 @@ solution "engine_test"
         targetdir "build/Release"
         defines { "NDEBUG" }
         optimize "Full"
-        flags { "LinkTimeOptimization", "MultiProcessorCompile" }
+        flags { "LinkTimeOptimization" }
     configuration {}
     
     -- os specific configurations
