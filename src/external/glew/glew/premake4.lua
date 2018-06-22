@@ -3,16 +3,7 @@ solution "glew"
     location ("build/" .. _ACTION)
     startproject "glew"
     language "C"
-
-    if os.is("linux") or os.is("macosx") then
-        if os.is64bit() then
-            platforms "x64"
-        else
-            platforms "x32"
-        end
-    else
-        platforms { "x32", "x64" }
-    end
+    platforms "x64"
 
     -- flags { "StaticRuntime", "NoExceptions", "Symbols" }
     flags { "StaticRuntime", "Symbols" }
@@ -44,10 +35,6 @@ solution "glew"
             "src/glew.c",
             "src/glewinfo.c"
         }
-        configuration {"x32", "Debug"}
-            targetsuffix ("_" .. _ACTION .. "_x86_debug" )
-        configuration {"x32", "Release"}
-            targetsuffix ("_" .. _ACTION .. "_x86_release" )
         configuration {"x64", "Debug"}
             targetsuffix ("_" .. _ACTION .. "_x64_debug")
         configuration {"x64", "Release"}

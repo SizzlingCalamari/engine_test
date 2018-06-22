@@ -22,10 +22,6 @@ end
 
 includedirs (g_externals_dir .. "fbxsdk/fbxsdk/include")
 
-configuration { "x32", "Debug" }
-    libdirs (lib_dir .. "x86/debug")
-configuration { "x32", "Release" }
-    libdirs (lib_dir .. "x86/release")
 configuration { "x64", "Debug" }
     libdirs (lib_dir .. "x64/debug")
 configuration { "x64", "Release" }
@@ -38,12 +34,6 @@ configuration { "linux or macosx" }
     links { "fbxsdk" }
 configuration {}
 
-configuration { "x32", "Debug" }
-    local fullLibPath = (lib_dir .. "x86/debug/" .. lib_name)
-    postbuildcommands { path.translate(copy_cmd .. fullLibPath .. " " .. g_output_dir, path_sep) }
-configuration { "x32", "Release" }
-    local fullLibPath = (lib_dir .. "x86/release/" .. lib_name)
-    postbuildcommands { path.translate(copy_cmd .. fullLibPath .. " " .. g_output_dir, path_sep) }
 configuration { "x64", "Debug" }
     local fullLibPath = (lib_dir .. "x64/debug/" .. lib_name)
     postbuildcommands { path.translate(copy_cmd .. fullLibPath .. " " .. g_output_dir, path_sep) }

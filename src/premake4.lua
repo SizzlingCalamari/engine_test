@@ -27,17 +27,7 @@ solution "engine_test"
     location "build"
     startproject "engine_test"
     language "C++"
-    
-    -- disable cross compiling on linux
-    if os.is("linux") or os.is("macosx") then
-        if os.is64bit() then
-            platforms "x64"
-        else
-            platforms "x32"
-        end
-    else
-        platforms { "x32", "x64" }
-    end
+    platforms "x64"
     
     flags { "StaticRuntime", "Symbols" }
     if exceptionhandling ~= nil then
