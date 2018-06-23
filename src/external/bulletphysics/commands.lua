@@ -1,45 +1,46 @@
 
 local repo = "https://github.com/bulletphysics/bullet3.git"
 local dir = path.getbasename(repo)
-local current_rev = "9e9b172b234e2ad127e0500bf386a277a9906ade"
+local current_rev = "6b2cae1b1d63056ef48c64b39c8db6027e897663"
 
 function getdir()
     return dir
 end
 
 function clone()
-    if not os.isdir(getdir() .. "/.git") then
-        os.execute("git clone --single-branch --branch master " .. repo .. " " .. getdir())
+    if os.isdir(getdir() .. "/.git") then
+        return
     end
+    
+    os.execute("git clone --single-branch --branch master " .. repo .. " " .. getdir())
+    
     local success, msg, errno = os.chdir(dir)
     if not success then
         error(msg)
     end
     os.execute("git checkout " .. current_rev)
     os.execute("git clean -ffdx .")
-    os.execute("git apply --ignore-whitespace ../bullet_build.patch")
 end
 
 function buildLinux()
-    local build_dir = getdir() .. "/build/"
-    os.execute(_PREMAKE_COMMAND .. " gmake --without-demos --file=" .. build_dir .. "premake4.lua")
+    local build_dir = getdir() .. "/build3/"
+    os.execute(_PREMAKE_COMMAND .. " gmake --file=premake4.lua")
 
-    local build_command = "cd bullet3/build/gmake; make -j4 "
+    local build_command = "cd bullet3/build3/gmake; make -j4 "
     os.execute(build_command .. "config=debug_x64")
     os.execute(build_command .. "config=release_x64")
 end
 
 function buildWindows()
-    local build_dir = getdir() .. "/build/"
-    os.execute(_PREMAKE_COMMAND .. " vs2013 --without-demos --file=" .. build_dir .. "premake4.lua")
+    os.execute(_PREMAKE_COMMAND .. " vs2017 --file=premake4.lua")
+
+    os.chdir(getdir() .. "/build3/")
     
-    local msbuild = '"' .. os.getenv("VS120COMNTOOLS") .. '../../../MSBuild/12.0/Bin/MSBuild"'
-    local build_command = msbuild .. " " .. build_dir .. "vs2013/"
+    local build_command = os.getenv("MSBUILD_PATH") .. " vs2017/"
+    print(build_command)
     
-    local debug_x32 = "/p:Configuration=Debug /p:Platform=Win32"
-    local debug_x64 = "/p:Configuration=Debug /p:Platform=x64"
-    local release_x32 = "/p:Configuration=Release /p:Platform=Win32"
-    local release_x64 = "/p:Configuration=Release /p:Platform=x64"
+    local debug_x64 = "/p:Configuration=Debug /p:Platform=x64 /p:PlatformToolset=v141"
+    local release_x64 = "/p:Configuration=Release /p:Platform=x64 /p:PlatformToolset=v141"
     os.execute(build_command .. "BulletSoftBody.vcxproj " .. debug_x64)
     os.execute(build_command .. "BulletSoftBody.vcxproj " .. release_x64)
 

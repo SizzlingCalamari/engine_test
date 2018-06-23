@@ -1,6 +1,6 @@
 
 local repo = "https://github.com/spurious/SDL-mirror.git"
-local branch = "release-2.0.4"
+local branch = "release-2.0.8"
 local dir = "SDL"
 
 function getdir()
@@ -8,9 +8,12 @@ function getdir()
 end
 
 function clone()
-    if not os.isdir(getdir() .. "/.git") then
-        os.execute("git clone --depth 1 --branch " .. branch .. " " .. repo .. " " .. getdir())
+    if os.isdir(getdir() .. "/.git") then
+        return
     end
+
+    os.execute("git clone --depth 1 --branch " .. branch .. " " .. repo .. " " .. getdir())
+
     local success, msg, errno = os.chdir(dir)
     if not success then
         error(msg)
@@ -29,12 +32,11 @@ end
 
 function buildWindows()
     local build_dir = getdir() .. "/VisualC/SDL/"
-    local msbuild = '"' .. os.getenv("VS120COMNTOOLS") .. '../../../MSBuild/12.0/Bin/MSBuild"'
-    local build_command = msbuild .. " " .. build_dir
+    local build_command = os.getenv("MSBUILD_PATH") .. " " .. build_dir
     
-    local debug_x64 = "/p:Configuration=Debug /p:Platform=x64"
-    local release_x64 = "/p:Configuration=Release /p:Platform=x64"
+    local debug_x64 = "/p:Configuration=Debug /p:Platform=x64 /p:PlatformToolset=v141"
+    local release_x64 = "/p:Configuration=Release /p:Platform=x64 /p:PlatformToolset=v141"
     
-    os.execute(build_command .. "SDL_VS2013.vcxproj " .. debug_x64)
-    os.execute(build_command .. "SDL_VS2013.vcxproj " .. release_x64)
+    os.execute(build_command .. "SDL.vcxproj " .. debug_x64)
+    os.execute(build_command .. "SDL.vcxproj " .. release_x64)
 end
