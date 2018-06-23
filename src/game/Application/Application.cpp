@@ -7,6 +7,11 @@ namespace ApplicationService
 {
     bool Initialize()
     {
+        
+#ifdef _WIN32
+        SDL_setenv("SDL_AUDIODRIVER", "directsound", true);
+#endif
+
         std::cout << "Hello World!" << std::endl;
         SDL_SetMainReady();
         bool ret = (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS) == 0);
