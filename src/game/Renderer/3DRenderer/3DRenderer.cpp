@@ -17,6 +17,10 @@ static void STDCALL GLErrorCallback(
     GLsizei length, const GLchar *msg,
     GLvoid *userdata )
 {
+    if(severity == GL_DEBUG_SEVERITY_NOTIFICATION)
+    {
+        return;
+    }
     std::cout << msg << std::endl;
 }
 
