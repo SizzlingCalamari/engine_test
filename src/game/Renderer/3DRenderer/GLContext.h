@@ -18,8 +18,6 @@ public:
     static bool SetDebugMessageCallback(GLDEBUGPROCARB fn,
                                         void* userdata = nullptr);
 
-    static void EnableDepthTest(GLenum func);
-
 private:
     void *m_context;
     std::unordered_set<ShaderManager*> m_shader_managers;

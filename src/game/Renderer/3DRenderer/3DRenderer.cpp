@@ -41,7 +41,9 @@ void Renderer3D::Init(const renderer3d_config& config)
     glBindVertexArray(m_vao);
 
     GLContext::SetDebugMessageCallback(&GLErrorCallback);
-    GLContext::EnableDepthTest(GL_LEQUAL);
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
 
     CreateSceneFbo(config.width, config.height);
 

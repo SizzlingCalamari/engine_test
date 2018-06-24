@@ -34,9 +34,3 @@ bool GLContext::SetDebugMessageCallback(
     }
     return false;
 }
-
-void GLContext::EnableDepthTest(GLenum func)
-{
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(func);
-}
