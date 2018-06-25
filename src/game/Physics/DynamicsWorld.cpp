@@ -1,6 +1,17 @@
 
 #include "DynamicsWorld.h"
 
+#include "BulletCollision/CollisionDispatch/btGhostObject.h"
+
+#include "BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h"
+#include "BulletCollision/CollisionDispatch/btCollisionDispatcher.h"
+#include "BulletCollision/BroadphaseCollision/btDbvtBroadphase.h"
+
+#include "BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h"
+#include "BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h"
+
+class btDiscreteDynamicsWorld;
+
 DynamicsWorld::DynamicsWorld()
 {
     m_BulletContext.collision_config = new btDefaultCollisionConfiguration();

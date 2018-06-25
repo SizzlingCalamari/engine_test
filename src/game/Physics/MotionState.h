@@ -1,10 +1,10 @@
 
 #pragma once
 
-#include "btBulletDynamicsCommon.h"
 #include <vector>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include "LinearMath/btMotionState.h"
 
 class MotionState: public btMotionState
 {

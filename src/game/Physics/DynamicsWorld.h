@@ -1,7 +1,11 @@
 
 #pragma once
 
-#include "btBulletDynamicsCommon.h"
+class btDefaultCollisionConfiguration;
+class btCollisionDispatcher;
+class btBroadphaseInterface;
+class btSequentialImpulseConstraintSolver;
+class btDiscreteDynamicsWorld;
 
 struct BulletPhysicsContext
 {

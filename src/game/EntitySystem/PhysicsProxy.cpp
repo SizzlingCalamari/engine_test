@@ -8,6 +8,10 @@
 #include "PhysicalComponent.h"
 #include "DynamicsComponent.h"
 
+#include "BulletCollision/CollisionShapes/btCollisionShape.h"
+#include "BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h"
+#include "BulletDynamics/Dynamics/btRigidBody.h"
+
 void PhysicsProxy::Cleanup()
 {
     auto *bullet_dynamics = m_dynamics->GetDynamicsWorld();
