@@ -73,10 +73,10 @@ namespace ApplicationService
         return (SDL_PeepEvents(nullptr, 0, SDL_PEEKEVENT, SDL_QUIT, SDL_QUIT) > 0);
     }
 
-    vector<SDL_Event> GetEventsOfType(SDL_EventType mintype, SDL_EventType maxtype)
+    std::vector<SDL_Event> GetEventsOfType(SDL_EventType mintype, SDL_EventType maxtype)
     {
         auto num_events = SDL_PeepEvents(nullptr, 0, SDL_PEEKEVENT, mintype, maxtype);
-        vector<SDL_Event> events(num_events);
+        std::vector<SDL_Event> events(num_events);
 
         SDL_PeepEvents(events.data(), num_events, SDL_PEEKEVENT, mintype, maxtype);
         return events;

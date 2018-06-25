@@ -2,14 +2,11 @@
 #pragma once
 
 #include "Window.h"
-#include "SDL_video.h"
 #include "SDL_events.h"
 #include <vector>
 
 namespace ApplicationService
 {
-    using namespace std;
-
     bool Initialize();
     void Shutdown();
 
@@ -23,5 +20,5 @@ namespace ApplicationService
     void FlushAndRefreshEvents();
     bool QuitRequested();
     
-    vector<SDL_Event> GetEventsOfType(SDL_EventType mintype, SDL_EventType maxtype);
+    std::vector<SDL_Event> GetEventsOfType(SDL_EventType mintype, SDL_EventType maxtype);
 }

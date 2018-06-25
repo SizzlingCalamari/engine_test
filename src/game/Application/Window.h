@@ -1,7 +1,6 @@
 
 #pragma once
 
-//#include "SDL_video.h"
 typedef struct SDL_Window SDL_Window;
 
 class Window
