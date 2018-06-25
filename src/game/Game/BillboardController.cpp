@@ -13,20 +13,17 @@ void BillboardController::Update()
     auto *camera = m_physical_components->PeekComponent(m_cameraEnt);
     auto cameraForward = math::forward(camera->orientation);
 
-    int numBillboards = static_cast<int>(m_billboardEnts.size());
-    for (int i = 0; i < numBillboards; ++i)
+    for(const BillboardEnt& billboardEnt : m_billboards)
     {
-        uint ent = m_billboardEnts[i];
-        auto initialForward = m_billboardData[i].initialDirection;
+        const CylindricalBillboard& billboard = billboardEnt.billboard;
+        const uint ent = billboardEnt.ent;
+        auto initialForward = billboard.initialDirection;
         if (IsBillboardActive(cameraForward, initialForward))
         {
-            auto billboard = m_physical_components->GetComponent(ent);
-            auto *billboardData = m_billboardData.data() + i;
-            // reorient the billboard
-            OrientBillboard(camera, billboardData, &billboard);
+            PhysicalComponent billboardPhysical = m_physical_components->GetComponent(ent);
+            OrientBillboard(camera, &billboard, &billboardPhysical);
 
-            // apply changes
-            m_physical_components->EditComponent(ent, &billboard);
+            m_physical_components->EditComponent(ent, &billboardPhysical);
         }
     }
 }

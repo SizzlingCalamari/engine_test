@@ -29,8 +29,7 @@ public:
 
     void AddBillboard(uint ent, const CylindricalBillboard& data)
     {
-        m_billboardEnts.emplace_back(ent);
-        m_billboardData.emplace_back(data);
+        m_billboards.emplace_back(BillboardEnt{data, ent});
     }
 
     void Update();
@@ -49,8 +48,13 @@ private:
                          PhysicalComponent* billboard);
 
 private:
+    struct BillboardEnt
+    {
+        CylindricalBillboard billboard;
+        uint ent;
+    };
+
     ComponentTable<PhysicalComponent> *m_physical_components;
-    std::vector<uint> m_billboardEnts;
-    std::vector<CylindricalBillboard> m_billboardData;
+    std::vector<BillboardEnt> m_billboards;
     uint m_cameraEnt;
 };
