@@ -16,7 +16,7 @@ struct ButtonCombination
     {
     }
 
-    static const uint MAX_BUTTON_COMBINATION = 4;
+    static constexpr uint MAX_BUTTON_COMBINATION = 4;
     union
     {
         uint64 m_allbuttons;

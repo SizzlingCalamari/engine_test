@@ -32,10 +32,7 @@ public:
     {
         // make sure the key combination doesn't have more than
         // the max number of keys
-        if (keys.size() > ButtonCombination::MAX_BUTTON_COMBINATION)
-        {
-            return static_cast<uint>(-1);
-        }
+        static_assert(keys.size() <= ButtonCombination::MAX_BUTTON_COMBINATION, "");
 
         // copy the key combination over
         ButtonCombination b;
