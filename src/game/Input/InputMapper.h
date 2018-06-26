@@ -10,6 +10,7 @@
 #include <SDL_scancode.h>
 #include <SDL_events.h>
 #include <bitset>
+#include <vector>
 
 class KeyboardContext;
 
@@ -85,8 +86,12 @@ private:
 
     void DispatchCallbacks()
     {
-        auto events = ApplicationService::GetEventsOfType(SDL_KEYDOWN, SDL_MOUSEWHEEL);
-        for (auto &e : events)
+        int num_events = SDL_PeepEvents(nullptr, 0, SDL_PEEKEVENT, SDL_KEYDOWN, SDL_MOUSEWHEEL);
+        std::vector<SDL_Event> events(num_events);
+
+        SDL_PeepEvents(events.data(), num_events, SDL_PEEKEVENT, SDL_KEYDOWN, SDL_MOUSEWHEEL);
+
+        for (const SDL_Event &e : events)
         {
             switch (e.type)
             {

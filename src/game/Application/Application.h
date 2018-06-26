@@ -2,8 +2,6 @@
 #pragma once
 
 #include "Window.h"
-#include "SDL_events.h"
-#include <vector>
 
 namespace ApplicationService
 {
@@ -19,6 +17,4 @@ namespace ApplicationService
 
     void FlushAndRefreshEvents();
     bool QuitRequested();
-    
-    std::vector<SDL_Event> GetEventsOfType(SDL_EventType mintype, SDL_EventType maxtype);
 }
