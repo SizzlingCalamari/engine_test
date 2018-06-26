@@ -6,6 +6,7 @@
 
 #include "../EntitySystem/PhysicalComponent.h"
 #include "../EntitySystem/GraphicalComponent.h"
+#include "../EntitySystem/DynamicsComponent.h"
 
 #include "../Input/InputMapper.h"
 

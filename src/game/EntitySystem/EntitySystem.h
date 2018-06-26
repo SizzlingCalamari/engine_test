@@ -2,60 +2,43 @@
 #pragma once
 
 #include "ComponentTable.h"
-#include "PhysicalComponent.h"
-#include "GraphicalComponent.h"
-#include "DynamicsComponent.h"
+
+struct PhysicalComponent;
+struct GraphicalComponent;
+struct DynamicsComponent;
 
 class EntitySystem
 {
 public:
-    EntitySystem():
-        m_ent_counter(0)
-    {
-    }
+    EntitySystem();
+    ~EntitySystem();
 
     uint CreateEntity()
     {
         return ++m_ent_counter;
     }
 
-    void DestroyEntity(uint ent)
-    {
-        m_physical_components.RemoveComponent(ent);
-        m_graphical_components.RemoveComponent(ent);
-        m_dynamics_components.RemoveComponent(ent);
-    }
+    void DestroyEntity(uint ent);
 
-    void CommitChanges()
-    {
-        m_physical_components.CommitChanges();
-        m_graphical_components.CommitChanges();
-        m_dynamics_components.CommitChanges();
-    }
+    void CommitChanges();
 
     //
     // Attaching components
     //
-    void AttachComponent(uint ent, PhysicalComponent* component)
+    template<typename T>
+    void AttachComponent(uint ent, T* component)
     {
-        return m_physical_components.AttachComponent(ent, component);
-    }
-
-    void AttachComponent(uint ent, GraphicalComponent* component)
-    {
-        return m_graphical_components.AttachComponent(ent, component);
-    }
-
-    void AttachComponent(uint ent, DynamicsComponent* component)
-    {
-        return m_dynamics_components.AttachComponent(ent, component);
+        GetTable<T>()->AttachComponent(ent, component);
     }
 
     //
     // Removing components
     //
     template<typename T>
-    void RemoveComponent(uint ent);
+    void RemoveComponent(uint ent)
+    {
+        GetTable<T>()->RemoveComponent(ent);
+    }
 
     //
     // Getting component tables
@@ -70,33 +53,3 @@ private:
 
     uint m_ent_counter;
 };
-
-template<>
-inline void EntitySystem::RemoveComponent<PhysicalComponent>(uint ent)
-{
-    m_physical_components.RemoveComponent(ent);
-}
-
-template<>
-inline void EntitySystem::RemoveComponent<GraphicalComponent>(uint ent)
-{
-    m_graphical_components.RemoveComponent(ent);
-}
-
-template<>
-inline ComponentTable<PhysicalComponent>* EntitySystem::GetTable()
-{
-    return &m_physical_components;
-}
-
-template<>
-inline ComponentTable<GraphicalComponent>* EntitySystem::GetTable()
-{
-    return &m_graphical_components;
-}
-
-template<>
-inline ComponentTable<DynamicsComponent>* EntitySystem::GetTable()
-{
-    return &m_dynamics_components;
-}
