@@ -14,7 +14,7 @@ void CameraController_InterpolatedPath::Update(uint32 dt)
     assert(m_physical_components);
     assert(m_positions.size() >= 4);
 
-    auto numPoints = m_positions.size();
+    size_t numPoints = m_positions.size();
 
     uint timePerControlPoint = m_timePerControlPoint;
     float interpValue = (float)(m_curTime % timePerControlPoint) / timePerControlPoint;
@@ -22,7 +22,7 @@ void CameraController_InterpolatedPath::Update(uint32 dt)
     uint point1 = (m_curTime / timePerControlPoint) % numPoints;
     uint point2 = (point1 + 1) % numPoints;
 
-    auto camera = m_physical_components->GetComponent(m_cameraEnt);
+    PhysicalComponent camera = m_physical_components->GetComponent(m_cameraEnt);
     camera.position = InterpPosition(point1, point2, interpValue);
     camera.orientation = InterpOrientation(point1, point2, interpValue);
     
@@ -35,7 +35,7 @@ void CameraController_InterpolatedPath::Update(uint32 dt)
 
 glm::vec3 CameraController_InterpolatedPath::InterpPosition(uint index1, uint index2, const float t)
 {
-    auto numPoints = m_positions.size();
+	size_t numPoints = m_positions.size();
     uint index0 = (index1 - 1) % numPoints;
     uint index3 = (index2 + 1) % numPoints;
     return glm::catmullRom(m_positions[index0], m_positions[index1],
