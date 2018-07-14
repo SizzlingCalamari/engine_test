@@ -35,7 +35,7 @@ void CameraController_InterpolatedPath::Update(uint32 dt)
 
 glm::vec3 CameraController_InterpolatedPath::InterpPosition(uint index1, uint index2, const float t)
 {
-	size_t numPoints = m_positions.size();
+    size_t numPoints = m_positions.size();
     uint index0 = (index1 - 1) % numPoints;
     uint index3 = (index2 + 1) % numPoints;
     return glm::catmullRom(m_positions[index0], m_positions[index1],
