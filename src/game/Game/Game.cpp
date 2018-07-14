@@ -823,6 +823,7 @@ void Game::LoadEnts()
             shape->addPoint(v, recalculateAABB);
         }
         shape->recalcLocalAabb();
+		shape->optimizeConvexHull();
 
         m_entity_system.AttachComponent(m_teapotMarbleEnt, &dynamics);
     }
