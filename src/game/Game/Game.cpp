@@ -12,6 +12,7 @@
 
 #include "BulletCollision/CollisionShapes/btBoxShape.h"
 #include "BulletCollision/CollisionShapes/btConvexHullShape.h"
+#include "BulletCollision/CollisionShapes/btShapeHull.h"
 #include "mathutils.h"
 
 #include "ModelLoader_OBJ.h"
@@ -813,17 +814,18 @@ void Game::LoadEnts()
         DynamicsComponent dynamics;
         dynamics.mass = 1.0f;
         dynamics.inertia = glm::vec3(0.0f);
-        btConvexHullShape* shape = new btConvexHullShape();
+        btConvexHullShape* shape = new btConvexHullShape(
+            reinterpret_cast<const btScalar*>(m.vertices.data()),
+            static_cast<int>(m.vertices.size()),
+            sizeof(glm::vec3));
         dynamics.shape = shape;
 
-        for(const glm::vec3& point : m.vertices)
+        btShapeHull shapeHull(shape);
+        if (shapeHull.buildHull(shape->getMargin()))
         {
-            const btVector3 v(point.x, point.y, point.z);
-            const bool recalculateAABB = false;
-            shape->addPoint(v, recalculateAABB);
+            shape->~btConvexHullShape();
+            ::new(shape) btConvexHullShape(&shapeHull.getVertexPointer()->getX(), shapeHull.numVertices());
         }
-        shape->recalcLocalAabb();
-        shape->optimizeConvexHull();
 
         m_entity_system.AttachComponent(m_teapotMarbleEnt, &dynamics);
     }
