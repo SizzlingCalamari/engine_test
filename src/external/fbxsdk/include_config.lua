@@ -4,7 +4,7 @@ local lib_name = ""
 local path_sep = ""
 local copy_cmd = ""
 if (os.get() == "windows") then
-    lib_dir = (g_externals_dir .. "fbxsdk/fbxsdk/lib/vs2013/")
+    lib_dir = (g_externals_dir .. "fbxsdk/fbxsdk/lib/vs2015/")
     lib_name = "libfbxsdk.dll"
     path_sep = "\\"
     copy_cmd = "copy "
