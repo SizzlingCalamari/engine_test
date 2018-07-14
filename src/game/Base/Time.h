@@ -5,8 +5,9 @@
 
 namespace Time
 {
-    using TimePoint = std::chrono::high_resolution_clock::time_point;
-    using Duration = std::chrono::high_resolution_clock::duration;
+    using Clock = std::chrono::steady_clock;
+    using TimePoint = Clock::time_point;
+    using Duration = Clock::duration;
 
     Duration FromSeconds(float seconds);
 

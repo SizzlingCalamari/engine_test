@@ -1,8 +1,6 @@
 
 #include "Time.h"
 
-using Clock = std::chrono::high_resolution_clock;
-
 Time::Duration Time::FromSeconds(float seconds)
 {
     using FloatSec = std::chrono::duration<float>;
