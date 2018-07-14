@@ -8,10 +8,10 @@
     configuration "vs*"
         buildoptions "/wd4244 /wd4267"
     configuration "Release"
-        flags { "Optimize", "EnableSSE2", "StaticRuntime", "NoMinimalRebuild", "FloatFast" }
+        flags { "Optimize", "EnableSSE2", "NoMinimalRebuild", "FloatFast" }
     configuration "Debug"
         defines {"_DEBUG=1"}
-        flags { "Symbols", "StaticRuntime" , "NoMinimalRebuild", "NoEditAndContinue" ,"FloatFast" }
+        flags { "Symbols", "NoMinimalRebuild", "NoEditAndContinue" ,"FloatFast" }
     configuration {}
     
     platforms "x64"

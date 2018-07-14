@@ -6,7 +6,7 @@ solution "glew"
     platforms "x64"
 
     -- flags { "StaticRuntime", "NoExceptions", "Symbols" }
-    flags { "StaticRuntime", "Symbols" }
+    flags { "Symbols" }
     vectorextensions "SSE2"
 
     configurations { "Debug", "Release" }

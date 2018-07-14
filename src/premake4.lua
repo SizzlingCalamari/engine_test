@@ -29,7 +29,7 @@ solution "engine_test"
     language "C++"
     platforms "x64"
     
-    flags { "StaticRuntime", "Symbols", "MultiProcessorCompile" }
+    flags { "Symbols", "MultiProcessorCompile" }
     if exceptionhandling ~= nil then
         exceptionhandling "Off"
     else
