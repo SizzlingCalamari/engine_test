@@ -58,14 +58,7 @@ solution "engine_test"
     configuration "windows"
         defines "WIN32"
     configuration {}
-    
-    -- hidden option to improve optimized code debugging
-    configuration "vs*"
-        buildoptions
-        {
-            "/d2Zi+"
-        }
-    
+
     -- Remove sse2 specification on windows 64 bit compile to 
     -- get rid of unknown option /arch:SSE2 warning.
     -- Note: SSE2 is still generated
