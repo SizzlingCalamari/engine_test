@@ -2,12 +2,14 @@
 #pragma once
 
 #include "Game/Game.h"
-#include "Application/Window.h"
 #include "Audio/public/hAudioSystem.h"
 #include "EntitySystem/RenderProxy.h"
 #include "Physics/DynamicsWorld.h"
 #include "EntitySystem/PhysicsProxy.h"
 #include "Input/InputMapper.h"
+
+typedef struct SDL_Window SDL_Window;
+typedef void *SDL_GLContext;
 
 class Renderer3D;
 
@@ -28,8 +30,9 @@ private:
 private:
     Game m_game;
 
-    Window m_window;
-    void *m_gl_context;
+    SDL_Window* m_window;
+    SDL_GLContext m_gl_context;
+
     Renderer3D *m_renderer;
     RenderProxy *m_render_proxy;
 

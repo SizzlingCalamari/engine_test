@@ -1,6 +1,7 @@
 
-#include "Application/Application.h"
 #include "Engine.h"
+
+#include "SDL.h"
 
 #include <pmmintrin.h>
 #include <xmmintrin.h>
@@ -93,9 +94,29 @@ int main(int argc, const char *argv[])
             chdir("..");
         }
     }
-    ApplicationService::Initialize();
 
+#ifdef _WIN32
+    SDL_setenv("SDL_AUDIODRIVER", "directsound", true);
+#endif
+
+    SDL_SetMainReady();
+
+    if(SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS) == 0)
     {
+        SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+        SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+        SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+        SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
+        SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+        SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+
+        SDL_GL_SetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, 1);
+
         heap_aligned_alloc<Engine, 16U> engine;
 
         engine->Initialize();
@@ -103,6 +124,6 @@ int main(int argc, const char *argv[])
         engine->Shutdown();
     }
 
-    ApplicationService::Shutdown();
+    SDL_Quit();
     return 0;
 }

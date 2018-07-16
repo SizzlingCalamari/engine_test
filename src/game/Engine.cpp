@@ -1,7 +1,9 @@
 
 #include "Engine.h"
+
 #include "SDL_timer.h"
-#include "Application/Application.h"
+#include "SDL_video.h"
+#include "SDL_events.h"
 
 #include "Base/Time.h"
 
@@ -24,10 +26,10 @@ void Engine::Initialize()
     config.width = 1280;
     config.height = 720;
 
-    m_window = ApplicationService::CreateWindow(
+    m_window = SDL_CreateWindow(
         "JORDAN", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
         config.width, config.height, SDL_WINDOW_OPENGL);
-    m_gl_context = ApplicationService::CreateGLContext(m_window);
+    m_gl_context = SDL_GL_CreateContext(m_window);
     m_renderer = Renderer::CreateRenderer3D(m_gl_context);
 
     m_renderer->Init(config);
@@ -82,8 +84,8 @@ void Engine::Shutdown()
     m_renderer->Shutdown();
     Renderer::FreeRenderer(m_renderer);
 
-    ApplicationService::FreeGLContext(m_gl_context);
-    ApplicationService::FreeWindow(m_window);
+    SDL_GL_DeleteContext(m_gl_context);
+    SDL_DestroyWindow(m_window);
 }
 
 class SDLStopWatch
@@ -121,9 +123,14 @@ void Engine::Run()
     Time::StopWatch renderWatch;
     Time::Duration renderAcc = renderPeriod;
 
-    while (ApplicationService::FlushAndRefreshEvents(),
-            !ApplicationService::QuitRequested())
+    for(;;)
     {
+        SDL_PumpEvents();
+        if (SDL_PeepEvents(nullptr, 0, SDL_PEEKEVENT, SDL_QUIT, SDL_QUIT) > 0)
+        {
+            break;
+        }
+
         m_inputMapper.DispatchCallbacks();
 
         logicAcc += std::min(250u, logicWatch.Reset());
@@ -140,6 +147,8 @@ void Engine::Run()
             Render();
             renderAcc %= renderPeriod;
         }
+
+        SDL_FlushEvents(SDL_FIRSTEVENT, SDL_LASTEVENT);
     }
 }
 
@@ -151,5 +160,5 @@ void Engine::Simulate(uint64 tick, uint32 dt)
 void Engine::Render()
 {
     m_game.Render();
-    m_window.SwapBuffers();
+    SDL_GL_SwapWindow(m_window);
 }
