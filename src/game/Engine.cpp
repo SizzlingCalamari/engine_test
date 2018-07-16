@@ -126,7 +126,7 @@ void Engine::Run()
     for(;;)
     {
         SDL_PumpEvents();
-        if (SDL_PeepEvents(nullptr, 0, SDL_PEEKEVENT, SDL_QUIT, SDL_QUIT) > 0)
+        if (SDL_HasEvent(SDL_QUIT) == SDL_TRUE)
         {
             break;
         }
