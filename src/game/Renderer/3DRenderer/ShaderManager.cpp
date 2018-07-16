@@ -4,7 +4,6 @@
 #include "GL/glew.h"
 #include "utils.h"
 #include "glutils.h"
-#include <cassert>
 
 using namespace std;
 

@@ -1,8 +1,8 @@
 
 #include "TextureLoader_JPG.h"
 #include "stb_image.h"
-#include <cstring>
-#include <cstdlib>
+#include <string.h>
+#include <stdlib.h>
 
 // Assumes in is the same size as out.
 // The pixel data from stb_image has the topleft

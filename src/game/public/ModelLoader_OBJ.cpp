@@ -5,8 +5,8 @@
 #include <glm/vec3.hpp>
 #include <vector>
 #include <deque>
-#include <cstring>
-#include <cstdio>
+#include <string.h>
+#include <stdio.h>
 #include <regex>
 
 enum FaceType

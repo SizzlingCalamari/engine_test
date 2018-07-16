@@ -5,9 +5,9 @@
 #  define PLATFORM_PCH
 #endif
 
-#include <cstdint>
-#include <cstddef>
-#include <cassert>
+#include <stdint.h>
+#include <stddef.h>
+#include <assert.h>
 
 // STDCALL define
 #ifndef STDCALL

@@ -1,8 +1,8 @@
 
 #include "ImageLoader.h"
 #include "stb_image.h"
-#include <cstring>
-#include <cstdlib>
+#include <string.h>
+#include <stdlib.h>
 
 Image::Image():
     pixelData(nullptr)
