@@ -74,14 +74,9 @@ void InputMapper::DispatchCallbacks()
 
     for (const SDL_Event &e : events)
     {
-        switch (e.type)
+        if (e.type == SDL_KEYDOWN || e.type == SDL_KEYUP)
         {
-        case SDL_KEYDOWN:
-        case SDL_KEYUP:
             ReceiveInput(e.key);
-            break;
-        default:
-            break;
         }
     }
     for (auto& func : m_callback_queue)
