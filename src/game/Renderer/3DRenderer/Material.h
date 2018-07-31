@@ -12,6 +12,7 @@ struct Material
         specularIntensity(1.0f),
         specularPower(32.0f),
         alphaTestValue(1.0f),
+        uvTransform(1.0f),
         noiseDiffuseMap(false),
         noiseBumpMap(false),
         celShaded(false)

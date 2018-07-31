@@ -723,7 +723,6 @@ void Game::LoadEnts()
     {
         PhysicalComponent physical;
         physical.position = glm::vec3(0.0f, 20.0f, -150.0f);
-        physical.orientation = glm::quat();
         m_entity_system.AttachComponent(m_camera, &physical);
     }
 
@@ -1015,7 +1014,7 @@ void Game::LoadEnts()
     {
         PhysicalComponent physical;
         physical.position = glm::vec3(2000.0f, 5000.0f, 0.0f);
-        physical.orientation = ModelLookAt(physical.position, glm::vec3(), glm::vec3(0.0f, 1.0f, 0.0f));
+        physical.orientation = ModelLookAt(physical.position, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         m_entity_system.AttachComponent(m_moonEnt, &physical);
 
         GraphicalComponent graphical;

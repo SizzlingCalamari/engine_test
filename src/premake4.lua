@@ -77,7 +77,7 @@ solution "engine_test"
             forceincludes "game/public/platform.h"
         configuration {}
 
-        defines { "SDL_MAIN_HANDLED", "GLM_FORCE_RADIANS" }
+        defines { "SDL_MAIN_HANDLED", "GLM_ENABLE_EXPERIMENTAL" }
         files { "game/**.h", "game/**.cpp", "game/**.vert", "game/**.frag", "game/**.glsl" }
         includedirs {
             src_dir .. "public/"

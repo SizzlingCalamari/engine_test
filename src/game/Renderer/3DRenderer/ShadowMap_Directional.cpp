@@ -9,7 +9,11 @@ ShadowMapDirectional::ShadowMapDirectional():
     m_resourceLoader(nullptr),
     m_shadowMapShader(0),
     m_fbo(0),
-    m_shadowMap(0)
+    m_shadowMap(0),
+    m_shadowMapWidth(0),
+    m_shadowMapHeight(0),
+    m_frustumDimensions(0.0f),
+    m_biasPV(1.0f)
 {
 }
 

@@ -8,6 +8,7 @@
 struct SceneNode
 {
     SceneNode():
+        transform(1.0f),
         meshId(0),
         materialId(0)
     {

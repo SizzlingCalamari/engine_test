@@ -5,6 +5,7 @@
 
 DynamicsComponent::DynamicsComponent():
     mass(0.0f),
+    inertia(0.0f),
     shape(nullptr)
 {
 }

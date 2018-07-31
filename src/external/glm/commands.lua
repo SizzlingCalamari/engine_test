@@ -1,6 +1,6 @@
 
 local repo = "https://github.com/g-truc/glm.git"
-local branch = "0.9.8-align"
+local tag = "0.9.9.0"
 local dir = path.getbasename(repo)
 
 function getdir()
@@ -9,7 +9,7 @@ end
 
 function clone()
     if not os.isdir(getdir() .. "/.git") then
-        os.execute("git clone --depth 1 --branch " .. branch .. " " .. repo .. " " .. getdir())
+        os.execute("git clone --depth 1 --branch " .. tag .. " " .. repo .. " " .. getdir())
     end
     local success, msg, errno = os.chdir(dir)
     if not success then

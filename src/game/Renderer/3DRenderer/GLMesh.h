@@ -18,8 +18,8 @@ struct GLMesh
     void FreeBuffers();
     static GLMesh GLMeshFromMesh(const Mesh& mesh);
 
-    glm::vec3 minAABB;
-    glm::vec3 maxAABB;
+    glm::vec3 minAABB = glm::vec3(0.0f);
+    glm::vec3 maxAABB = glm::vec3(0.0f);
 
     uint vertexBufferId = 0;
     uint uvBufferId     = 0;

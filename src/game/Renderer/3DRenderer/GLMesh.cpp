@@ -15,8 +15,8 @@ GLMesh::GLMesh(GLMesh&& other):
     normalBufferId(other.normalBufferId),
     numVertices(other.numVertices)
 {
-    other.minAABB = glm::vec3();
-    other.maxAABB = glm::vec3();
+    other.minAABB = glm::vec3(0.0f);
+    other.maxAABB = glm::vec3(0.0f);
     other.vertexBufferId = 0;
     other.uvBufferId = 0;
     other.normalBufferId = 0;
@@ -43,8 +43,8 @@ GLMesh& GLMesh::operator=(GLMesh&& other)
     normalBufferId = other.normalBufferId;
     numVertices = other.numVertices;
 
-    other.minAABB = glm::vec3();
-    other.maxAABB = glm::vec3();
+    other.minAABB = glm::vec3(0.0f);
+    other.maxAABB = glm::vec3(0.0f);
     other.vertexBufferId = 0;
     other.uvBufferId = 0;
     other.normalBufferId = 0;

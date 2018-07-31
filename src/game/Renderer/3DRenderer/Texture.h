@@ -49,7 +49,8 @@ class Texture3D
 {
 public:
     Texture3D():
-        m_texture(0)
+        m_texture(0),
+        m_dimensions(0)
     {
     }
 

@@ -10,8 +10,8 @@ class Camera
 {
 public:
     Camera():
-        m_position(),
-        m_orientation(),
+        m_position(0.0f),
+        m_orientation(1.0f, 0.0f, 0.0f, 0.0f),
         m_fovRad(glm::radians(70.0f)),
         m_nearZ(0.1f),
         m_farZ(10000.0f)

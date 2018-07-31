@@ -66,8 +66,8 @@ void ParseOBJ(const char *filename,
               glm::vec3& minAABB,
               glm::vec3& maxAABB)
 {
-    minAABB = glm::vec3();
-    maxAABB = glm::vec3();
+    minAABB = glm::vec3(0.0f);
+    maxAABB = glm::vec3(0.0f);
 
     std::deque<glm::vec3> vertices_temp;
     std::deque<glm::vec2> uvs_temp;
