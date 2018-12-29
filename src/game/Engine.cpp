@@ -4,6 +4,7 @@
 #include "SDL_timer.h"
 #include "SDL_video.h"
 #include "SDL_events.h"
+#include "SDL_audio.h"
 
 #include "Base/Time.h"
 
@@ -15,8 +16,6 @@
 #include <glm/gtx/transform.hpp>
 
 #include "EntitySystem/EntitySystem.h"
-
-#include "Audio/public/hAudioDevice.h"
 
 void Engine::Initialize()
 {
@@ -38,30 +37,32 @@ void Engine::Initialize()
     m_dynamics_world.Initialize();
     m_physics_proxy = PhysicsProxy(&m_dynamics_world);
 
-    m_audioSystem = SDLAudio::CreateAudioSystem();
+    SDL_AudioSpec audioSpec;
+    audioSpec.freq = 44100;
+    audioSpec.format = AUDIO_S16;
+    audioSpec.channels = 1;
+    //audioSpec.silence = 0;
+    audioSpec.samples = 2048;
+    //audioSpec.padding = 0;
+    //audioSpec.size = 0;
+    audioSpec.callback = nullptr;
+    audioSpec.userdata = nullptr;
 
-    SDLAudio::AudioDeviceDesc desc{};
-    desc.deviceName = nullptr;
-    desc.audioSpec.freq = 44100;
-    desc.audioSpec.format = AUDIO_S16;
-    desc.audioSpec.channels = 1;
-    desc.audioSpec.samples = 2048;
-    desc.audioSpec.callback = nullptr;
-    desc.audioSpec.userdata = nullptr;
+    const SDL_AudioDeviceID audioDeviceId = SDL_OpenAudioDevice(NULL, 0, &audioSpec, &audioSpec, 0);
+    mAudioDeviceId = audioDeviceId;
 
-    SDLAudio::AudioDevice* audioDevice = m_audioSystem->OpenAudioDevice(desc);
-    if(audioDevice)
+    if(audioDeviceId >= 2)
     {
-        printf("Audio Driver: %s\n", m_audioSystem->GetCurrentAudioDriver());
-        printf("Audio Device: %s\n", audioDevice->GetDeviceDesc().deviceName);
-        audioDevice->StartPlayback();
+        printf("Audio Driver: %s\n", SDL_GetCurrentAudioDriver());
+        printf("Audio Device: %s\n", "default");
+
+        SDL_PauseAudioDevice(audioDeviceId, 0);
     }
 
     EngineContext engine;
     engine.renderer = m_render_proxy;
     engine.physics = &m_physics_proxy;
     engine.input = &m_inputMapper;
-    engine.audio = audioDevice;
 
     m_game.Initialize(engine);
 
@@ -74,7 +75,7 @@ void Engine::Shutdown()
 {
     m_game.Shutdown();
 
-    SDLAudio::FreeAudioSystem(m_audioSystem);
+    SDL_CloseAudioDevice(mAudioDeviceId);
 
     m_dynamics_world.Shutdown();
 

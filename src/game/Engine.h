@@ -2,7 +2,6 @@
 #pragma once
 
 #include "Game/Game.h"
-#include "Audio/public/hAudioSystem.h"
 #include "EntitySystem/RenderProxy.h"
 #include "Physics/DynamicsWorld.h"
 #include "EntitySystem/PhysicsProxy.h"
@@ -10,6 +9,7 @@
 
 typedef struct SDL_Window SDL_Window;
 typedef void *SDL_GLContext;
+typedef Uint32 SDL_AudioDeviceID;
 
 class Renderer3D;
 
@@ -41,5 +41,5 @@ private:
 
     InputMapper m_inputMapper;
 
-    SDLAudio::AudioSystem* m_audioSystem;
+    SDL_AudioDeviceID mAudioDeviceId;
 };

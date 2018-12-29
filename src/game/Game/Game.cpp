@@ -20,14 +20,11 @@
 #include "SDL_keyboard.h"
 #include "SDL_mouse.h"
 
-#include "../Audio/public/hAudioDevice.h"
-
 #include <iostream>
 
 Game::Game():
     m_renderer(nullptr),
     m_physics(nullptr),
-    m_audio(nullptr),
     m_jesusMaterial(0),
     m_teapotDefaultMaterial(0),
     m_teapotMarbleMaterial(0),
@@ -68,7 +65,6 @@ void Game::Initialize(const EngineContext& engine)
 
     m_renderer = engine.renderer;
     m_physics = engine.physics;
-    m_audio = engine.audio;
 
     m_renderer->SetComponentTables(m_entity_system.GetTable<PhysicalComponent>(),
                                    m_entity_system.GetTable<GraphicalComponent>());
@@ -145,18 +141,19 @@ void Game::Initialize(const EngineContext& engine)
 
     m_thwomp.SetComponentTables(m_entity_system.GetTable<PhysicalComponent>());
     m_thwomp.SetThwompEnt(m_thwompEnt);
-    m_thwomp.OnHitGround([&]()
+    /*m_thwomp.OnHitGround([&]()
     {
+        SDL_QueueAudio(m_deviceId, data, numBytes);
         m_audio->PushAudio(m_jesusThwompBuf, m_jesusThwompLen);
-    });
+    });*/
 
-    SDL_AudioSpec spec = m_audio->GetDeviceDesc().audioSpec;
+    /*SDL_AudioSpec spec = m_audio->GetDeviceDesc().audioSpec;
     if (SDL_LoadWAV("sounds/urgh.wav", &spec, &m_jesusThwompBuf, &m_jesusThwompLen))
     {
         //m_audio->PushAudio(m_jesusThwompBuf, m_jesusThwompLen);
     }
     const char* error = SDL_GetError();
-    printf("%s\n", error);
+    printf("%s\n", error);*/
 }
 
 void Game::Shutdown()
