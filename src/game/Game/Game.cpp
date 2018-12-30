@@ -165,7 +165,7 @@ void Game::Shutdown()
     m_renderer->Update();
     m_entity_system.CommitChanges();
 
-    SDL_FreeWAV(m_jesusThwompBuf);
+    //SDL_FreeWAV(m_jesusThwompBuf);
 }
 
 void Game::Simulate(uint64 tick, uint32 dt)
