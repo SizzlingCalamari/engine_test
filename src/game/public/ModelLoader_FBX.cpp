@@ -58,9 +58,16 @@ bool LoadFbxScene(fbxsdk::FbxManager *fbxManager, fbxsdk::FbxScene *fbxScene, co
     return importStatus;
 }
 
-vector<glm::vec3> ParseFBX(const char *filename)
+void ParseFBX
+(
+    const char *filename,
+    std::vector<glm::vec3>& vertices,
+    std::vector<glm::vec2>& uvcoords,
+    std::vector<glm::vec3>& normals,
+    glm::vec3& minAABB,
+    glm::vec3& maxAABB
+)
 {
-    vector<glm::vec3> vertices;
     fbxsdk::FbxManager *fbxManager = nullptr;
     fbxsdk::FbxScene *fbxScene = nullptr;
 
@@ -84,30 +91,61 @@ vector<glm::vec3> ParseFBX(const char *filename)
             continue;
         }
 
-        auto *nodeMesh = static_cast<FbxMesh*>(nodeAttribute);
-        FbxVector4 *nodeVertices = nodeMesh->GetControlPoints();
-        for (int j = 0; j < nodeMesh->GetPolygonCount(); ++j)
+        const fbxsdk::FbxMesh *nodeMesh = static_cast<const fbxsdk::FbxMesh*>(nodeAttribute);
+
+        const_cast<fbxsdk::FbxMesh*>(nodeMesh)->ComputeBBox();
+        const fbxsdk::FbxDouble3 bboxMin = nodeMesh->BBoxMin;
+        const fbxsdk::FbxDouble3 bboxMax = nodeMesh->BBoxMax;
+
+        minAABB = glm::vec3(bboxMin.mData[0], bboxMin.mData[1], bboxMin.mData[2]);
+        maxAABB = glm::vec3(bboxMax.mData[0], bboxMax.mData[1], bboxMax.mData[2]);
+
+        // Vertices
         {
-            int numVertices = nodeMesh->GetPolygonSize(j);
-            assert(numVertices == 3);
-
-            for (int k = 0; k < numVertices; ++k)
+            fbxsdk::FbxVector4* controlPoints = nodeMesh->GetControlPoints();
+            const int* indices = nodeMesh->GetPolygonVertices();
+            const int numIndices = nodeMesh->GetPolygonVertexCount();
+            assert((numIndices % 3) == 0);
+            if (numIndices > 0)
             {
-                int controlPointIndex = nodeMesh->GetPolygonVertex(j, k);
-
-                vertices.emplace_back(nodeVertices[controlPointIndex].mData[0],
-                                       nodeVertices[controlPointIndex].mData[1],
-                                       nodeVertices[controlPointIndex].mData[2]);
+                vertices.resize(numIndices);
+                glm::vec3* verticesOut = &vertices[0];
+                for (int j = 0; j < numIndices; ++j)
+                {
+                    const fbxsdk::FbxVector4& vertex = controlPoints[indices[j]];
+                    verticesOut[j] = glm::vec3(vertex.mData[0], vertex.mData[1], vertex.mData[2]);
+                }
             }
         }
+
+        // Normals
+        fbxsdk::FbxArray<fbxsdk::FbxVector4> normalsArray;
+        if (nodeMesh->GetPolygonVertexNormals(normalsArray))
+        {
+            const fbxsdk::FbxVector4* fbxNormals = normalsArray.GetArray();
+            const int numNormals = normalsArray.Size();
+            if (numNormals > 0)
+            {
+                normals.resize(numNormals);
+                glm::vec3* normalsOut = &normals[0];
+                for (int j = 0; j < numNormals; ++j)
+                {
+                    const fbxsdk::FbxVector4& normal = fbxNormals[j];
+                    normalsOut[j] = glm::vec3(normal.mData[0], normal.mData[1], normal.mData[2]);
+                }
+            }
+        }
+
+        // UVs
+
+        break;
     }
     DestroyFbxObjects(fbxManager);
-    return vertices;
 }
 
 Mesh LoadMeshFromFBX(const char *filename)
 {
     Mesh mesh;
-    mesh.vertices = ParseFBX(filename);
+    ParseFBX(filename, mesh.vertices, mesh.uvcoords, mesh.normals, mesh.minAABB, mesh.maxAABB);
     return mesh;
 }
