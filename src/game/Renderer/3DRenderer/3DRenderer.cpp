@@ -266,7 +266,7 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
 
     m_texture_shader.SetUniform("eyePosition_worldspace", &cam->GetPosition());
 
-    for (auto &obj : scene->m_objects.GetDataArray())
+    for (const SceneNode &obj : scene->m_objects.GetDataArray())
     {
         auto mvp = pv * obj.transform;
         auto depthMVP = m_shadowMapping.GetBiasDepthPV() * obj.transform;
@@ -274,7 +274,7 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
         m_texture_shader.SetUniform("g_depthMVP", &depthMVP[0][0]);
         m_texture_shader.SetUniform("modelToWorld", &obj.transform);
 
-        auto *material = m_resourceLoader->GetMaterial(obj.materialId);
+        const Material *material = m_resourceLoader->GetMaterial(obj.materialId);
         m_texture_shader.SetUniform("cUVTransform", &material->uvTransform[0][0]);
         m_texture_shader.SetUniform("g_diffuseColour", &material->diffuseSolidColour);
         m_texture_shader.SetUniform("g_noiseDiffuseMap", &material->noiseDiffuseMap);
@@ -290,7 +290,7 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
         }
         m_texture_shader.SetUniform("g_solidDiffuseColour", &usingDiffuseColour);
 
-        auto *mesh = m_resourceLoader->GetMesh(obj.meshId);
+        const GLMesh *mesh = m_resourceLoader->GetMesh(obj.meshId);
         m_texture_shader.SetUniform("minAABB", &mesh->minAABB);
 
         glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBufferId);
@@ -310,15 +310,15 @@ void Renderer3D::RenderScene(const Viewport* viewport, const Camera* cam, const 
 
         if (material->diffuseMap > 0)
         {
-            auto *texture = m_resourceLoader->GetTexture(material->diffuseMap);
+            const Texture *texture = m_resourceLoader->GetTexture(material->diffuseMap);
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, texture->GetGLId());
         }
 
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, m_shadowMapping.GetShadowMapId());
-            
-        auto num_vertices = static_cast<GLsizei>(mesh->numVertices);
+
+        const GLsizei num_vertices = static_cast<GLsizei>(mesh->numVertices);
         glDrawArrays(GL_TRIANGLES, 0, num_vertices);
 
         glBindTexture(GL_TEXTURE_2D, 0);
