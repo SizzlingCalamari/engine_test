@@ -995,23 +995,11 @@ void Game::LoadEnts()
         m_entity_system.AttachComponent(m_thwompEnt, &graphical);
     }
 
-    auto ModelLookAt = [](
-        const glm::vec3& position,
-        const glm::vec3& target,
-        const glm::vec3& up
-    ) -> glm::quat
-    {
-        const glm::vec3 fwd = glm::normalize(target - position);
-        const glm::vec3 right = glm::normalize(cross(up, fwd));
-        const glm::vec3 newUp = glm::cross(fwd, right);
-        return glm::quat(glm::mat3(right, newUp, fwd));
-    };
-
     m_moonEnt = m_entity_system.CreateEntity();
     {
         PhysicalComponent physical;
         physical.position = glm::vec3(2000.0f, 5000.0f, 0.0f);
-        physical.orientation = ModelLookAt(physical.position, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        physical.orientation = glm::quatLookAt(-glm::normalize(physical.position), glm::vec3(0.0f, 1.0f, 0.0f));
         m_entity_system.AttachComponent(m_moonEnt, &physical);
 
         GraphicalComponent graphical;
