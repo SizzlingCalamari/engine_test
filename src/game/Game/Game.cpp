@@ -277,11 +277,11 @@ bool Game::HandleCameraMovement(PhysicalComponent *camera, uint32 dt)
             auto right = math::right(camera->orientation);
             if (keys[SDL_SCANCODE_A])
             {
-                camera->position += (right * key_factor);
+                camera->position -= (right * key_factor);
             }
             else if (keys[SDL_SCANCODE_D])
             {
-                camera->position -= (right * key_factor);
+                camera->position += (right * key_factor);
             }
         }
         if (keys[SDL_SCANCODE_Q] != keys[SDL_SCANCODE_E])
@@ -299,7 +299,7 @@ bool Game::HandleCameraMovement(PhysicalComponent *camera, uint32 dt)
 
     // mouse camera handling
     {
-        float mouse_factor = glm::radians(dt * 0.02f);
+        float mouse_factor = glm::radians(dt * -0.02f);
         int x = 0;
         int y = 0;
         auto mouse = SDL_GetRelativeMouseState(&x, &y);
@@ -311,7 +311,7 @@ bool Game::HandleCameraMovement(PhysicalComponent *camera, uint32 dt)
                 // left/right rotations. no angle clamping
                 const auto y_axis = glm::vec3(0.0f, 1.0f, 0.0f);
                 //const auto y_axis = math::up(camera->orientation);
-                camera->orientation = math::rotate_world(camera->orientation, -x*mouse_factor, y_axis);
+                camera->orientation = math::rotate_world(camera->orientation, x*mouse_factor, y_axis);
             }
             if (y != 0)
             {

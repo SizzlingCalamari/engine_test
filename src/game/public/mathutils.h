@@ -46,21 +46,17 @@ namespace math
     template <typename T, glm::precision P>
     inline glm::tvec3<T, P> forward(glm::tquat<T, P> const & q)
     {
-        // equivalent to
-        // return q * vec3(0.0, 0.0, 1.0) * conjugate(q);
-        //
-        auto x = 2 * (q.x * q.z + q.w * q.y);
-        auto y = 2 * (q.y * q.z - q.w * q.x);
-        auto z = 1 - 2 * (q.x * q.x + q.y * q.y);
+        //return(glm::mat3_cast(q) * glm::vec3(0.0f, 0.0f, -1.0f));
+        auto x = -2 * (q.x * q.z + q.w * q.y);
+        auto y = -2 * (q.y * q.z - q.w * q.x);
+        auto z = -1 + 2 * (q.x * q.x + q.y * q.y);
         return glm::normalize(glm::tvec3<T, P>(x, y, z));
     }
 
     template <typename T, glm::precision P>
     inline glm::tvec3<T, P> up(glm::tquat<T, P> const & q)
     {
-        // equivalent to
-        // return q * vec3(0.0, 1.0, 0.0) * conjugate(q);
-        //
+        //return(glm::mat3_cast(q) * glm::vec3(0.0f, 1.0f, 0.0f));
         auto x = 2 * (q.x * q.y - q.w * q.z);
         auto y = 1 - 2 * (q.x * q.x + q.z * q.z);
         auto z = 2 * (q.y * q.z + q.w * q.x);
@@ -70,9 +66,7 @@ namespace math
     template <typename T, glm::precision P>
     inline glm::tvec3<T, P> right(glm::tquat<T, P> const & q)
     {
-        // equivalent to
-        // return q * vec3(1.0, 0.0, 0.0) * conjugate(q);
-        //
+        //return(glm::mat3_cast(q) * glm::vec3(1.0f, 0.0f, 0.0f));
         auto x = 1 - 2 * (q.y * q.y + q.z * q.z);
         auto y = 2 * (q.x * q.y + q.w * q.z);
         auto z = 2 * (q.x * q.z - q.w * q.y);
