@@ -200,13 +200,13 @@ void Game::InputEventCallback(const KeyboardEventInfo& info)
     }
     else if (info.mappingId == m_inputIdP && info.pressed)
     {
-        auto* physical_table = m_entity_system.GetTable<PhysicalComponent>();
-        auto* physical = physical_table->PeekComponent(m_camera);
+        ComponentTable<PhysicalComponent>* physical_table = m_entity_system.GetTable<PhysicalComponent>();
+        const PhysicalComponent* physical = physical_table->PeekComponent(m_camera);
         
         std::cout << physical->position.x
             << " " << physical->position.y
             << " " << physical->position.z << std::endl;
-        auto forward = math::forward(physical->orientation);
+        const glm::vec3 forward = math::forward(physical->orientation);
         std::cout << forward.x << " " << forward.y << " " << forward.z << std::endl;
     }
     else if (info.mappingId == m_inputIdX && info.pressed)
@@ -217,12 +217,12 @@ void Game::InputEventCallback(const KeyboardEventInfo& info)
 
 void Game::CameraSimulation(uint32 dt)
 {
-    auto *physical_table = m_entity_system.GetTable<PhysicalComponent>();
+    ComponentTable<PhysicalComponent>* physical_table = m_entity_system.GetTable<PhysicalComponent>();
     switch (m_activeCameraType)
     {
     case Camera_FirstPerson:
         {
-            auto camera_physical = physical_table->GetComponent(m_camera);
+            PhysicalComponent camera_physical = physical_table->GetComponent(m_camera);
             if (HandleCameraMovement(&camera_physical, dt))
             {
                 physical_table->EditComponent(m_camera, &camera_physical);
@@ -232,7 +232,7 @@ void Game::CameraSimulation(uint32 dt)
     case Camera_ThirdPerson:
         {
             const uint target = m_thirdperson_controller.GetTargetEnt();
-            auto physical = physical_table->GetComponent(target);
+            PhysicalComponent physical = physical_table->GetComponent(target);
             if (HandleCameraMovement(&physical, dt))
             {
                 physical_table->EditComponent(target, &physical);
@@ -254,14 +254,14 @@ bool Game::HandleCameraMovement(PhysicalComponent *camera, uint32 dt)
     // keyboard camera handling
     {
         float key_factor = float(dt * 2.5);
-        auto *keys = SDL_GetKeyboardState(nullptr);
+        const Uint8* keys = SDL_GetKeyboardState(nullptr);
 
         // Using != for bools is like an xor.
         // Only pass through if one of the keys is down and not both.
         if (keys[SDL_SCANCODE_W] != keys[SDL_SCANCODE_S])
         {
             updated = true;
-            auto forward = math::forward(camera->orientation);
+            const glm::vec3 forward = math::forward(camera->orientation);
             if (keys[SDL_SCANCODE_W])
             {
                 camera->position += (forward * key_factor);
@@ -274,7 +274,7 @@ bool Game::HandleCameraMovement(PhysicalComponent *camera, uint32 dt)
         if (keys[SDL_SCANCODE_A] != keys[SDL_SCANCODE_D])
         {
             updated = true;
-            auto right = math::right(camera->orientation);
+            const glm::vec3 right = math::right(camera->orientation);
             if (keys[SDL_SCANCODE_A])
             {
                 camera->position -= (right * key_factor);
@@ -287,7 +287,7 @@ bool Game::HandleCameraMovement(PhysicalComponent *camera, uint32 dt)
         if (keys[SDL_SCANCODE_Q] != keys[SDL_SCANCODE_E])
         {
             updated = true;
-            auto forward = math::forward(camera->orientation);
+            const glm::vec3 forward = math::forward(camera->orientation);
             float angle = dt * 0.002f;
             if (keys[SDL_SCANCODE_Q])
             {
@@ -302,15 +302,14 @@ bool Game::HandleCameraMovement(PhysicalComponent *camera, uint32 dt)
         float mouse_factor = glm::radians(dt * -0.02f);
         int x = 0;
         int y = 0;
-        auto mouse = SDL_GetRelativeMouseState(&x, &y);
+        const Uint32 mouse = SDL_GetRelativeMouseState(&x, &y);
         if (mouse & SDL_BUTTON(SDL_BUTTON_RIGHT) && (x != 0 || y != 0))
         {
             updated = true;
             if (x != 0)
             {
                 // left/right rotations. no angle clamping
-                const auto y_axis = glm::vec3(0.0f, 1.0f, 0.0f);
-                //const auto y_axis = math::up(camera->orientation);
+                const glm::vec3 y_axis(0.0f, 1.0f, 0.0f);
                 camera->orientation = math::rotate_world(camera->orientation, x*mouse_factor, y_axis);
             }
             if (y != 0)
@@ -318,12 +317,11 @@ bool Game::HandleCameraMovement(PhysicalComponent *camera, uint32 dt)
                 // up/down rotations. clamp to +-90 degrees.
                 // A better idea would be to limit the rotation before
                 // the rotation calculation, but learning the quaternion math was fun.
-                //const auto x_axis = glm::vec3(1.0f, 0.0f, 0.0f);
-                const auto x_axis = math::right(camera->orientation);
-                auto after_rotation = math::rotate_world(camera->orientation, y*mouse_factor, x_axis);
-                auto right = math::right(after_rotation);
-                auto up = math::up(after_rotation);
-                auto fwd = math::forward(after_rotation);
+                const glm::vec3 x_axis = math::right(camera->orientation);
+                const glm::quat after_rotation = math::rotate_world(camera->orientation, y*mouse_factor, x_axis);
+                const glm::vec3 right = math::right(after_rotation);
+                const glm::vec3 up = math::up(after_rotation);
+                const glm::vec3 fwd = math::forward(after_rotation);
                 std::cout << std::setprecision(10) << right.x << " " << right.y << " " << right.z << std::endl;
                 std::cout << std::setprecision(10) << up.x << " " << up.y << " " << up.z << std::endl;
                 std::cout << std::setprecision(10) << fwd.x << " " << fwd.y << " " << fwd.z << std::endl;
@@ -331,9 +329,9 @@ bool Game::HandleCameraMovement(PhysicalComponent *camera, uint32 dt)
                 //camera->orientation = math::limit_rotation_xaxis(after_rotation, glm::quarter_pi<float>() / 2.0f);
                 camera->orientation = after_rotation;
                 
-                auto right2 = math::right(camera->orientation);
-                auto up2 = math::up(camera->orientation);
-                auto fwd2 = math::forward(camera->orientation);
+                const glm::vec3 right2 = math::right(camera->orientation);
+                const glm::vec3 up2 = math::up(camera->orientation);
+                const glm::vec3 fwd2 = math::forward(camera->orientation);
                 std::cout << std::setprecision(10) << right2.x << " " << right2.y << " " << right2.z << std::endl;
                 std::cout << std::setprecision(10) << up2.x << " " << up2.y << " " << up2.z << std::endl;
                 std::cout << std::setprecision(10) << fwd2.x << " " << fwd2.y << " " << fwd2.z << std::endl;
